@@ -1,0 +1,97 @@
+---
+- hosts: packages
+  serial: 1
+  tasks:
+    - fail:
+        msg: "'files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
+      when: files is not defined
+
+    - name: 'Make package directory'
+      file:
+        state: 'directory'
+        path: "packages/{{ inventory_hostname }}"
+      register: package_directory_result
+
+    - block:
+        - name: 'Ensure .tmp directory'
+          file:
+            state: 'directory'
+            path: ".tmp"
+
+        - block:
+            - set_fact:
+                upstream_directory: "{{ upstream.split('/')[-1] }}"
+
+            - name: 'Clone upstream'
+              git:
+                repo: "{{ upstream }}"
+                dest: ".tmp/{{ upstream_directory }}"
+                version: "{{ branch }}"
+
+            - name: 'Copy files'
+              synchronize:
+                src: ".tmp/{{ upstream_directory }}/{{ item }}"
+                dest: "packages/{{ inventory_hostname }}/"
+              with_items: "{{ files }}"
+          when: "{{ upstream.endswith('.git') }}"
+          rescue:
+            - name: 'Remove package directory'
+              file:
+                state: 'absent'
+                path: "packages/{{ inventory_hostname }}"
+
+        - block:
+            - name: 'Make package download directory'
+              file:
+                state: 'directory'
+                path: ".tmp/{{ inventory_hostname }}"
+
+            - name: 'Fetch srpm'
+              get_url:
+                url: "{{ upstream }}"
+                dest: ".tmp/{{ inventory_hostname }}/"
+
+            - name: 'Find SRPM'
+              find:
+                pattern: "*.src.rpm"
+                paths: ".tmp/{{ inventory_hostname }}/"
+              register: "srpm"
+
+            - name: 'Explode srpm'
+              shell: "rpm2cpio {{ srpm.files[0].path | basename }} | cpio -idmv"
+              args:
+                chdir: ".tmp/{{ inventory_hostname }}"
+
+            - name: 'Copy files'
+              synchronize:
+                src: ".tmp/{{ inventory_hostname }}/{{ item }}"
+                dest: "packages/{{ inventory_hostname }}/"
+              with_items: "{{ files }}"
+
+          when: "{{ upstream.endswith('src.rpm') }}"
+          rescue:
+            - name: 'Remove package directory'
+              file:
+                state: 'absent'
+                path: "packages/{{ inventory_hostname }}"
+
+        - name: 'Git add new package'
+          command: "git annex add packages/{{ inventory_hostname }}/{{ item }}"
+          with_items: "{{ annex }}"
+          when: annex is defined
+
+        - name: 'Git add new package'
+          command: "git add packages/{{ inventory_hostname }}/*"
+
+        - name: 'Check if changes in package'
+          command: 'git status -s packages/{{ inventory_hostname }}'
+          register: git_status
+
+        - name: 'Git commit new package'
+          command: "git commit packages/{{ inventory_hostname }} -m 'Add {{ inventory_hostname }}'"
+          when: git_status.stdout != ''
+
+        - name: 'Git add new package'
+          command: "git add packages/{{ inventory_hostname }}/*"
+          when: git_status.stdout != ''
+      when: package_directory_result|changed
