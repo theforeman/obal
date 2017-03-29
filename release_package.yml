@@ -39,7 +39,7 @@
         - debug:
             msg: "Mismatch found for EL6: {{ brew_rhel6_rpm.stdout.split(' ')[0] }} {{ packaging_rhel6_rpm.stdout }}"
           when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout
-        
+
         - debug:
             msg: "Mismatch found for EL7: {{ brew_rhel7_rpm.stdout.split(' ')[0] }} {{ packaging_rhel7_rpm.stdout }}"
           when: brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
@@ -55,12 +55,12 @@
             chdir: "packages/{{ inventory_hostname }}"
           register: result
           ignore_errors: true
-        
+
         - debug:
             msg: "{{ result.stdout.split('\n') }}"
           when: result.rc == 0
-        
+
         - fail:
             msg: "{{ result.stdout.split('\n') }}"
           when: result.rc != 0
-      when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout or brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout 
+      when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout or brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
