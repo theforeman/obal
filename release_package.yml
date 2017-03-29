@@ -50,7 +50,7 @@
             chdir: "packages"
 
         - name: 'Release to brew'
-          command: "tito release {{ releaser }} -y"
+          shell: "tito release {{ releaser }} -y"
           args:
             chdir: "packages/{{ inventory_hostname }}"
           register: result
