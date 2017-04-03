@@ -26,7 +26,6 @@
         msg: "Package packages/{{ inventory_hostname }} does not exist"
       when: not st.stat.exists
 
-
     - block:
         - name: 'Lookup current version of package in RHEL7 tag'
           command: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
@@ -49,7 +48,6 @@
         - name: 'Calculate EL6 RPM version in packaging'
           command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if inventory_hostname.startswith('tfm-') else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
           register: packaging_rhel6_rpm
-
 
     - block:
         - debug:
