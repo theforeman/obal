@@ -27,54 +27,55 @@
       when: not st.stat.exists
 
     - block:
-        - name: 'Lookup current version of package in RHEL7 tag'
-          command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
-          register: brew_rhel7_rpm
+      - name: 'Lookup current version of package in RHEL7 tag'
+        command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
+        register: brew_rhel7_rpm
 
-        - name: 'Lookup current version of package in RHEL6 tag'
-          command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
-          register: brew_rhel6_rpm
+      - name: 'Lookup current version of package in RHEL6 tag'
+        command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
+        register: brew_rhel6_rpm
 
-        - name: "Find spec file"
-          find:
-            pattern: "*.spec"
-            path: "packages/{{ inventory_hostname }}"
-          register: "spec_file"
+      - name: "Find spec file"
+        find:
+          pattern: "*.spec"
+          path: "packages/{{ inventory_hostname }}"
+        register: "spec_file"
 
-        - name: 'Calculate EL7 RPM version in packaging'
-          command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
-          register: packaging_rhel7_rpm
+      - name: 'Calculate EL7 RPM version in packaging'
+        command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        register: packaging_rhel7_rpm
 
-        - name: 'Calculate EL6 RPM version in packaging'
-          command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if inventory_hostname.startswith('tfm-') else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
-          register: packaging_rhel6_rpm
+      - name: 'Calculate EL6 RPM version in packaging'
+        command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if inventory_hostname.startswith('tfm-') else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        register: packaging_rhel6_rpm
 
     - block:
-        - debug:
-            msg: "Mismatch found for EL6: {{ brew_rhel6_rpm.stdout.split(' ')[0] }} {{ packaging_rhel6_rpm.stdout }}"
-          when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout
+      - debug:
+          msg: "Mismatch found for EL6: {{ brew_rhel6_rpm.stdout.split(' ')[0] }} {{ packaging_rhel6_rpm.stdout }}"
+        when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout
 
-        - debug:
-            msg: "Mismatch found for EL7: {{ brew_rhel7_rpm.stdout.split(' ')[0] }} {{ packaging_rhel7_rpm.stdout }}"
-          when: brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
+      - debug:
+          msg: "Mismatch found for EL7: {{ brew_rhel7_rpm.stdout.split(' ')[0] }} {{ packaging_rhel7_rpm.stdout }}"
+        when: brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
 
-        - name: 'Run setup_sources'
-          shell: "./setup_sources.sh {{ inventory_hostname }}"
-          args:
-            chdir: "packages"
+      - name: 'Run setup_sources'
+        shell: "./setup_sources.sh {{ inventory_hostname }}"
+        args:
+          chdir: "packages"
 
-        - name: 'Release to brew'
-          shell: "tito release {{ releaser }} -y"
-          args:
-            chdir: "packages/{{ inventory_hostname }}"
-          register: result
-          ignore_errors: true
+      - name: 'Release to brew'
+        shell: "tito release {{ releaser }} -y"
+        args:
+          chdir: "packages/{{ inventory_hostname }}"
+        register: result
+        ignore_errors: true
 
-        - debug:
-            msg: "{{ result.stdout.split('\n') }}"
-          when: result.rc == 0
+      - debug:
+          msg: "{{ result.stdout.split('\n') }}"
+        when: result.rc == 0
 
-        - fail:
-            msg: "{{ result.stdout.split('\n') }}"
-          when: result.rc != 0
-      when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout or brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
+      - fail:
+          msg: "{{ result.stdout.split('\n') }}"
+        when: result.rc != 0
+
+      when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout or brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout # block
