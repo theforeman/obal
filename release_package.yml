@@ -2,7 +2,8 @@
 - hosts: localhost
   connection: local
   tasks:
-    - package:
+    - name: install required packages
+      package:
         name: "{{ item }}"
         state: latest
       with_items:
@@ -17,23 +18,24 @@
 
 - hosts: packages
   serial: 1
+  any_errors_fatal: false # don't bomb out the entire playbook if one host (i.e. package) fails
   tasks:
-    - stat:
+    - name: confirm package dir exists
+      stat:
         path: "packages/{{ inventory_hostname }}"
       register: st
 
-    - fail:
-        msg: "Package packages/{{ inventory_hostname }} does not exist"
-      when: not st.stat.exists
-
     - block:
+      - set_fact:
+          scl_enabled: "{{ inventory_hostname.startswith('tfm-') }}"
+
       - name: 'Lookup current version of package in RHEL7 tag'
         command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
-        register: brew_rhel7_rpm
+        register: latest_brewed_rhel7
 
       - name: 'Lookup current version of package in RHEL6 tag'
         command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
-        register: brew_rhel6_rpm
+        register: latest_brewed_rhel6
 
       - name: "Find spec file"
         find:
@@ -41,41 +43,51 @@
           path: "packages/{{ inventory_hostname }}"
         register: "spec_file"
 
+      - set_fact:
+          spec_file_path: "{{ spec_file.files[0].path }}"
+
       - name: 'Calculate EL7 RPM version in packaging'
-        command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec -q {{ spec_file_path }} --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
         register: packaging_rhel7_rpm
 
       - name: 'Calculate EL6 RPM version in packaging'
-        command: "rpmspec -q {{ spec_file.files[0].path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if inventory_hostname.startswith('tfm-') else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec -q {{ spec_file_path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if scl_enabled else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
         register: packaging_rhel6_rpm
 
-    - block:
-      - debug:
-          msg: "Mismatch found for EL6: {{ brew_rhel6_rpm.stdout.split(' ')[0] }} {{ packaging_rhel6_rpm.stdout }}"
-        when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout
+      - set_fact:
+          latest_brewed_rhel6_pkg: "{{ latest_brewed_rhel6.stdout.split(' ')[0] }}"
+          latest_brewed_rhel7_pkg: "{{ latest_brewed_rhel7.stdout.split(' ')[0] }}"
+          packaging_rhel6_pkg: "{{ packaging_rhel6_rpm.stdout }}"
+          packaging_rhel7_pkg: "{{ packaging_rhel7_rpm.stdout }}"
 
-      - debug:
-          msg: "Mismatch found for EL7: {{ brew_rhel7_rpm.stdout.split(' ')[0] }} {{ packaging_rhel7_rpm.stdout }}"
-        when: brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout
+      - block:
+        - debug:
+            msg: "Mismatch found for EL6: {{ latest_brewed_rhel6_pkg }} {{ packaging_rhel6_pkg }}"
+          when: latest_brewed_rhel6_pkg != packaging_rhel6_pkg
 
-      - name: 'Run setup_sources'
-        shell: "./setup_sources.sh {{ inventory_hostname }}"
-        args:
-          chdir: "packages"
+        - debug:
+            msg: "Mismatch found for EL7: {{ latest_brewed_rhel7_pkg }} {{ packaging_rhel7_pkg }}"
+          when: latest_brewed_rhel7_pkg != packaging_rhel7_pkg
 
-      - name: 'Release to brew'
-        shell: "tito release {{ releaser }} -y"
-        args:
-          chdir: "packages/{{ inventory_hostname }}"
-        register: result
-        ignore_errors: true
+        - name: 'Run setup_sources'
+          shell: "./setup_sources.sh {{ inventory_hostname }}"
+          args:
+            chdir: "packages"
 
-      - debug:
-          msg: "{{ result.stdout.split('\n') }}"
-        when: result.rc == 0
+        - name: 'Release to brew'
+          shell: "tito release {{ releaser }} -y"
+          args:
+            chdir: "packages/{{ inventory_hostname }}"
+          register: brew_release
+          ignore_errors: true
 
-      - fail:
-          msg: "{{ result.stdout.split('\n') }}"
-        when: result.rc != 0
+        - debug:
+            msg: "{{ brew_release.stdout.split('\n') }}"
+          when: brew_release | succeeded
 
-      when: brew_rhel6_rpm.stdout.split(' ')[0] != packaging_rhel6_rpm.stdout or brew_rhel7_rpm.stdout.split(' ')[0] != packaging_rhel7_rpm.stdout # block
+        - debug:
+            msg: "{{ brew_release.stderr.split('\n') }}"
+          when: brew_release | failed
+
+        when: latest_brewed_rhel6_pkg != packaging_rhel6_pkg or latest_brewed_rhel7_pkg != packaging_rhel7_pkg # block
+      when: st.stat.exists # block
