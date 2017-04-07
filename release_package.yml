@@ -28,11 +28,11 @@
 
     - block:
         - name: 'Lookup current version of package in RHEL7 tag'
-          command: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
+          command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
           register: brew_rhel7_rpm
 
         - name: 'Lookup current version of package in RHEL6 tag'
-          command: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
+          command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
           register: brew_rhel6_rpm
 
         - name: "Find spec file"
