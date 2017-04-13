@@ -79,7 +79,6 @@
           args:
             chdir: "packages/{{ inventory_hostname }}"
           register: brew_release
-          ignore_errors: true
 
         - debug:
             msg: "{{ brew_release.stdout.split('\n') }}"
