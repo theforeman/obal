@@ -30,11 +30,11 @@
           scl_enabled: "{{ inventory_hostname.startswith('tfm-') }}"
 
       - name: 'Lookup current version of package in RHEL7 tag'
-        command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }} | sort -r -k 1"
         register: latest_brewed_rhel7
 
       - name: 'Lookup current version of package in RHEL6 tag'
-        command: "brew list-tagged --quiet --latest satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }}"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} | sort -r -k 1"
         register: latest_brewed_rhel6
 
       - name: "Find spec file"
