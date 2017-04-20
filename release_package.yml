@@ -47,11 +47,11 @@
           spec_file_path: "{{ spec_file.files[0].path }}"
 
       - name: 'Calculate EL7 RPM version in packaging'
-        command: "rpmspec -q {{ spec_file_path }} --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec -q '{{ spec_file_path }}' --define 'dist .el7sat' --define 'scl_prefix tfm-' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
         register: packaging_rhel7_rpm
 
       - name: 'Calculate EL6 RPM version in packaging'
-        command: "rpmspec -q {{ spec_file_path }} --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if scl_enabled else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec -q '{{ spec_file_path }}' --define 'dist .el6sat' --define 'scl_prefix {{ 'tfm-' if scl_enabled else '' }}' --queryformat='%{name}-%{version}-%{release}\n' --srpm"
         register: packaging_rhel6_rpm
 
       - set_fact:
