@@ -30,11 +30,11 @@
           scl_enabled: "{{ inventory_hostname.startswith('tfm-') }}"
 
       - name: 'Lookup current version of package in RHEL7 tag'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }} | sort -r -k 1"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }} | sort --reverse --key 1 --version-sort"
         register: latest_brewed_rhel7
 
       - name: 'Lookup current version of package in RHEL6 tag'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} | sort -r -k 1"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} | sort --reverse --key 1 --version-sort"
         register: latest_brewed_rhel6
 
       - name: "Find spec file"
@@ -62,11 +62,11 @@
 
       - block:
         - debug:
-            msg: "Mismatch found for EL6: {{ latest_brewed_rhel6_pkg }} {{ packaging_rhel6_pkg }}"
+            msg: "Mismatch found for EL6: brew:[ {{ latest_brewed_rhel6_pkg }} ] local:[ {{ packaging_rhel6_pkg }} ]"
           when: latest_brewed_rhel6_pkg != packaging_rhel6_pkg
 
         - debug:
-            msg: "Mismatch found for EL7: {{ latest_brewed_rhel7_pkg }} {{ packaging_rhel7_pkg }}"
+            msg: "Mismatch found for EL7: brew:[ {{ latest_brewed_rhel7_pkg }} ] local:[ {{ packaging_rhel7_pkg }} ]"
           when: latest_brewed_rhel7_pkg != packaging_rhel7_pkg
 
         - name: 'Run setup_sources'
