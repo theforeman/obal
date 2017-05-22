@@ -1,0 +1,35 @@
+---
+- hosts: packages
+  serial: 1
+  tasks:
+    - fail:
+        msg: "'files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
+      when: files is not defined
+
+    - name: Determine source file from spec
+      shell: "spectool --list-files *.spec"
+      args:
+        chdir: "packages/{{ inventory_hostname }}"
+      register: source_url
+
+    - set_fact:
+        source: "{{ source_url.stdout.split('\n')[0].split('/')[-1] }}"
+
+    - name: "Remove old source"
+      command: "git rm {{ source }}"
+      args:
+        chdir: "packages/{{ inventory_hostname }}"
+
+    - include: download_and_extract_source.yml
+
+    - name: Determine new source file from spec
+      shell: "spectool --list-files *.spec"
+      args:
+        chdir: "packages/{{ inventory_hostname }}"
+      register: source_url
+
+    - set_fact:
+        source: "{{ source_url.stdout.split('/')[-1] }}"
+
+    - name: 'Git annex add new package'
+      command: "git annex add packages/{{ inventory_hostname }}/{{ source }}"

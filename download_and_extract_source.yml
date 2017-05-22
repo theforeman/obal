@@ -1,0 +1,61 @@
+- name: 'Ensure .tmp directory'
+  file:
+    state: 'directory'
+    path: ".tmp"
+
+- block:
+    - set_fact:
+        upstream_directory: "{{ upstream.split('/')[-1] }}"
+
+    - name: 'Clone upstream'
+      git:
+        repo: "{{ upstream }}"
+        dest: ".tmp/{{ upstream_directory }}"
+        version: "{{ branch }}"
+        update: yes
+
+    - name: 'Copy files'
+      synchronize:
+        src: ".tmp/{{ upstream_directory }}/{{ item }}"
+        dest: "packages/{{ inventory_hostname }}/"
+      with_items: "{{ files }}"
+  when: upstream.endswith('.git') #block
+  rescue: #block
+    - name: 'Remove package directory'
+      file:
+        state: 'absent'
+        path: "packages/{{ inventory_hostname }}"
+
+- block:
+    - name: 'Make package download directory'
+      file:
+        state: 'directory'
+        path: ".tmp/{{ inventory_hostname }}"
+
+    - name: 'Fetch srpm'
+      get_url:
+        url: "{{ upstream }}"
+        dest: ".tmp/{{ inventory_hostname }}/"
+
+    - name: 'Find SRPM'
+      find:
+        pattern: "*.src.rpm"
+        paths: ".tmp/{{ inventory_hostname }}/"
+      register: "srpm"
+
+    - name: 'Explode srpm'
+      shell: "rpm2cpio {{ srpm.files[0].path | basename }} | cpio -idmv"
+      args:
+        chdir: ".tmp/{{ inventory_hostname }}"
+
+    - name: 'Copy files'
+      synchronize:
+        src: ".tmp/{{ inventory_hostname }}/{{ item }}"
+        dest: "packages/{{ inventory_hostname }}/"
+      with_items: "{{ files }}"
+  when: upstream.endswith('src.rpm') #block
+  rescue: #block
+    - name: 'Remove package directory'
+      file:
+        state: 'absent'
+        path: "packages/{{ inventory_hostname }}"
