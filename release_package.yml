@@ -1,6 +1,7 @@
 ---
 - hosts: localhost
   connection: local
+  gather_facts: no
   tasks:
     - name: install required packages
       package:
@@ -19,6 +20,7 @@
 - hosts: packages
   serial: 1
   any_errors_fatal: false # don't bomb out the entire playbook if one host (i.e. package) fails
+  gather_facts: no
   tasks:
     - name: confirm package dir exists
       stat:

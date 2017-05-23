@@ -1,6 +1,7 @@
 ---
 - hosts: packages
   serial: 1
+  gather_facts: no
   tasks:
     - fail:
         msg: "'files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
