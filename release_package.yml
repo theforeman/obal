@@ -19,13 +19,14 @@
 
 - hosts: packages
   serial: 1
-  any_errors_fatal: false # don't bomb out the entire playbook if one host (i.e. package) fails
   gather_facts: no
   tasks:
     - name: confirm package dir exists
       stat:
         path: "packages/{{ inventory_hostname }}"
       register: st
+      tags:
+        - always
 
     - block:
       - name: "Get spec file"
@@ -33,91 +34,168 @@
           pattern: "*.spec"
           path: "packages/{{ inventory_hostname }}"
         register: spec_file
+        tags:
+          - always
 
       - set_fact:
           spec_file_path: "{{ spec_file.files[0].path }}"
           scl_prefix_option_str: "{{ '--define \"scl_prefix tfm-\"' if inventory_hostname.startswith('tfm-') else '' }}"
           branches_list: "{{ lookup('ini', 'branches section={{ releaser }} file=rel-eng/releasers.conf') }}"
+        tags:
+          - always
 
       - set_fact:
           rhel5_branch_exists: "{{ true if 'rhel-5' in branches_list else false }}"
           rhel6_branch_exists: "{{ true if 'rhel-6' in branches_list else false }}"
           rhel7_branch_exists: "{{ true if 'rhel-7' in branches_list else false }}"
+        tags:
+          - always
 
       - name: 'Look up current version of package in brew for EL5'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-5-candidate {{ inventory_hostname }} | sort --reverse --key 1 --version-sort | head -n1 | cut -d' ' -f1"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-5-candidate {{ inventory_hostname }} \
+          | sort --reverse --key 1 --version-sort \
+          | head -n1 \
+          | cut -d' ' -f1"
         register: latest_brewed_rhel5
         when: rhel5_branch_exists | bool
+        tags:
+          - always
 
       - name: 'Look up current version of package in brew for EL6'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} | sort --reverse --key 1 --version-sort | head -n1 | cut -d' ' -f1"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} \
+          | sort --reverse --key 1 --version-sort \
+          | head -n1 \
+          | cut -d' ' -f1"
         register: latest_brewed_rhel6
         when: rhel6_branch_exists | bool
+        tags:
+          - always
 
       - name: 'Look up current version of package in brew for EL7'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }} | sort --reverse --key 1 --version-sort | head -n1 | cut -d' ' -f1"
+        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}
+          | sort --reverse --key 1 --version-sort
+          | head -n1
+          | cut -d' ' -f1"
         register: latest_brewed_rhel7
         when: rhel7_branch_exists | bool
+        tags:
+          - always
 
       - name: 'Calculate EL5 RPM version in local specfile'
-        command: "rpmspec -q '{{ spec_file_path }}' --define 'dist .el5sat' {{ scl_prefix_option_str }} --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec --query '{{ spec_file_path }}' \
+          --define 'dist .el5sat' \
+          {{ scl_prefix_option_str }} \
+          --queryformat='%{name}-%{version}-%{release}\n' \
+          --srpm"
         register: latest_local_rhel5
         when: rhel5_branch_exists | bool
+        tags:
+          - always
 
       - name: 'Calculate EL6 RPM version in local specfile'
-        command: "rpmspec -q '{{ spec_file_path }}' --define 'dist .el6sat' {{ scl_prefix_option_str }} --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec --query '{{ spec_file_path }}' \
+          --define 'dist .el6sat' \
+          {{ scl_prefix_option_str }} \
+          --queryformat='%{name}-%{version}-%{release}\n' \
+          --srpm"
         register: latest_local_rhel6
         when: rhel6_branch_exists | bool
+        tags:
+          - always
 
       - name: 'Calculate EL7 RPM version in local specfile'
-        command: "rpmspec -q '{{ spec_file_path }}' --define 'dist .el7sat' {{ scl_prefix_option_str }} --queryformat='%{name}-%{version}-%{release}\n' --srpm"
+        command: "rpmspec --query '{{ spec_file_path }}' \
+          --define 'dist .el7sat' \
+          {{ scl_prefix_option_str }} \
+          --queryformat='%{name}-%{version}-%{release}\n' \
+          --srpm"
         register: latest_local_rhel7
         when: rhel7_branch_exists | bool
+        tags:
+          - always
 
       - set_fact:
           latest_brewed_rhel5: "{{ latest_brewed_rhel5.stdout | default('') }}"
           latest_brewed_rhel6: "{{ latest_brewed_rhel6.stdout | default('') }}"
           latest_brewed_rhel7: "{{ latest_brewed_rhel7.stdout | default('') }}"
-          latest_local_rhel5: "{{ latest_local_rhel5.stdout | default('') }}"
-          latest_local_rhel6: "{{ latest_local_rhel6.stdout | default('') }}"
-          latest_local_rhel7: "{{ latest_local_rhel7.stdout | default('') }}"
+          latest_local_rhel5:  "{{ latest_local_rhel5.stdout | default('') }}"
+          latest_local_rhel6:  "{{ latest_local_rhel6.stdout | default('') }}"
+          latest_local_rhel7:  "{{ latest_local_rhel7.stdout | default('') }}"
+        tags:
+          - always
 
       - set_fact:
-          rhel5_build_needed: "{{ (latest_brewed_rhel5 != latest_local_rhel5) | bool }}"
-          rhel6_build_needed: "{{ (latest_brewed_rhel6 != latest_local_rhel6) | bool }}"
-          rhel7_build_needed: "{{ (latest_brewed_rhel7 != latest_local_rhel7) | bool }}"
+          rhel5_build_needed: "{{ latest_brewed_rhel5 != latest_local_rhel5 }}"
+          rhel6_build_needed: "{{ latest_brewed_rhel6 != latest_local_rhel6 }}"
+          rhel7_build_needed: "{{ latest_brewed_rhel7 != latest_local_rhel7 }}"
+        tags:
+          - always
 
       - block:
         - debug:
             msg: "Version compare for EL5: brew:[ {{ latest_brewed_rhel5 }} ] local:[ {{ latest_local_rhel5 }} ]"
-          when: rhel5_branch_exists
+          when: rhel5_branch_exists | bool
+          tags:
+            - always
 
         - debug:
             msg: "Version compare for EL6: brew:[ {{ latest_brewed_rhel6 }} ] local:[ {{ latest_local_rhel6 }} ]"
-          when: rhel6_branch_exists
+          when: rhel6_branch_exists | bool
+          tags:
+            - always
 
         - debug:
             msg: "Version compare for EL7: brew:[ {{ latest_brewed_rhel7 }} ] local:[ {{ latest_local_rhel7 }} ]"
-          when: rhel7_branch_exists
+          when: rhel7_branch_exists | bool
+          tags:
+            - always
 
         - name: 'Run setup_sources'
           shell: "./setup_sources.sh {{ inventory_hostname }}"
           args:
             chdir: "packages"
+          tags:
+            - always
 
         - name: 'Release to brew'
           shell: "tito release {{ releaser }} -y"
           args:
             chdir: "packages/{{ inventory_hostname }}"
           register: brew_release
+          tags:
+            - always
 
         - debug:
             msg: "{{ brew_release.stdout_lines }}"
           when: brew_release | succeeded
+          tags:
+            - always
 
         - debug:
             msg: "{{ brew_release.stderr.split('\n') }}"
           when: brew_release | failed
+          tags:
+            - always
+
+        # we use this to ensure that `wait` tagged tasks only run with `--tags
+        # wait` is passed
+        - command: /bin/true
+          register: normal_execution_check
+
+        - set_fact:
+            brew_tasks: "{{ brew_release.stdout_lines \
+              | select('match', '^Created task:.*') \
+              | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
+              | list }}"
+          when: normal_execution_check is not defined
+          tags:
+            - wait
+
+        - name: 'Watch brew task(s)'
+          command: "brew watch-task {{ brew_tasks | join(' ') }}"
+          when: (brew_release | succeeded) and (normal_execution_check is not defined)
+          tags:
+            - wait
 
         when: rhel5_build_needed or rhel6_build_needed or rhel7_build_needed # block
       when: st.stat.exists # block
