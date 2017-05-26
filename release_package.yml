@@ -83,7 +83,7 @@
 
       - name: 'Calculate EL5 RPM version in local specfile'
         command: "rpmspec --query '{{ spec_file_path }}' \
-          --define 'dist .el5sat' \
+          --define 'dist .el5' \
           {{ scl_prefix_option_str }} \
           --queryformat='%{name}-%{version}-%{release}\n' \
           --srpm"
