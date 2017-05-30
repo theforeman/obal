@@ -4,9 +4,10 @@
   gather_facts: no
   tasks:
     - name: install required packages
-      package:
+      yum:
         name: "{{ item }}"
         state: latest
+      become: true
       with_items:
         - koji
         - brewkoji
