@@ -22,7 +22,6 @@
       command: "git rm {{ source }}"
       args:
         chdir: "packages/{{ inventory_hostname }}"
-      when: annex is defined
 
     - include: tasks/download_and_extract_source.yml
 
