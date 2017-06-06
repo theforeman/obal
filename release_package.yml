@@ -9,6 +9,7 @@
         state: latest
       become: true
       with_items:
+        - rpm-build
         - koji
         - brewkoji
         - git-annex
@@ -85,6 +86,7 @@
       - name: 'Calculate EL5 RPM version in local specfile'
         command: "rpmspec --query '{{ spec_file_path }}' \
           --define 'dist .el5' \
+          --define 'foremandist .{{ foremandist }}' \
           {{ scl_prefix_option_str }} \
           --queryformat='%{name}-%{version}-%{release}\n' \
           --srpm"
@@ -96,6 +98,7 @@
       - name: 'Calculate EL6 RPM version in local specfile'
         command: "rpmspec --query '{{ spec_file_path }}' \
           --define 'dist .el6sat' \
+          --define 'foremandist .{{ foremandist }}' \
           {{ scl_prefix_option_str }} \
           --queryformat='%{name}-%{version}-%{release}\n' \
           --srpm"
@@ -107,6 +110,7 @@
       - name: 'Calculate EL7 RPM version in local specfile'
         command: "rpmspec --query '{{ spec_file_path }}' \
           --define 'dist .el7sat' \
+          --define 'foremandist .{{ foremandist }}' \
           {{ scl_prefix_option_str }} \
           --queryformat='%{name}-%{version}-%{release}\n' \
           --srpm"
