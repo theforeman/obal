@@ -20,7 +20,7 @@
             - always
 
         - name: 'Build srpm'
-          shell: "tito release {{ releaser.replace('dist-git', 'scratch') }}"
+          shell: "tito release {{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
           args:
             chdir: "packages/{{ inventory_hostname }}"
           register: brew_release

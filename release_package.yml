@@ -42,19 +42,21 @@
       - set_fact:
           spec_file_path: "{{ spec_file.files[0].path }}"
           scl_prefix_option_str: "{{ '--define \"scl_prefix tfm-\"' if inventory_hostname.startswith('tfm-') else '' }}"
-          branches_list: "{{ lookup('ini', 'branches section={{ releaser }} file=rel-eng/releasers.conf') }}"
+          joined_releasers: "{{ releasers | join(' ') }}"
         tags:
           - always
 
       - set_fact:
-          rhel5_branch_exists: "{{ true if 'rhel-5' in branches_list else false }}"
-          rhel6_branch_exists: "{{ true if 'rhel-6' in branches_list else false }}"
-          rhel7_branch_exists: "{{ true if 'rhel-7' in branches_list else false }}"
+          rhel5_branch_exists: "{{ true if 'rhel-5' in joined_releasers else false }}"
+          rhel6_branch_exists: "{{ true if 'rhel-6' in joined_releasers else false }}"
+          rhel7_branch_exists: "{{ true if 'rhel-7' in joined_releasers else false }}"
         tags:
           - always
 
       - name: 'Look up current version of package in brew for EL5'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-5-candidate {{ inventory_hostname }} \
+        shell: "brew list-tagged --quiet \
+          satellite-{{ satellite_version }}-rhel-5-candidate \
+          {{ inventory_hostname }} \
           | sort --reverse --key 1 --version-sort \
           | head -n1 \
           | cut -d' ' -f1"
@@ -64,7 +66,9 @@
           - always
 
       - name: 'Look up current version of package in brew for EL6'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-6-candidate {{ inventory_hostname }} \
+        shell: "brew list-tagged --quiet \
+          satellite-{{ satellite_version }}-rhel-6-candidate \
+          {{ inventory_hostname }} \
           | sort --reverse --key 1 --version-sort \
           | head -n1 \
           | cut -d' ' -f1"
@@ -74,7 +78,9 @@
           - always
 
       - name: 'Look up current version of package in brew for EL7'
-        shell: "brew list-tagged --quiet satellite-{{ satellite_version }}-rhel-7-candidate {{ inventory_hostname }}
+        shell: "brew list-tagged --quiet \
+          satellite-{{ satellite_version }}-rhel-7-candidate \
+          {{ inventory_hostname }}
           | sort --reverse --key 1 --version-sort
           | head -n1
           | cut -d' ' -f1"
@@ -163,7 +169,7 @@
             - always
 
         - name: 'Release to brew'
-          shell: "tito release {{ releaser }} -y"
+          shell: "tito release {{ joined_releasers }} -y"
           args:
             chdir: "packages/{{ inventory_hostname }}"
           register: brew_release
