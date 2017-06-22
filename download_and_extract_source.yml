@@ -14,11 +14,11 @@
         version: "{{ branch }}"
         update: yes
 
-    - name: 'Copy files'
+    - name: 'Copy upstream files'
       synchronize:
         src: ".tmp/{{ upstream_directory }}/{{ item }}"
         dest: "packages/{{ inventory_hostname }}/"
-      with_items: "{{ files }}"
+      with_items: "{{ upstream_files }}"
   when: upstream.endswith('.git') #block
   rescue: #block
     - name: 'Remove package directory'
@@ -48,11 +48,11 @@
       args:
         chdir: ".tmp/{{ inventory_hostname }}"
 
-    - name: 'Copy files'
+    - name: 'Copy upstream files'
       synchronize:
         src: ".tmp/{{ inventory_hostname }}/{{ item }}"
         dest: "packages/{{ inventory_hostname }}/"
-      with_items: "{{ files }}"
+      with_items: "{{ upstream_files }}"
   when: upstream.endswith('src.rpm') #block
   rescue: #block
     - name: 'Remove package directory'

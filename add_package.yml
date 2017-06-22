@@ -4,8 +4,8 @@
   gather_facts: no
   tasks:
     - fail:
-        msg: "'files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
-      when: files is not defined
+        msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
+      when: upstream_files is not defined
 
     - name: 'Make package directory'
       file:
