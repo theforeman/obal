@@ -3,60 +3,52 @@
   serial: 1
   any_errors_fatal: false # don't bomb out the entire playbook if one host (i.e. package) fails
   gather_facts: no
+  roles:
+    - ensure-package
   tasks:
-    - name: confirm package dir exists
-      stat:
-        path: "packages/{{ inventory_hostname }}"
-      register: st
-      tags:
-        - always
+      - name: 'Run setup_sources'
+        shell: "./setup_sources.sh {{ inventory_hostname }}"
+        args:
+          chdir: "packages"
+        tags:
+          - always
 
-    - block:
-        - name: 'Run setup_sources'
-          shell: "./setup_sources.sh {{ inventory_hostname }}"
-          args:
-            chdir: "packages"
-          tags:
-            - always
+      - name: 'Build srpm'
+        shell: "tito release {{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
+        args:
+          chdir: "packages/{{ inventory_hostname }}"
+        register: brew_release
+        tags:
+          - always
 
-        - name: 'Build srpm'
-          shell: "tito release {{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
-          args:
-            chdir: "packages/{{ inventory_hostname }}"
-          register: brew_release
-          tags:
-            - always
+      - debug:
+          msg: "{{ brew_release.stdout_lines }}"
+        when: brew_release | succeeded
+        tags:
+          - always
 
-        - debug:
-            msg: "{{ brew_release.stdout_lines }}"
-          when: brew_release | succeeded
-          tags:
-            - always
+      - debug:
+          msg: "{{ brew_release.stderr.split('\n') }}"
+        when: brew_release | failed
+        tags:
+          - always
 
-        - debug:
-            msg: "{{ brew_release.stderr.split('\n') }}"
-          when: brew_release | failed
-          tags:
-            - always
+      # we use this to ensure that `wait` tagged tasks only run with `--tags
+      # wait` is passed
+      - command: /bin/true
+        register: normal_execution_check
 
-        # we use this to ensure that `wait` tagged tasks only run with `--tags
-        # wait` is passed
-        - command: /bin/true
-          register: normal_execution_check
+      - set_fact:
+          brew_tasks: "{{ brew_release.stdout_lines \
+            | select('match', '^Created task:.*') \
+            | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
+            | list }}"
+        when: normal_execution_check is not defined
+        tags:
+          - wait
 
-        - set_fact:
-            brew_tasks: "{{ brew_release.stdout_lines \
-              | select('match', '^Created task:.*') \
-              | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
-              | list }}"
-          when: normal_execution_check is not defined
-          tags:
-            - wait
-
-        - name: 'Watch brew task(s)'
-          command: "brew watch-task {{ brew_tasks | join(' ') }}"
-          when: (brew_release | succeeded) and (normal_execution_check is not defined)
-          tags:
-            - wait
-
-      when: st.stat.exists # block
+      - name: 'Watch brew task(s)'
+        command: "brew watch-task {{ brew_tasks | join(' ') }}"
+        when: (brew_release | succeeded) and (normal_execution_check is not defined)
+        tags:
+          - wait

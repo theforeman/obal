@@ -1,0 +1,8 @@
+---
+- name: check for package dir
+  stat:
+    path: "packages/{{ inventory_hostname }}"
+  register: package_dir
+  failed_when: not package_dir.stat.exists
+  tags:
+    - always
