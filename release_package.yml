@@ -23,6 +23,7 @@
   serial: 1
   gather_facts: no
   roles:
+    - git-annex-setup
     - ensure-package
     - diff-brew-package
   tasks:
