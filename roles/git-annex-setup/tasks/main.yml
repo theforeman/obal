@@ -3,3 +3,5 @@
   command: git annex init
   args:
     creates: .git/annex/index
+  tags:
+    - always
