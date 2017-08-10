@@ -1,0 +1,27 @@
+---
+# we use this to ensure that `wait` tagged tasks only run with `--tags
+# wait` is passed
+- command: /bin/true
+  register: normal_execution_check
+
+- set_fact:
+    brew_tasks: "{{ brew_release.stdout_lines \
+      | select('match', '^Created task:.*') \
+      | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
+      | list }}"
+  when: normal_execution_check is not defined
+  tags:
+    - wait
+
+- name: 'Watch brew task(s)'
+  command: "brew watch-task {{ brew_tasks | join(' ') }}"
+  when: (brew_release | succeeded) and (normal_execution_check is not defined)
+  tags:
+    - wait
+
+- name: 'Download brew task(s) logs'
+  command: "brew download-logs -r {{ brew_tasks | join(' ') }}"
+  when: (brew_release | succeeded) and (normal_execution_check is not defined)
+  tags:
+    - wait
+    - download

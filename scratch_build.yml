@@ -7,56 +7,13 @@
     - git-annex-setup
     - ensure-package
   tasks:
-      - name: 'Run setup_sources'
-        shell: "./setup_sources.sh {{ inventory_hostname }}"
-        args:
-          chdir: "packages"
-        tags:
-          - always
+    - include: setup_sources.yml
 
-      - name: 'Build srpm'
-        shell: "tito release {{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
-        args:
-          chdir: "packages/{{ inventory_hostname }}"
-        register: brew_release
-        tags:
-          - always
+    - set_fact:
+        tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
+      tags:
+        - always
 
-      - debug:
-          msg: "{{ brew_release.stdout_lines }}"
-        when: brew_release | succeeded
-        tags:
-          - always
+    - include: tito_release.yml
 
-      - debug:
-          msg: "{{ brew_release.stderr.split('\n') }}"
-        when: brew_release | failed
-        tags:
-          - always
-
-      # we use this to ensure that `wait` tagged tasks only run with `--tags
-      # wait` is passed
-      - command: /bin/true
-        register: normal_execution_check
-
-      - set_fact:
-          brew_tasks: "{{ brew_release.stdout_lines \
-            | select('match', '^Created task:.*') \
-            | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
-            | list }}"
-        when: normal_execution_check is not defined
-        tags:
-          - wait
-
-      - name: 'Watch brew task(s)'
-        command: "brew watch-task {{ brew_tasks | join(' ') }}"
-        when: (brew_release | succeeded) and (normal_execution_check is not defined)
-        tags:
-          - wait
-
-      - name: 'Download brew task(s) logs'
-        command: "brew download-logs -r {{ brew_tasks | join(' ') }}"
-        when: (brew_release | succeeded) and (normal_execution_check is not defined)
-        tags:
-          - wait
-          - download
+    - include: brew_wait_and_download.yml

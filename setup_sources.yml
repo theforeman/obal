@@ -1,0 +1,7 @@
+---
+- name: 'Run setup_sources'
+  shell: "./setup_sources.sh {{ inventory_hostname }}"
+  args:
+    chdir: "packages"
+  tags:
+    - always

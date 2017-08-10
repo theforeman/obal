@@ -1,0 +1,20 @@
+---
+- name: 'Release to brew'
+  shell: "tito release {{ tito_releasers }} -y"
+  args:
+    chdir: "packages/{{ inventory_hostname }}"
+  register: brew_release
+  tags:
+    - always
+
+- debug:
+    msg: "{{ brew_release.stdout_lines }}"
+  when: brew_release | succeeded
+  tags:
+    - always
+
+- debug:
+    msg: "{{ brew_release.stderr.split('\n') }}"
+  when: brew_release | failed
+  tags:
+    - always
