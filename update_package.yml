@@ -22,7 +22,7 @@
         chdir: "packages/{{ inventory_hostname }}"
       when: annex is defined
 
-    - include: download_and_extract_source.yml
+    - include: tasks/download_and_extract_source.yml
 
     - name: Determine new source file from spec
       shell: "spectool --list-files *.spec"

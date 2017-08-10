@@ -7,13 +7,13 @@
     - git-annex-setup
     - ensure-package
   tasks:
-    - include: setup_sources.yml
+    - include: tasks/setup_sources.yml
 
     - set_fact:
         tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
       tags:
         - always
 
-    - include: tito_release.yml
+    - include: tasks/tito_release.yml
 
-    - include: brew_wait_and_download.yml
+    - include: tasks/brew_wait_and_download.yml
