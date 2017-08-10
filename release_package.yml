@@ -97,3 +97,9 @@
       tags:
         - wait
 
+    - name: 'Download brew task(s) logs'
+      command: "brew download-logs -r {{ brew_tasks | join(' ') }}"
+      when: (brew_release | succeeded) and (normal_execution_check is not defined)
+      tags:
+        - wait
+        - download
