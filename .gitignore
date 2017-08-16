@@ -2,6 +2,7 @@
 *.swp
 
 ansible.log
+kojilogs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
