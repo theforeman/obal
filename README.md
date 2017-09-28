@@ -12,6 +12,16 @@ To update a package from upstream, start by updating the `package_manifest.yml` 
 
 You can review the changes made by doing a `git status`. After making any manual changes, commit the changes and open an MR with the updates.
 
+## Updating a Package from Downstream
+
+To update a package from downstream, no changes to `package_manifest.yml` are needed, just run the update playbook specifying the package and the correct downstream version:
+
+    ansible-playbook update_package.yml -l tfm-rubygem-hammer_cli -e downstream_version=0.11.0.1
+
+This will update the spec file to point to the Dogfood location for source files and update the version to be what was provided. Then it will download the source from Dogfood and add it to git annex.
+
+You can review the changes made by doing a `git status`. After making any manual changes, commit the changes and open an MR with the updates.
+
 ## Add a New Package from Upstream
 
 To add a new package from upstream, start by adding an entry to `package_manifest.yml` in the appropriate section (server, client, capsule, etc):

@@ -1,6 +1,6 @@
 ---
 - name: 'Run setup_sources'
-  shell: "./setup_sources.sh {{ inventory_hostname }}"
+  shell: "./setup_sources.sh {{ setup_sources_flags | default('-r') }} {{ inventory_hostname }}"
   args:
     chdir: "packages"
   tags:

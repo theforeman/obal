@@ -20,7 +20,9 @@
         src: ".tmp/{{ upstream_directory }}/{{ item }}"
         dest: "packages/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when: upstream.endswith('.git') #block
+  when: #block
+    - upstream.endswith('.git')
+    - downstream_version is not defined
   rescue: #block
     - name: 'Remove package directory'
       file:
@@ -54,7 +56,55 @@
         src: ".tmp/{{ inventory_hostname }}/{{ item }}"
         dest: "packages/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when: upstream.endswith('src.rpm') #block
+  when: #block
+    - upstream.endswith('src.rpm')
+    - downstream_version is not defined
+  rescue: #block
+    - name: 'Remove package directory'
+      file:
+        state: 'absent'
+        path: "packages/{{ inventory_hostname }}"
+
+- block:
+    - name: get spec file
+      find:
+        pattern: "*.spec"
+        path: "packages/{{ inventory_hostname }}"
+      register: spec_file
+
+    - set_fact:
+        spec_file_path: "{{ spec_file.files[0].path }}"
+        setup_sources_flags: '-f'
+
+    - name: 'Ensure Source0 specfile points to dogfood'
+      replace:
+        path: "{{ spec_file_path }}"
+        regexp: '^(?P<prefix>Source0:\s+)http.*/(?P<filename>.*)$'
+        replace: '\g<prefix>http://sat-r220-02.lab.eng.rdu2.redhat.com/pulp/isos/Sat6-CI-Source_Files-Satellite_6_3_Source_Files/\g<filename>'
+
+    - name: 'Bump version in specfile'
+      replace:
+        path: "{{ spec_file_path }}"
+        regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
+        replace: '\g<prefix>{{ downstream_version }}\g<suffix>'
+      with_items:
+        - 'Version:'
+        - '%global _version'
+        - '%global mainver'
+
+    - name: 'Bump release in specfile'
+      replace:
+        path: "{{ spec_file_path }}"
+        regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
+        replace: '\g<prefix>{{ downstream_release | default(1) }}\g<suffix>'
+      with_items:
+        - 'Release:'
+        - '%global _release'
+        - '%global release'
+
+    - include: tasks/setup_sources.yml
+  when: #block
+    - downstream_version is defined
   rescue: #block
     - name: 'Remove package directory'
       file:
