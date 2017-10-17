@@ -19,7 +19,7 @@
         source: "{{ source_url.stdout.split('\n')[0].split('/')[-1] }}"
 
     - name: "Remove old source"
-      command: "git rm {{ source }}"
+      command: "git rm --ignore-unmatch {{ source }}"
       args:
         chdir: "packages/{{ inventory_hostname }}"
 
