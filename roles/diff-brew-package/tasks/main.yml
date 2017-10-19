@@ -29,6 +29,7 @@
     | head -n1 \
     | cut -d' ' -f1"
   register: latest_brewed_rhel5
+  changed_when: False
   when: rhel5_branch_exists | bool
   tags:
     - always
@@ -41,6 +42,7 @@
     | head -n1 \
     | cut -d' ' -f1"
   register: latest_brewed_rhel6
+  changed_when: False
   when: rhel6_branch_exists | bool
   tags:
     - always
@@ -53,6 +55,7 @@
     | head -n1
     | cut -d' ' -f1"
   register: latest_brewed_rhel7
+  changed_when: False
   when: rhel7_branch_exists | bool
   tags:
     - always
@@ -65,6 +68,7 @@
     --queryformat='%{name}-%{version}-%{release}\n' \
     --srpm"
   register: latest_local_rhel5
+  changed_when: False
   when: rhel5_branch_exists | bool
   tags:
     - always
@@ -77,6 +81,7 @@
     --queryformat='%{name}-%{version}-%{release}\n' \
     --srpm"
   register: latest_local_rhel6
+  changed_when: False
   when: rhel6_branch_exists | bool
   tags:
     - always
@@ -89,6 +94,7 @@
     --queryformat='%{name}-%{version}-%{release}\n' \
     --srpm"
   register: latest_local_rhel7
+  changed_when: False
   when: rhel7_branch_exists | bool
   tags:
     - always
