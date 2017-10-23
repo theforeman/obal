@@ -18,7 +18,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: ".tmp/{{ upstream_directory }}/{{ item }}"
-        dest: "packages/{{ inventory_hostname }}/"
+        dest: "{{ inventory_dir }}/packages/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream.endswith('.git')
@@ -27,7 +27,7 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
 
 - block:
     - name: 'Make package download directory'
@@ -54,7 +54,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: ".tmp/{{ inventory_hostname }}/{{ item }}"
-        dest: "packages/{{ inventory_hostname }}/"
+        dest: "{{ inventory_dir }}/packages/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream.endswith('src.rpm')
@@ -127,4 +127,4 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"

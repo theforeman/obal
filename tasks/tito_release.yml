@@ -2,7 +2,7 @@
 - name: 'Release to brew'
   command: "tito release {{ tito_releasers }} -y"
   args:
-    chdir: "packages/{{ inventory_hostname }}"
+    chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
   register: brew_release
   tags:
     - always

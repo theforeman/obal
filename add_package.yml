@@ -12,7 +12,7 @@
     - name: 'Make package directory'
       file:
         state: 'directory'
-        path: "packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
       register: package_directory_result
 
     - block:
@@ -22,19 +22,29 @@
           command: "git annex add packages/{{ inventory_hostname }}/{{ item }}"
           with_items: "{{ annex }}"
           when: annex is defined
+          args:
+            chdir: "{{ inventory_dir }}"
 
         - name: 'Git add new package'
           command: "git add packages/{{ inventory_hostname }}/*"
+          args:
+            chdir: "{{ inventory_dir }}"
 
         - name: 'Check if changes in package'
           command: 'git status -s packages/{{ inventory_hostname }}'
           register: git_status
+          args:
+            chdir: "{{ inventory_dir }}"
 
         - name: 'Git commit new package'
           command: "git commit packages/{{ inventory_hostname }} -m 'Add {{ inventory_hostname }}'"
           when: git_status.stdout != ''
+          args:
+            chdir: "{{ inventory_dir }}"
 
         - name: 'Git add new package'
           command: "git add packages/{{ inventory_hostname }}/*"
           when: git_status.stdout != ''
+          args:
+            chdir: "{{ inventory_dir }}"
       when: package_directory_result|changed
