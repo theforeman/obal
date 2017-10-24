@@ -102,6 +102,16 @@
         - '%global _release'
         - '%global release'
 
+    - name: 'add changelog entry'
+      lineinfile:
+        path: "{{ spec_file_path }}"
+        line: |
+          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release | default(1) }}
+          {{ downstream_changelog }}
+        insertafter: '^%changelog'
+      when:
+        - downstream_changelog is defined
+
     - include: tasks/setup_sources.yml
   when: #block
     - downstream_version is defined
