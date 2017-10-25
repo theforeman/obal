@@ -116,7 +116,7 @@
       lineinfile:
         path: "{{ spec_file_path }}"
         line: |
-          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release }}
+          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_changelog_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release }}
           {{ downstream_changelog }}
         insertafter: '^%changelog'
 

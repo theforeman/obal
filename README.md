@@ -25,7 +25,7 @@ You can review the changes made by doing a `git status`. After making any manual
 The downstream section of the playbook also supports the following variables:
 
 * `downstream_release`, defaults to `1`, if you ever have to bump the release only.
-* `downstream_name`, defaults to `Satellite6 Jenkins`, the name used in the changelog entry.
+* `downstream_changelog_name`, defaults to `Satellite6 Jenkins`, the name used in the changelog entry.
 * `downstream_changelog`, defaults to `- Release {{ inventory_hostname }} {{ downstream_version }}`, if you want to supply a custom changelog entry (can contain newlines).
 
 ## Add a New Package from Upstream
