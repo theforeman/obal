@@ -76,6 +76,16 @@
         spec_file_path: "{{ spec_file.files[0].path }}"
         setup_sources_flags: '-f'
 
+    - set_fact:
+        downstream_release: '1'
+      when:
+        - downstream_release is not defined
+
+    - set_fact:
+        downstream_changelog: '- Release {{ inventory_hostname }} {{ downstream_version }}'
+      when:
+        - downstream_changelog is not defined
+
     - name: 'Ensure Source0 specfile points to dogfood'
       replace:
         path: "{{ spec_file_path }}"
@@ -96,7 +106,7 @@
       replace:
         path: "{{ spec_file_path }}"
         regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
-        replace: '\g<prefix>{{ downstream_release | default(1) }}\g<suffix>'
+        replace: '\g<prefix>{{ downstream_release }}\g<suffix>'
       with_items:
         - 'Release:'
         - '%global _release'
@@ -106,11 +116,9 @@
       lineinfile:
         path: "{{ spec_file_path }}"
         line: |
-          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release | default(1) }}
+          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release }}
           {{ downstream_changelog }}
         insertafter: '^%changelog'
-      when:
-        - downstream_changelog is defined
 
     - include: tasks/setup_sources.yml
   when: #block
