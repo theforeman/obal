@@ -1,22 +1,26 @@
-# Satellite Packaging
-
-## new-6.3 required packages
-
-- ansible
+# obal - packaging wrapper using ansible
 
 ## Updating a Package from Upstream
 
-To update a package from upstream, start by updating the `package_manifest.yml` entry for that package with the new versions and relevant information. Next run the update playbook specifying the package:
+To update a package from upstream, start by updating the `package_manifest.yml` entry for that package with the new versions and relevant information. Next run the update action specifying the package:
 
-    ansible-playbook update_package.yml -l tfm-rubygem-hammer_cli
+    obal update tfm-rubygem-hammer_cli
+
+This is equivalent to running the `update_package.yml` playbook:
+
+    ansible-playbook --inventory package_manifest.yaml /path/to/obal/update_package.yml -l tfm-rubygem-hammer_cli
 
 You can review the changes made by doing a `git status`. After making any manual changes, commit the changes and open an MR with the updates.
 
 ## Updating a Package from Downstream
 
-To update a package from downstream, no changes to `package_manifest.yml` are needed, just run the update playbook specifying the package and the correct downstream version:
+To update a package from downstream, no changes to `package_manifest.yml` are needed, just run the update action specifying the package and the correct downstream version:
 
-    ansible-playbook update_package.yml -l tfm-rubygem-hammer_cli -e downstream_version=0.11.0.1
+    obal update tfm-rubygem-hammer_cli -e downstream_version=0.11.0.1
+
+This is equivalent to running the `update_package.yml` playbook:
+
+    ansible-playbook --inventory package_manifest.yaml /path/to/obal/update_package.yml -l tfm-rubygem-hammer_cli -e downstream_version=0.11.0.1
 
 This will update the spec file to point to the Dogfood location for source files and update the version to be what was provided. Then it will download the source from Dogfood and add it to git annex.
 
@@ -39,6 +43,12 @@ my-new-package:
 ```
 
 The minimum fields required are the package's name and `upstream_files` which lists files to copy from upstream to satellite-packaging. Entries in `upstream_files` can be file paths, or directories (denoted with a trailing slash).
+
+```
+obal add my-new-package
+```
+
+*OR*
 
 ```
 ansible-playbook add_package.yml -l my-new-package
