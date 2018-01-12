@@ -21,7 +21,7 @@ _PLAYBOOKS = {
     'release': 'release_package.yml',
     'scratch': 'scratch_build.yml',
     'update': 'update_package.yml'
-    }
+}
 
 
 def main():
@@ -95,7 +95,7 @@ def main():
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
     if args.verbose:
-        ansible_args.append("-%s" % str("v"*args.verbose))
+        ansible_args.append("-%s" % str("v" * args.verbose))
     if args.start_at_task:
         ansible_args.append("--start-at-task")
         ansible_args.append(args.start_at_task)
