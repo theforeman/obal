@@ -3,5 +3,6 @@
   command: git annex init
   args:
     creates: .git/annex/index
+    chdir: "{{ inventory_dir }}/packages"
   tags:
     - always
