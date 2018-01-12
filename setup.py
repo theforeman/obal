@@ -29,6 +29,7 @@ setup(
     long_description=long_description,
     url='https://github.com/theforeman/obal',
     author='The Foreman Project',
+    author_email='foreman-dev@googlegroups.com',
     zip_safe=False,
 
     classifiers=[
