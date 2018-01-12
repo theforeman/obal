@@ -8,6 +8,7 @@ import os
 
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
+from pkg_resources import resource_filename
 
 try:
     import argcomplete
@@ -72,8 +73,7 @@ def main():
 
     args = parser.parse_args()
 
-    packaging_playbooks_path = os.path.realpath(os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), '..'))
+    packaging_playbooks_path = resource_filename(__name__, 'data')
     playbook = _PLAYBOOKS[args.action]
     playbook_path = os.path.join(packaging_playbooks_path, playbook)
     cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
