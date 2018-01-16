@@ -1,0 +1,28 @@
+---
+- set_fact:
+    package_dir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+  tags:
+    - always
+
+- name: get spec file
+  find:
+    pattern: "*.spec"
+    path: "{{ package_dir }}"
+  register: spec_file
+  tags:
+    - always
+
+- set_fact:
+    spec_file_path: "{{ spec_file.files[0].path }}"
+  tags:
+    - always
+
+- name: 'Extract Sources from spec'
+  shell: "spectool --list-files --sources {{ spec_file_path }} | awk '{print $2}'"
+  register: sources
+  changed_when: False
+  tags:
+    - always
+
+- include: annex.yml
+  with_items: "{{ sources.stdout_lines | list }}"
