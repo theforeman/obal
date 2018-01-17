@@ -24,15 +24,20 @@ _PLAYBOOKS = {
 }
 
 
-def main():
-    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
-
+def find_packages(inventory_path):
     package_choices = None
     if os.path.exists(inventory_path):
         ansible_loader = DataLoader()
         ansible_inventory = InventoryManager(loader=ansible_loader,
                                              sources=inventory_path)
         package_choices = ansible_inventory.hosts.keys()
+    return package_choices
+
+
+def main():
+    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
+
+    package_choices = find_packages(inventory_path)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--extra-vars',

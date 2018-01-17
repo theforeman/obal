@@ -1,0 +1,8 @@
+---
+packages:
+  children:
+    server: {}
+
+server:
+  hosts:
+    testpackage: {}
