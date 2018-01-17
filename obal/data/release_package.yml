@@ -6,7 +6,7 @@
     - name: install required packages
       yum:
         name: "{{ item }}"
-        state: latest
+        state: present
       become: true
       with_items:
         - rpm-build
@@ -30,7 +30,8 @@
   tasks:
     - include: tasks/check_builds.yml
 
-    - set_fact:
+    - name: 'Set tito_releasers'
+      set_fact:
         tito_releasers: "{{ joined_releasers }}"
       tags:
         - always

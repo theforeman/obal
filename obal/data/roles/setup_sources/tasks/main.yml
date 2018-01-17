@@ -1,5 +1,6 @@
 ---
-- set_fact:
+- name: 'Set package_dir'
+  set_fact:
     package_dir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
   tags:
     - always
@@ -12,7 +13,8 @@
   tags:
     - always
 
-- set_fact:
+- name: 'Set spec file path'
+  set_fact:
     spec_file_path: "{{ spec_file.files[0].path }}"
   tags:
     - always

@@ -7,14 +7,16 @@
   tags:
     - always
 
-- set_fact:
+- name: "Set spec file path, scl options and releasers"
+  set_fact:
     spec_file_path: "{{ spec_file.files[0].path }}"
     scl_prefix_option_str: "{{ '--define \"scl_prefix tfm-\"' if inventory_hostname.startswith('tfm-') else '' }}"
     joined_releasers: "{{ releasers | join(' ') }}"
   tags:
     - always
 
-- set_fact:
+- name: "Set branch checks"
+  set_fact:
     rhel5_branch_exists: "{{ true if 'rhel-5' in joined_releasers else false }}"
     rhel6_branch_exists: "{{ true if 'rhel-6' in joined_releasers else false }}"
     rhel7_branch_exists: "{{ true if 'rhel-7' in joined_releasers else false }}"
@@ -99,7 +101,8 @@
   tags:
     - always
 
-- set_fact:
+- name: "Set latest for brew and local"
+  set_fact:
     latest_brewed_rhel5: "{{ latest_brewed_rhel5.stdout | default('') }}"
     latest_brewed_rhel6: "{{ latest_brewed_rhel6.stdout | default('') }}"
     latest_brewed_rhel7: "{{ latest_brewed_rhel7.stdout | default('') }}"
@@ -109,7 +112,8 @@
   tags:
     - always
 
-- set_fact:
+- name: "Compared local and brew package versions"
+  set_fact:
     rhel5_build_needed: "{{ latest_brewed_rhel5 != latest_local_rhel5 }}"
     rhel6_build_needed: "{{ latest_brewed_rhel6 != latest_local_rhel6 }}"
     rhel7_build_needed: "{{ latest_brewed_rhel7 != latest_local_rhel7 }}"

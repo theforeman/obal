@@ -1,10 +1,13 @@
 ---
 # we use this to ensure that `wait` tagged tasks only run with `--tags
 # wait` is passed
-- command: /bin/true
+- name: 'Ensure wait tags run'
+  command: /bin/true
   register: normal_execution_check
+  when: True
 
-- set_fact:
+- name: 'Set brew task numbers'
+  set_fact:
     brew_tasks: "{{ brew_release.stdout_lines \
       | select('match', '^Created task:.*') \
       | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
