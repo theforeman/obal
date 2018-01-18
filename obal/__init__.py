@@ -34,11 +34,7 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def main():
-    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
-
-    package_choices = find_packages(inventory_path)
-
+def obal_argument_parser(package_choices):
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--extra-vars',
                         dest="extra_vars",
@@ -64,6 +60,18 @@ def main():
                         dest="list_tasks",
                         default=False,
                         help="list tasks that will be run in the playbook")
+    parser.add_argument('-t', '--tags',
+                        dest='tags',
+                        default=[],
+                        action='append',
+                        help="""only run plays and tasks tagged with these
+                        values""")
+    parser.add_argument('--skip-tags',
+                        dest='skip_tags',
+                        default=[],
+                        action='append',
+                        help="""only run plays and tasks whose tags do not
+                        match these values""")
 
     parser.add_argument("action",
                         choices=_PLAYBOOKS.keys(),
@@ -76,6 +84,40 @@ def main():
 
     if argcomplete:
         argcomplete.autocomplete(parser)
+
+    return parser
+
+
+def generate_ansible_args(inventory_path, playbook_path, args):
+    limit = ':'.join(args.package)
+    ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
+                    limit]
+    for extra_var in args.extra_vars:
+        ansible_args.extend(["-e", extra_var])
+    if args.verbose:
+        ansible_args.append("-%s" % str("v" * args.verbose))
+    if args.start_at_task:
+        ansible_args.append("--start-at-task")
+        ansible_args.append(args.start_at_task)
+    if args.tags:
+        ansible_args.append("--tags")
+        ansible_args.append(",".join(args.tags))
+    if args.skip_tags:
+        ansible_args.append("--skip-tags")
+        ansible_args.append(",".join(args.skip_tags))
+    if args.step:
+        ansible_args.append("--step")
+    if args.list_tasks:
+        ansible_args = ["--list-tasks"]
+    return ansible_args
+
+
+def main():
+    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
+
+    package_choices = find_packages(inventory_path)
+
+    parser = obal_argument_parser(package_choices)
 
     args = parser.parse_args()
 
@@ -96,21 +138,7 @@ def main():
 
     from ansible.cli.playbook import PlaybookCLI
 
-    limit = ':'.join(args.package)
-    ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
-                    limit]
-    for extra_var in args.extra_vars:
-        ansible_args.extend(["-e", extra_var])
-    if args.verbose:
-        ansible_args.append("-%s" % str("v" * args.verbose))
-    if args.start_at_task:
-        ansible_args.append("--start-at-task")
-        ansible_args.append(args.start_at_task)
-    if args.step:
-        ansible_args.append("--step")
-    if args.list_tasks:
-        ansible_args = ["--list-tasks"]
-
+    ansible_args = generate_ansible_args(inventory_path, playbook_path, args)
     ansible_playbook = (["ansible-playbook"] + ansible_args)
 
     if args.verbose:
