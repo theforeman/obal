@@ -71,6 +71,7 @@ def main():
     parser.add_argument('package',
                         metavar='package',
                         choices=package_choices,
+                        nargs='+',
                         help="the package to build")
 
     if argcomplete:
@@ -95,8 +96,9 @@ def main():
 
     from ansible.cli.playbook import PlaybookCLI
 
+    limit = ':'.join(args.package)
     ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
-                    args.package]
+                    limit]
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
     if args.verbose:
