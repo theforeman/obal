@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import argparse
 import os
+import sys
 
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
@@ -146,7 +147,8 @@ def main():
 
     cli = PlaybookCLI(ansible_playbook)
     cli.parse()
-    cli.run()
+    exit_code = cli.run()
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':
