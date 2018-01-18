@@ -24,5 +24,5 @@
   tags:
     - always
 
-- include: annex.yml
+- include_task: annex.yml
   with_items: "{{ sources.stdout_lines | list }}"
