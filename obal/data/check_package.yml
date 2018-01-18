@@ -3,8 +3,8 @@
   serial: 1
   gather_facts: no
   roles:
-    - git-annex-setup
-    - ensure-package
-    - diff-brew-package
+    - git_annex_setup
+    - ensure_package
+    - diff_brew_package
   tasks:
     - include: tasks/check_builds.yml
