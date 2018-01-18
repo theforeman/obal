@@ -5,10 +5,9 @@
   gather_facts: no
   roles:
     - git-annex-setup
+    - setup_sources
     - ensure-package
   tasks:
-    - include: tasks/setup_sources.yml
-
     - set_fact:
         tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
       tags:
