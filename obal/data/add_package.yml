@@ -3,7 +3,7 @@
   serial: 1
   gather_facts: no
   roles:
-    - git-annex-setup
+    - git_annex_setup
   tasks:
     - fail:
         msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"

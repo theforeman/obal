@@ -23,10 +23,10 @@
   serial: 1
   gather_facts: no
   roles:
-    - git-annex-setup
-    - ensure-package
+    - git_annex_setup
+    - ensure_package
     - setup_sources
-    - diff-brew-package
+    - diff_brew_package
   tasks:
     - include: tasks/check_builds.yml
 
