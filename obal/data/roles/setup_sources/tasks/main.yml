@@ -26,3 +26,5 @@
 
 - include_tasks: annex.yml
   with_items: "{{ sources.stdout_lines | list }}"
+  tags:
+    - always
