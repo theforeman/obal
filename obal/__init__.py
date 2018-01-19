@@ -7,6 +7,7 @@ import argparse
 import os
 import sys
 
+from ansible.utils.display import Display
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from pkg_resources import resource_filename
@@ -114,6 +115,11 @@ def generate_ansible_args(inventory_path, playbook_path, args):
 
 
 def main():
+    # this needs to be global, as otherwise PlaybookCLI fails
+    # to set the verbosity correctly
+    global display
+    display = Display()
+
     inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
 
     package_choices = find_packages(inventory_path)
