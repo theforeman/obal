@@ -48,20 +48,11 @@ def obal_argument_parser(package_choices):
                         action="count",
                         dest="verbose",
                         help="verbose output")
-    parser.add_argument("--start-at-task",
-                        action="store",
-                        dest="start_at_task",
-                        help="Start at a specific task")
     parser.add_argument("--step",
                         action="store_true",
                         dest="step",
                         default=False,
                         help="interactive: confirm each task before running")
-    parser.add_argument("--list-tasks",
-                        action="store_true",
-                        dest="list_tasks",
-                        default=False,
-                        help="list tasks that will be run in the playbook")
     parser.add_argument('-t', '--tags',
                         dest='tags',
                         default=[],
@@ -98,9 +89,6 @@ def generate_ansible_args(inventory_path, playbook_path, args):
         ansible_args.extend(["-e", extra_var])
     if args.verbose:
         ansible_args.append("-%s" % str("v" * args.verbose))
-    if args.start_at_task:
-        ansible_args.append("--start-at-task")
-        ansible_args.append(args.start_at_task)
     if args.tags:
         ansible_args.append("--tags")
         ansible_args.append(",".join(args.tags))
@@ -109,8 +97,6 @@ def generate_ansible_args(inventory_path, playbook_path, args):
         ansible_args.append(",".join(args.skip_tags))
     if args.step:
         ansible_args.append("--step")
-    if args.list_tasks:
-        ansible_args = ["--list-tasks"]
     return ansible_args
 
 
