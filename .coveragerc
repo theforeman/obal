@@ -1,0 +1,7 @@
+[paths]
+source = obal/
+  .tox/*/lib/*/site-packages/obal/
+
+[run]
+source = obal/
+parallel = true

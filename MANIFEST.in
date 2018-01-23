@@ -1,3 +1,4 @@
 include requirements*.txt
 include LICENSE
+include .coveragerc
 recursive-include rules *.py
