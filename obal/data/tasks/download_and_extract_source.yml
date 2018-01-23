@@ -5,7 +5,8 @@
     path: ".tmp"
 
 - block:
-    - set_fact:
+    - name: 'Extract upstream directory'
+      set_fact:
         upstream_directory: "{{ upstream.split('/')[-1] }}"
 
     - name: 'Clone upstream'
@@ -72,16 +73,19 @@
         path: "packages/{{ inventory_hostname }}"
       register: spec_file
 
-    - set_fact:
+    - name: 'Set spec file path and setup flag'
+      set_fact:
         spec_file_path: "{{ spec_file.files[0].path }}"
         setup_sources_flags: '-f'
 
-    - set_fact:
+    - name: 'Set downstream release'
+      set_fact:
         downstream_release: '1'
       when:
         - downstream_release is not defined
 
-    - set_fact:
+    - name: 'Set default downstream changelog'
+      set_fact:
         downstream_changelog: '- Release {{ inventory_hostname }} {{ downstream_version }}'
       when:
         - downstream_changelog is not defined
@@ -120,7 +124,6 @@
           {{ downstream_changelog }}
         insertafter: '^%changelog'
 
-    - include: tasks/setup_sources.yml
   when: #block
     - downstream_version is defined
   rescue: #block

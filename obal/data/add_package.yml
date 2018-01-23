@@ -5,7 +5,8 @@
   roles:
     - git_annex_setup
   tasks:
-    - fail:
+    - name: 'Ensure upstream_files is defined'
+      fail:
         msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
       when: upstream_files is not defined
 

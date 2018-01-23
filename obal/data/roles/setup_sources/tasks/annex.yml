@@ -1,11 +1,13 @@
 ---
-- set_fact:
+- name: 'Set source values'
+  set_fact:
     source: "{{ item }}"
     sourcebase: "{{ item | basename }}"
   tags:
     - always
 
-- set_fact:
+- name: 'Set source path'
+  set_fact:
     sourcepath: "{{ package_dir  }}/{{ sourcebase }}"
   tags:
     - always
@@ -29,7 +31,7 @@
     - always
 
 - name: 'Add url to annex for source'
-  shell: "git annex addurl {{ setup_sources_annex_options }} --file '{{ sourcebase }}' '{{ source }}'"
+  command: "git annex addurl {{ setup_sources_annex_options }} --file '{{ sourcebase }}' '{{ source }}'"
   args:
     chdir: "{{ package_dir }}"
   ignore_errors: yes

@@ -4,6 +4,7 @@
   args:
     chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
   register: brew_release
+  when: brew_release is not defined
   tags:
     - always
 

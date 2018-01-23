@@ -3,7 +3,8 @@
   serial: 1
   gather_facts: no
   tasks:
-    - fail:
+    - name: 'Ensure upstream_files is defined'
+      fail:
         msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
       when:
         - upstream_files is not defined
@@ -13,15 +14,18 @@
       shell: "spectool --list-files --source 0 *.spec"
       args:
         chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
-      register: source_url
+      register: old_source_url
+      when: old_source_url is not defined
 
-    - set_fact:
-        source: "{{ source_url.stdout.split('\n')[0].split('/')[-1] }}"
+    - name: 'Extract old source file name'
+      set_fact:
+        old_source: "{{ old_source_url.stdout.split('\n')[0].split('/')[-1] }}"
 
     - name: "Remove old source"
-      command: "git rm --ignore-unmatch {{ source }}"
+      command: "git rm --ignore-unmatch {{ old_source }}"
       args:
         chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+      when: old_source is defined
 
     - include: tasks/download_and_extract_source.yml
 
@@ -29,12 +33,15 @@
       shell: "spectool --list-files --source 0 *.spec"
       args:
         chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
-      register: source_url
+      register: new_source_url
+      when: new_source_url is not defined
 
-    - set_fact:
-        source: "{{ source_url.stdout.split('/')[-1] }}"
+    - name: 'Extract name of souce file from url'
+      set_fact:
+        new_source: "{{ new_source_url.stdout.split('/')[-1] }}"
 
     - name: 'Git annex add new package'
-      command: "git annex add packages/{{ inventory_hostname }}/{{ source }}"
+      command: "git annex add packages/{{ inventory_hostname }}/{{ new_source }}"
       args:
         chdir: "{{ inventory_dir }}"
+      when: new_source is defined

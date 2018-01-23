@@ -8,7 +8,8 @@
     - setup_sources
     - ensure_package
   tasks:
-    - set_fact:
+    - name: 'Set tito_releasers'
+      set_fact:
         tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
       tags:
         - always
