@@ -70,7 +70,7 @@
     - name: get spec file
       find:
         pattern: "*.spec"
-        path: "packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
       register: spec_file
 
     - name: 'Set spec file path and setup flag'
@@ -123,6 +123,10 @@
           * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_changelog_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release }}
           {{ downstream_changelog }}
         insertafter: '^%changelog'
+
+    - name: 'update source files'
+      include_role:
+        name: setup_sources
 
   when: #block
     - downstream_version is defined
