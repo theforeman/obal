@@ -7,9 +7,6 @@ import argparse
 import os
 import sys
 
-from ansible.utils.display import Display
-from ansible.inventory.manager import InventoryManager
-from ansible.parsing.dataloader import DataLoader
 from pkg_resources import resource_filename
 
 try:
@@ -29,6 +26,8 @@ _PLAYBOOKS = {
 def find_packages(inventory_path):
     package_choices = None
     if os.path.exists(inventory_path):
+        from ansible.inventory.manager import InventoryManager
+        from ansible.parsing.dataloader import DataLoader
         ansible_loader = DataLoader()
         ansible_inventory = InventoryManager(loader=ansible_loader,
                                              sources=inventory_path)
@@ -101,8 +100,15 @@ def generate_ansible_args(inventory_path, playbook_path, args):
 
 
 def main():
+    packaging_playbooks_path = resource_filename(__name__, 'data')
+    cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
+
+    if os.path.exists(cfg_path):
+        os.environ["ANSIBLE_CONFIG"] = cfg_path
+
     # this needs to be global, as otherwise PlaybookCLI fails
     # to set the verbosity correctly
+    from ansible.utils.display import Display
     global display
     display = Display()
 
@@ -114,13 +120,8 @@ def main():
 
     args = parser.parse_args()
 
-    packaging_playbooks_path = resource_filename(__name__, 'data')
     playbook = _PLAYBOOKS[args.action]
     playbook_path = os.path.join(packaging_playbooks_path, playbook)
-    cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
-
-    if os.path.exists(cfg_path):
-        os.environ["ANSIBLE_CONFIG"] = cfg_path
 
     if not os.path.exists(inventory_path):
         print("Could not find your package_manifest.yaml")
