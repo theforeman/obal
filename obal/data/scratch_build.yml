@@ -3,17 +3,10 @@
   serial: 1
   any_errors_fatal: false # don't bomb out the entire playbook if one host (i.e. package) fails
   gather_facts: no
+  vars:
+    build_package_scratch: true
   roles:
     - git_annex_setup
     - setup_sources
     - ensure_package
-  tasks:
-    - name: 'Set tito_releasers'
-      set_fact:
-        tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
-      tags:
-        - always
-
-    - include: tasks/tito_release.yml
-
-    - include: tasks/brew_wait_and_download.yml
+    - build_package

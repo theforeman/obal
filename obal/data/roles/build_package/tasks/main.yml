@@ -1,0 +1,13 @@
+---
+# we use this to ensure that `wait` tagged tasks only run with `--tags
+# wait` is passed
+- name: 'Ensure wait tags run'
+  command: warn=no /bin/true
+  register: build_package_normal_execution_check
+  tags:
+    - skip_ansible_lint
+
+- name: 'Include {{ build_package_build_system }}.yml'
+  include_tasks: "{{ build_package_build_system }}.yml"
+  tags:
+    - always

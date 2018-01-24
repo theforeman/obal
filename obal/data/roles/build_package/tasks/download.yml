@@ -1,0 +1,5 @@
+- name: 'Download {{ build_package_koji_command }}  task(s) logs'
+  command: "{{ build_package_koji_command }}  download-logs -r {{ build_package_koji_tasks | join(' ') }}"
+  args:
+    chdir: "{{ inventory_dir }}"
+  when: (build_package_tito_release | succeeded)

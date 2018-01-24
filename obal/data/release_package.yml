@@ -27,15 +27,5 @@
     - ensure_package
     - setup_sources
     - diff_brew_package
-  tasks:
-    - include: tasks/check_builds.yml
-
-    - name: 'Set tito_releasers'
-      set_fact:
-        tito_releasers: "{{ joined_releasers }}"
-      tags:
-        - always
-
-    - include: tasks/tito_release.yml
-
-    - include: tasks/brew_wait_and_download.yml
+    - check_builds
+    - build_package

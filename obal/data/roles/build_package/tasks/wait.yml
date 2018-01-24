@@ -1,0 +1,18 @@
+---
+- name: 'Get {{ build_package_koji_command }} task ids'
+  set_fact:
+    build_package_koji_tasks: "{{ build_package_tito_release.stdout_lines \
+      | select('match', '^Created task:.*') \
+      | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
+      | list }}"
+
+- name: 'Watch {{ build_package_koji_command }} task(s)'
+  command: "{{ build_package_koji_command }} watch-task {{ build_package_koji_tasks | join(' ') }}"
+  ignore_errors: yes
+  register: build_package_koji_status
+  when: (build_package_tito_release | succeeded)
+
+- name: 'Failed build'
+  fail:
+    msg: 'The build in {{ build_package_koji_command }}  has failed'
+  when: (build_package_koji_status | failed)

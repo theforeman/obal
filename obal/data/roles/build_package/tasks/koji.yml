@@ -1,0 +1,45 @@
+---
+- name: 'Set tito_releasers for brew scratch'
+  set_fact:
+    build_package_tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
+  when: build_package_koji_command == 'brew' and build_package_scratch|default(false)
+  tags:
+    - always
+
+- name: 'Set tito_releasers'
+  set_fact:
+    build_package_tito_releasers: "{{ releasers | join(' ')  }}"
+  when: build_package_koji_command != 'brew' or not build_package_scratch|default(false) 
+  tags:
+    - always
+
+- name: 'Set test build'
+  set_fact:
+      build_package_tito_args: "{{ build_package_tito_args }} --test"
+  when: build_package_test|default(false)
+  tags:
+    - always
+
+- name: 'Set scratch build'
+  set_fact:
+    build_package_tito_args: "{{ build_package_tito_args }} --scratch"
+  when: build_package_koji_command != 'brew' and build_package_scratch|default(false)
+  tags:
+    - always
+
+- include_tasks: tito_release.yml
+  tags:
+    - always
+
+- name: 'Wait for tasks to finish'
+  include_tasks: wait.yml
+  when: build_package_normal_execution_check is not defined
+  tags:
+    - wait
+
+- name: 'Download task results'
+  include_tasks: download.yml
+  when: build_package_normal_execution_check is not defined
+  tags:
+    - wait
+    - download
