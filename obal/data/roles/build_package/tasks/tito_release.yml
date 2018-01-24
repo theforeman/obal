@@ -1,0 +1,21 @@
+---
+- name: 'Release to {{ build_package_koji_command }}'
+  command: "tito release {{ build_package_tito_args }} {{ build_package_tito_releasers }} -y"
+  args:
+    chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+  register: build_package_tito_release
+  when: build_package_tito_release is not defined
+  tags:
+    - always
+
+- debug:
+    msg: "{{ build_package_tito_release.stdout_lines }}"
+  when: build_package_tito_release | succeeded
+  tags:
+    - always
+
+- debug:
+    msg: "{{ build_package_tito_release.stderr.split('\n') }}"
+  when: build_package_tito_release | failed
+  tags:
+    - always

@@ -6,5 +6,4 @@
     - git_annex_setup
     - ensure_package
     - diff_brew_package
-  tasks:
-    - include: tasks/check_builds.yml
+    - check_builds
