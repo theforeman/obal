@@ -8,6 +8,8 @@ FIXTURE_DIR = os.path.join(
     'fixtures',
 )
 
+DEFAULT_ARGS = ['dummy.yml', '--inventory', 'inventory.yml']
+
 
 def test_find_no_packages():
     packages = obal.find_packages(os.path.join(FIXTURE_DIR, 'nope.yaml'))
@@ -33,14 +35,22 @@ def test_generate_ansible_args_none():
         _test_generate_ansible_args([])
 
 
-def test_generate_ansible_args_testpackage():
-    ansible_args = _test_generate_ansible_args(['scratch', 'testpackage'])
-    assert 'testpackage' in ansible_args
-
-
-def test_generate_ansible_args_tags():
-    cliargs = ['--tags', 'wait,download', 'scratch', 'testpackage']
+@pytest.mark.parametrize('cliargs,expected', [
+    (['scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage']),
+    (['--verbose', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '-v']),
+    (['-vvvv', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '-vvvv']),
+    (['--step', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '--step']),
+    (['--skip-tags', 't1,t2', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '--skip-tags', 't1,t2']),
+    (['--tags', 'wait,download', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '--tags', 'wait,download']),
+    (['-e', 'v1=1', '-e', 'v2=2', 'scratch', 'testpackage'],
+     DEFAULT_ARGS + ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
+])
+def test_generate_ansible_args(cliargs, expected):
     ansible_args = _test_generate_ansible_args(cliargs)
-    assert 'testpackage' in ansible_args
-    assert '--tags' in ansible_args
-    assert 'wait,download' in ansible_args
+    assert ansible_args == expected
