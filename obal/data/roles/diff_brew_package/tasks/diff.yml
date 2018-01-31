@@ -1,0 +1,120 @@
+- name: get spec file
+  find:
+    pattern: "*.spec"
+    path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+  register: spec_file
+  tags:
+    - always
+
+- name: "Set spec file path, scl options and releasers"
+  set_fact:
+    spec_file_path: "{{ spec_file.files[0].path }}"
+    scl_prefix_option_str: "{{ '--define \"scl_prefix tfm-\"' if inventory_hostname.startswith('tfm-') else '' }}"
+    joined_releasers: "{{ releasers | join(' ') }}"
+  tags:
+    - always
+
+- name: "Set branch checks"
+  set_fact:
+    rhel5_branch_exists: "{{ true if 'rhel-5' in joined_releasers else false }}"
+    rhel6_branch_exists: "{{ true if 'rhel-6' in joined_releasers else false }}"
+    rhel7_branch_exists: "{{ true if 'rhel-7' in joined_releasers else false }}"
+  tags:
+    - always
+
+- name: 'Look up current version of package in brew for EL5'
+  shell: "brew list-tagged --quiet \
+    satellite-{{ satellite_version }}-rhel-5-candidate \
+    {{ inventory_hostname }} \
+    | sort --reverse --key 1 --version-sort \
+    | head -n1 \
+    | cut -d' ' -f1"
+  register: latest_brewed_rhel5
+  changed_when: False
+  when: rhel5_branch_exists | bool
+  tags:
+    - always
+
+- name: 'Look up current version of package in brew for EL6'
+  shell: "brew list-tagged --quiet \
+    satellite-{{ satellite_version }}-rhel-6-candidate \
+    {{ inventory_hostname }} \
+    | sort --reverse --key 1 --version-sort \
+    | head -n1 \
+    | cut -d' ' -f1"
+  register: latest_brewed_rhel6
+  changed_when: False
+  when: rhel6_branch_exists | bool
+  tags:
+    - always
+
+- name: 'Look up current version of package in brew for EL7'
+  shell: "brew list-tagged --quiet \
+    satellite-{{ satellite_version }}-rhel-7-candidate \
+    {{ inventory_hostname }}
+    | sort --reverse --key 1 --version-sort
+    | head -n1
+    | cut -d' ' -f1"
+  register: latest_brewed_rhel7
+  changed_when: False
+  when: rhel7_branch_exists | bool
+  tags:
+    - always
+
+- name: 'Calculate EL5 RPM version in local specfile'
+  command: "rpmspec --query '{{ spec_file_path }}' \
+    --define 'dist .el5' \
+    --define 'foremandist .{{ foremandist }}' \
+    {{ scl_prefix_option_str }} \
+    --queryformat='%{name}-%{version}-%{release}\n' \
+    --srpm"
+  register: latest_local_rhel5
+  changed_when: False
+  when: rhel5_branch_exists | bool
+  tags:
+    - always
+
+- name: 'Calculate EL6 RPM version in local specfile'
+  command: "rpmspec --query '{{ spec_file_path }}' \
+    --define 'dist .el6sat' \
+    --define 'foremandist .{{ foremandist }}' \
+    {{ scl_prefix_option_str }} \
+    --queryformat='%{name}-%{version}-%{release}\n' \
+    --srpm"
+  register: latest_local_rhel6
+  changed_when: False
+  when: rhel6_branch_exists | bool
+  tags:
+    - always
+
+- name: 'Calculate EL7 RPM version in local specfile'
+  command: "rpmspec --query '{{ spec_file_path }}' \
+    --define 'dist .el7sat' \
+    --define 'foremandist .{{ foremandist }}' \
+    {{ scl_prefix_option_str }} \
+    --queryformat='%{name}-%{version}-%{release}\n' \
+    --srpm"
+  register: latest_local_rhel7
+  changed_when: False
+  when: rhel7_branch_exists | bool
+  tags:
+    - always
+
+- name: "Set latest for brew and local"
+  set_fact:
+    latest_brewed_rhel5: "{{ latest_brewed_rhel5.stdout | default('') }}"
+    latest_brewed_rhel6: "{{ latest_brewed_rhel6.stdout | default('') }}"
+    latest_brewed_rhel7: "{{ latest_brewed_rhel7.stdout | default('') }}"
+    latest_local_rhel5:  "{{ latest_local_rhel5.stdout | default('') }}"
+    latest_local_rhel6:  "{{ latest_local_rhel6.stdout | default('') }}"
+    latest_local_rhel7:  "{{ latest_local_rhel7.stdout | default('') }}"
+  tags:
+    - always
+
+- name: "Compared local and brew package versions"
+  set_fact:
+    rhel5_build_needed: "{{ latest_brewed_rhel5 != latest_local_rhel5 }}"
+    rhel6_build_needed: "{{ latest_brewed_rhel6 != latest_local_rhel6 }}"
+    rhel7_build_needed: "{{ latest_brewed_rhel7 != latest_local_rhel7 }}"
+  tags:
+    - always
