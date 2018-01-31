@@ -6,20 +6,20 @@
 - debug:
     msg: "Version compare for EL5: brew:[ {{ latest_brewed_rhel5 }} ] local:[ {{ latest_local_rhel5 }} ]"
   changed_when: rhel5_branch_exists | bool
-  when: rhel5_branch_exists | bool
+  when: rhel5_branch_exists is defined and rhel5_branch_exists | bool
   tags:
     - always
 
 - debug:
     msg: "Version compare for EL6: brew:[ {{ latest_brewed_rhel6 }} ] local:[ {{ latest_local_rhel6 }} ]"
   changed_when: rhel6_branch_exists | bool
-  when: rhel6_branch_exists | bool
+  when: rhel6_branch_exists is defined and rhel6_branch_exists | bool
   tags:
     - always
 
 - debug:
     msg: "Version compare for EL7: brew:[ {{ latest_brewed_rhel7 }} ] local:[ {{ latest_local_rhel7 }} ]"
   changed_when: rhel7_branch_exists | bool
-  when: rhel7_branch_exists | bool
+  when: rhel7_branch_exists is defined and rhel7_branch_exists | bool
   tags:
     - always
