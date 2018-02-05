@@ -5,28 +5,14 @@
   tags:
     - always
 
-- name: get spec file
-  find:
-    pattern: "*.spec"
-    path: "{{ package_dir }}"
-  register: spec_file
+- name: 'Setup sources from specfile'
+  include_tasks: specfile.yml
+  when: setup_sources_git is not defined
   tags:
     - always
 
-- name: 'Set spec file path'
-  set_fact:
-    spec_file_path: "{{ spec_file.files[0].path }}"
-  tags:
-    - always
-
-- name: 'Extract Sources from spec'
-  shell: "spectool --list-files --sources {{ spec_file_path }} | awk '{print $2}'"
-  register: sources
-  changed_when: False
-  tags:
-    - always
-
-- include_tasks: annex.yml
-  with_items: "{{ sources.stdout_lines | list }}"
+- name: 'Clone git repository'
+  include_tasks: git.yml
+  when: setup_sources_git is defined
   tags:
     - always

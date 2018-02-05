@@ -1,0 +1,17 @@
+---
+- name: 'Set source checkout location'
+  set_fact:
+    setup_sources_git_checkout_dir: "/tmp/ansible_git_{{ inventory_hostname }}"
+
+- name: 'Clone latest git'
+  git:
+    repo: "{{ setup_sources_git }}"
+    dest: "{{ setup_sources_git_checkout_dir }}"
+    version: "{{ git_branch|default('master') }}"
+    force: yes
+
+- name: 'Register source dir tito argument'
+  set_fact:
+    build_package_tito_releaser_args: '--arg source_dir={{ setup_sources_git_checkout_dir }}'
+  tags:
+    - always

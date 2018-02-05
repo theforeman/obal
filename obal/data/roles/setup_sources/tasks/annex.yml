@@ -1,40 +1,40 @@
 ---
 - name: 'Set source values'
   set_fact:
-    source: "{{ item }}"
-    sourcebase: "{{ item | basename }}"
+    setup_sources_source: "{{ item }}"
+    setup_sources_sourcebase: "{{ item | basename }}"
   tags:
     - always
 
 - name: 'Set source path'
   set_fact:
-    sourcepath: "{{ package_dir  }}/{{ sourcebase }}"
+    setup_sources_sourcepath: "{{ package_dir  }}/{{ setup_sources_sourcebase }}"
   tags:
     - always
 
 - name: 'Source exists'
   stat:
-    path: "{{ sourcepath }}"
-  register: source_exists
+    path: "{{ setup_sources_sourcepath }}"
+  register: setup_sources_source_exists
   tags:
     - always
 
 - name: 'Search annex for web link'
-  shell: 'git annex whereis {{ sourcepath }} 2>/dev/null | grep -q " web:"'
+  shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q " web:"'
   args:
     chdir: "{{ package_dir }}"
   changed_when: False
-  register: search_annex
+  register: setup_sources_search_annex
   ignore_errors: yes
-  when: (not source_exists.stat.exists) or ( source_exists.stat.exists and source_exists.stat.islnk is defined and source_exists.stat.islnk )
+  when: (not setup_sources_source_exists.stat.exists) or ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined and setup_sources_source_exists.stat.islnk )
   tags:
     - always
 
 - name: 'Add url to annex for source'
-  command: "git annex addurl {{ setup_sources_annex_options }} --file '{{ sourcebase }}' '{{ source }}'"
+  command: "git annex addurl {{ setup_sources_annex_options }} --file '{{ setup_sources_sourcebase }}' '{{ setup_sources_source }}'"
   args:
     chdir: "{{ package_dir }}"
   ignore_errors: yes
-  when: search_annex|failed
+  when: setup_sources_search_annex|failed
   tags:
     - always

@@ -1,0 +1,26 @@
+---
+- name: get spec file
+  find:
+    pattern: "*.spec"
+    path: "{{ package_dir }}"
+  register: setup_sources_spec_file
+  tags:
+    - always
+
+- name: 'Set spec file path'
+  set_fact:
+    setup_sources_spec_file_path: "{{ setup_sources_spec_file.files[0].path }}"
+  tags:
+    - always
+
+- name: 'Extract Sources from spec'
+  shell: "spectool --list-files --sources {{ setup_sources_spec_file_path }} | awk '{print $2}'"
+  register: setup_sources_sources
+  changed_when: False
+  tags:
+    - always
+
+- include_tasks: annex.yml
+  with_items: "{{ setup_sources_sources.stdout_lines | list }}"
+  tags:
+    - always
