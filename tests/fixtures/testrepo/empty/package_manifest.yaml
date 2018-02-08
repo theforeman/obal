@@ -1,0 +1,15 @@
+---
+packages:
+  vars:
+    diff_brew_package_skip: false
+    build_package_koji_command: 'brew'
+    satellite_version: '6.3.0'
+    foremandist: 'fm1_15'
+    releasers:
+      - obaltest-dist-git-rhel-7
+  hosts:
+    hello:
+      upstream: "../../upstream/.git"
+      branch: "master"
+      upstream_files:
+        - "packages/hello/"

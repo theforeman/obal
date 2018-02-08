@@ -2,6 +2,8 @@
 - hosts: packages
   serial: 1
   gather_facts: no
+  roles:
+    - git_annex_setup
   tasks:
     - name: 'Ensure upstream_files is defined'
       fail:

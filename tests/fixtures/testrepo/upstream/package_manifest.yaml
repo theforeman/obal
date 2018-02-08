@@ -1,0 +1,7 @@
+---
+packages:
+  vars:
+    releasers:
+      - dist-git
+  hosts:
+    hello: {}
