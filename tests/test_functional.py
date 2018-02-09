@@ -2,7 +2,6 @@ import functools
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 import pytest
 import obal
@@ -51,9 +50,8 @@ def obal_cli_test(func=None, repotype='upstream'):
 
 
 def run_obal(args, exitcode):
-    sys.argv = ['obal'] + DEFAULT_ARGS + args
     with pytest.raises(SystemExit) as excinfo:
-        obal.main()
+        obal.main(DEFAULT_ARGS + args)
     assert excinfo.value.code == exitcode
 
 
