@@ -23,7 +23,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: "{{ obal_tmp_dir }}/{{ upstream_directory }}/{{ item }}"
-        dest: "{{ inventory_dir }}/packages/{{ inventory_hostname }}/"
+        dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream.endswith('.git')
@@ -32,7 +32,7 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
 - block:
     - name: 'Make package download directory'
@@ -59,7 +59,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/{{ item }}"
-        dest: "{{ inventory_dir }}/packages/{{ inventory_hostname }}/"
+        dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream.endswith('src.rpm')
@@ -68,13 +68,13 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "packages/{{ inventory_hostname }}"
+        path: "./{{ package_base_dir }}/{{ inventory_hostname }}"
 
 - block:
     - name: get spec file
       find:
         pattern: "*.spec"
-        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: spec_file
 
     - name: 'Set spec file path and setup flag'
@@ -138,4 +138,4 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
