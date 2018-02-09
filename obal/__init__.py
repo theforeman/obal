@@ -100,7 +100,7 @@ def generate_ansible_args(inventory_path, playbook_path, args):
     return ansible_args
 
 
-def main():
+def main(cliargs=None):
     packaging_playbooks_path = resource_filename(__name__, 'data')
     cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
 
@@ -119,7 +119,7 @@ def main():
 
     parser = obal_argument_parser(package_choices)
 
-    args = parser.parse_args()
+    args = parser.parse_args(cliargs)
 
     playbook = _PLAYBOOKS[args.action]
     playbook_path = os.path.join(packaging_playbooks_path, playbook)
