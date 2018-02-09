@@ -1,7 +1,7 @@
 ---
 - name: 'Set package_dir'
   set_fact:
-    package_dir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+    package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   tags:
     - always
 

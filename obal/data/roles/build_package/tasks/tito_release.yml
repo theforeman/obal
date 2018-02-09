@@ -2,7 +2,7 @@
 - name: 'Release to {{ build_package_koji_command }}'
   command: "tito release {{ build_package_tito_args }} {{ build_package_tito_releasers }} -y {{ build_package_tito_releaser_args|default('') }}"
   args:
-    chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+    chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: build_package_tito_release
   when: build_package_tito_release is not defined
   tags:

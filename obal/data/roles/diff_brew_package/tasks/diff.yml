@@ -1,7 +1,7 @@
 - name: get spec file
   find:
     pattern: "*.spec"
-    path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+    path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: spec_file
   tags:
     - always

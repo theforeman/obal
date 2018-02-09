@@ -15,7 +15,7 @@
     - name: Determine source file from spec
       shell: "spectool --list-files --source 0 *.spec"
       args:
-        chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_url
       when: old_source_url is not defined
 
@@ -26,7 +26,7 @@
     - name: "Remove old source"
       command: "git rm --ignore-unmatch {{ old_source }}"
       args:
-        chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       when: old_source is defined
 
     - include: tasks/download_and_extract_source.yml
@@ -34,7 +34,7 @@
     - name: Determine new source file from spec
       shell: "spectool --list-files --source 0 *.spec"
       args:
-        chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_url
       when: new_source_url is not defined
 
@@ -43,7 +43,7 @@
         new_source: "{{ new_source_url.stdout.split('/')[-1] }}"
 
     - name: 'Git annex add new package'
-      command: "git annex add packages/{{ inventory_hostname }}/{{ new_source }}"
+      command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
       args:
         chdir: "{{ inventory_dir }}"
       when: new_source is defined
