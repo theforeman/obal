@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: 'Get Copr repositories'
+      command: "copr-cli list {{ copr_user }}"
+      register: copr_repos
+      when: copr_repos is not defined
+
+    - name: 'Extract Copr repository names'
+      set_fact:
+        copr_scratch_repos: "{{ copr_repos.stdout.split('\n') | select('match', '^Name:') | list | replace('Name: ', '') }}"
+
+    - name: 'Extract Copr scratch repositories'
+      set_fact:
+        copr_scratch_repos: "{{ copr_scratch_repos | select('match', '.+scratch.+') | list }}"
+
+    - name: 'Remove scratch repositories from Copr'
+      command: "copr-cli delete {{ copr_user }}/{{ item }}"
+      with_items: "{{ copr_scratch_repos }}"
+      when: copr_scratch_repos

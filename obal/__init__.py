@@ -17,6 +17,7 @@ except ImportError:
 _PLAYBOOKS = {
     'add': 'add_package.yml',
     'check': 'check_package.yml',
+    'cleanup-copr': 'cleanup_copr.yml',
     'release': 'release_package.yml',
     'scratch': 'scratch_build.yml',
     'update': 'update_package.yml'
