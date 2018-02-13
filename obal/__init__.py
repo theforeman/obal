@@ -33,6 +33,7 @@ def find_packages(inventory_path):
                                              sources=inventory_path)
         package_choices = ansible_inventory.hosts.keys()
         package_choices.extend(ansible_inventory.groups.keys())
+        package_choices.extend(['all'])
     return package_choices
 
 
