@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+        - rpm-build
+        - koji
+        - brewkoji
+        - git-annex
+        - quvi
+        - tito
+        - rhpkg
+        - scl-utils
+        - scl-utils-build
+
