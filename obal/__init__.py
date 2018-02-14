@@ -19,6 +19,7 @@ _PLAYBOOKS = {
     'check': 'check_package.yml',
     'release': 'release_package.yml',
     'scratch': 'scratch_build.yml',
+    'setup': 'setup.yml',
     'update': 'update_package.yml'
 }
 
