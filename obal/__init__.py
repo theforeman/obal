@@ -19,6 +19,7 @@ _PLAYBOOKS = {
     'check': 'check_package.yml',
     'cleanup-copr': 'cleanup_copr.yml',
     'release': 'release_package.yml',
+    'repoclosure': 'repoclosure.yml',
     'scratch': 'scratch_build.yml',
     'setup': 'setup.yml',
     'update': 'update_package.yml'
@@ -72,6 +73,7 @@ def obal_argument_parser(package_choices):
     parser.add_argument("action",
                         choices=_PLAYBOOKS.keys(),
                         help="""which action to execute""")
+
     parser.add_argument('package',
                         metavar='package',
                         choices=package_choices,
