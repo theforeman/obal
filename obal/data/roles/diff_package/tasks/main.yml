@@ -1,0 +1,11 @@
+---
+- name: 'Include {{ diff_package_type }} package diff'
+  include_tasks: "{{ diff_package_type }}.yml"
+  tags:
+    - always
+  when: not diff_package_skip
+
+- name: 'Set diff_package_changed to True when skipping package diffs'
+  set_fact:
+    diff_package_changed: True
+  when: diff_package_skip
