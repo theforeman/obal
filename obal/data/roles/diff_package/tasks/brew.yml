@@ -1,0 +1,23 @@
+---
+- include_tasks: git_package_info.yml
+
+- set_fact:
+    diff_package_changed: False
+
+- name: 'Look up current version of package in brew'
+  shell: "brew list-tagged --quiet --latest {{ item }} {{ inventory_hostname }} | cut -d' ' -f1"
+  register: brew_package_versions
+  tags:
+    - always
+  with_items: "{{ brew_tags }}"
+
+- set_fact:
+    diff_package_changed: "{{ not item.stdout.startswith(git_package_version) or diff_package_changed }}"
+  with_items: "{{  brew_package_versions.results }}"
+
+- debug:
+    msg:
+      - "Git version: {{ git_package_version }}"
+      - "Brew version: {{ item.stdout }}"
+      - "Changed: {{ diff_package_changed }}"
+  with_items: "{{ brew_package_versions.results }}"

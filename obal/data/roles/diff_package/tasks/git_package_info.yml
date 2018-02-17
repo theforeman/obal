@@ -1,0 +1,25 @@
+---
+- name: get spec file
+  find:
+    pattern: "*.spec"
+    path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+  register: spec_file
+  tags:
+    - always
+
+- name: "Set spec file path, scl options and releasers"
+  set_fact:
+    spec_file_path: "{{ spec_file.files[0].path }}"
+
+- name: 'Get latest package info from git'
+  command: >
+    rpmspec --query
+      --undefine=dist
+      --queryformat=%{name}-%{version}-%{release}
+      {{ '--define "scl_prefix ' + scl + '-"' if scl else '' }}
+      --srpm
+      {{ spec_file_path }}
+  register: git_package_info
+
+- set_fact:
+    git_package_version: "{{ git_package_info.stdout }}"

@@ -132,7 +132,7 @@ def test_obal_release_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/brew', 'list-tagged', '--quiet', 'satellite-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
+        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
         "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
     ]
     assert_mockbin_log(expected_log)
@@ -159,7 +159,7 @@ def test_obal_release_downstream_hello_wait():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/brew', 'list-tagged', '--quiet', 'satellite-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
+        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
         "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
         "['{bin}/brew', 'watch-task']",
         "['{bin}/brew', 'download-logs', '-r']",
