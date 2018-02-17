@@ -1,0 +1,5 @@
+---
+repoclosure_additional_repos:  []
+repoclosure_config: repoclosure/el7.cfg
+repoclosure_target_repo: scratch
+repoclosure_look_aside_repos: []

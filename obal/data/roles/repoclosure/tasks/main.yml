@@ -1,0 +1,27 @@
+---
+- name: 'Build additional repos'
+  set_fact:
+    additional_repos: "{{ additional_repos|default([]) + ['--repofrompath=' + item.name + ',' + item.url] }}"
+  with_items: "{{ repoclosure_additional_repos }}"
+
+- name: 'Run repoclosure'
+  command: >
+    repoclosure
+      -c {{ inventory_dir }}/{{ repoclosure_config }}
+      -t
+      -r {{ repoclosure_target_repo }}
+      {{ additional_repos | join(' ') }}
+      {{ '-l ' if repoclosure_look_aside_repos else '' }}
+      {{ repoclosure_look_aside_repos | join(' -l ') }}
+  register: output
+  when: output is not defined
+  args:
+    chdir: "{{ inventory_dir }}"
+
+- name: 'Cleanup'
+  file:
+    state: absent
+    path: "{{ inventory_dir }}/{{ repoclosure_target_repo }}/"
+
+- debug:
+    msg: "{{ output.stdout_lines }}"
