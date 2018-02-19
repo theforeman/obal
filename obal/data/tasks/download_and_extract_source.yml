@@ -94,11 +94,11 @@
       when:
         - downstream_changelog is not defined
 
-    - name: 'Ensure Source0 specfile points to dogfood'
+    - name: 'Ensure Source0 specfile points to source server'
       replace:
         path: "{{ spec_file_path }}"
         regexp: '^(?P<prefix>Source0:\s+)http.*/(?P<filename>.*)$'
-        replace: '\g<prefix>http://sat-r220-02.lab.eng.rdu2.redhat.com/pulp/isos/Sat6-CI-Source_Files-Satellite_6_3_Source_Files/\g<filename>'
+        replace: '\g<prefix>{{ source_server }}\g<filename>'
 
     - name: 'Bump version in specfile'
       replace:
