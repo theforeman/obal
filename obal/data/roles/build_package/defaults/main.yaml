@@ -1,4 +1,5 @@
 ---
 build_package_build_system: koji
-build_package_koji_command: 'koji'
+build_package_koji_command: koji
 build_package_tito_args: ''
+build_package_scratch: false

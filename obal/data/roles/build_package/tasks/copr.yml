@@ -1,0 +1,65 @@
+---
+- name: 'Set test build'
+  set_fact:
+      build_package_tito_args: "{{ build_package_tito_args }} --test"
+  when: build_package_test|default(false)
+  tags:
+    - always
+
+- block:
+    - name: 'Set tito_releasers for copr release'
+      set_fact:
+        build_package_tito_releasers: "{{ releasers | join(' ') }}"
+      tags:
+        - always
+
+    - include_tasks: tito_release.yml
+      tags:
+        - always
+  when: not build_package_scratch
+
+- block:
+    - name: 'Create .tmp build directory'
+      file:
+        state: directory
+        path: "{{ inventory_dir }}/.tmp"
+      run_once: true
+      tags:
+        - always
+
+    - set_fact:
+        copr_repo_name: "{{ copr_user }}/{{ build_package_scratch_repo}}-{{ 999999999 | random | to_uuid }}"
+      run_once: true
+      when: not copr_repo_name
+      tags:
+        - always
+
+    - name: 'Write copr repo name to vars file'
+      copy:
+        content: "{{ 'copr_repo: ' + copr_repo_name | to_yaml }}"
+        dest: "{{ inventory_dir }}/.tmp/copr_repo"
+      run_once: true
+
+    - include_role:
+        name: copr_repo
+      run_once: true
+      tags:
+        - always
+
+    - name: 'Build SRPM'
+      command: 'tito build --srpm --scl={{ scl }}'
+      args:
+        chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
+      register: srpm_build
+      tags:
+        - always
+
+    - name: 'Run build'
+      command: "copr-cli build {{ copr_repo_name }} {{ srpm_build.stdout.split('Wrote: ')[1] }}"
+      register: build_status
+      tags:
+        - always
+
+    - debug:
+        msg: "{{ build_status.stdout_lines | join('\n') }}"
+  when: build_package_scratch|default(false)

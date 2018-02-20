@@ -7,7 +7,7 @@
   tags:
     - skip_ansible_lint
 
-- name: 'Include {{ build_package_build_system }}.yml'
+- name: "Include {{ build_package_build_system }}.yml"
   include_tasks: "{{ build_package_build_system }}.yml"
   tags:
     - always

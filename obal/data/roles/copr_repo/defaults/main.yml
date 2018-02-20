@@ -1,0 +1,6 @@
+---
+copr_repo_name: 'test-repo'
+copr_repo_chroot: epel-7-x86_64
+copr_repo_description: 'Scratch Builds'
+copr_repo_external_repos: ''
+copr_repo_packages: ''
