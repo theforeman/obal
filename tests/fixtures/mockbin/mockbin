@@ -1,10 +1,29 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+from __future__ import print_function
 
 import os
 import sys
+import argparse
 
 mockbin_log = os.environ.get('MOCKBIN_LOG', None)
 
 if mockbin_log:
     with open(mockbin_log, 'a') as logfile:
         logfile.write("%s\n" % sys.argv)
+
+prog = os.path.basename(sys.argv[0])
+
+if prog == 'tito':
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+    parser_release = subparsers.add_parser('release')
+    parser_release.add_argument('dest')
+    parser_release.add_argument('--scratch', action='store_true')
+    parser_release.add_argument('-y', action='store_true')
+    parser_build = subparsers.add_parser('build')
+    parser_build.add_argument('--srpm', action='store_const', dest='output', const='Wrote: hello.src.rpm')
+    parser_build.add_argument('--scl', action='store')
+    args = parser.parse_args()
+    if 'output' in args and args.output:
+        print(args.output)

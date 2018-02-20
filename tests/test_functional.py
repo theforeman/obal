@@ -196,3 +196,30 @@ def test_obal_repoclosure(**kwargs):
         "['{bin}/repoclosure', '-c', '{pwd}/repoclosure/el7.conf', '-t', '-r', 'scratch']"
     ]
     assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='copr')
+def test_obal_scratch_copr_hello():
+    assert_obal_success(['scratch', 'hello'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "['{bin}/copr-cli', 'create', 'copr-repo-scratch', '--chroot', 'epel-7-x86_64', '--description', 'Scratch Builds', '--unlisted-on-hp', 'on', '--repo', 'http://mirror.centos.org/centos/7/sclo/x86_64/rh/']",  # noqa: E501
+        "['{bin}/copr-cli', 'edit-chroot', 'copr-repo-scratch/epel-7-x86_64', '--packages', 'scl-utils-build rh-ruby24-build']",  # noqa: E501
+        "['{bin}/tito', 'build', '--srpm', '--scl=copr-scl']",
+        "['{bin}/copr-cli', 'build', 'copr-repo-scratch', 'hello.src.rpm']"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='copr')
+def test_obal_release_copr_hello():
+    assert_obal_success(['release', 'hello'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "['{bin}/tito', 'release', 'copr', '-y']",
+    ]
+    assert_mockbin_log(expected_log)

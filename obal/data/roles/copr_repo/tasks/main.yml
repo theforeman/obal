@@ -1,0 +1,17 @@
+---
+- name: 'Create copr scratch build repo'
+  command: >
+    copr-cli
+      create
+      {{ copr_repo_name }}
+      --chroot {{ copr_repo_chroot }}
+      --description '{{ copr_repo_description }}'
+      --unlisted-on-hp on
+      --repo '{{ copr_repo_external_repos | join(' ') }}'
+
+- name: 'Add build packages to chroot'
+  command: >
+    copr-cli
+      edit-chroot
+      {{ copr_repo_name }}/{{ copr_repo_chroot }}
+      --packages '{{ copr_repo_packages | join(' ') }}'

@@ -4,6 +4,7 @@ packages:
     diff_package_skip: false
     scl: tfm
     build_package_koji_command: 'brew'
+    build_package_build_system: 'koji'
     foremandist: 'fm1_15'
     releasers:
       - obaltest-dist-git-rhel-7
