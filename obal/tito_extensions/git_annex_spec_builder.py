@@ -8,7 +8,7 @@ from tito.config_object import ConfigObject
 from tito.builder import GitAnnexBuilder
 from tito.builder.main import BuilderBase
 from tito.common import error_out, debug, run_command, get_spec_version_and_release, \
-    find_spec_like_file, get_relative_project_dir_cwd, warn_out
+    find_spec_like_file, get_relative_project_dir_cwd, warn_out, get_build_commit
 
 
 class GitAnnexSpecBuilder(GitAnnexBuilder):
@@ -42,7 +42,7 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
         self.build_tag = tag
 
         self.build_version = self._get_build_version()
-        self.git_commit_id = self.build_version
+        self.git_commit_id = get_build_commit(tag=self.build_tag, test=True)
 
         if kwargs and 'options' in kwargs:
             warn_out("'options' no longer a supported builder constructor argument.")
@@ -84,13 +84,20 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
         self.srpm_location = None
 
     def _get_build_version(self):
-        self.spec_version = ''
-        self.spec_release = ''
-        build_version = get_spec_version_and_release(
-            self.start_dir,
-            find_spec_like_file(self.start_dir)
-        )
-        self.build_tag = build_version
+        """
+        Figure out the git tag and version-release we're building.
+        """
+        # Determine which package version we should build:
+        build_version = None
+        if self.build_tag:
+            build_version = self.build_tag[len(self.project_name + "-"):]
+        else:
+            build_version = get_spec_version_and_release(self.start_dir,
+                                                         find_spec_like_file(self.start_dir))
+            self.build_tag = self._get_tag_for_version(build_version)
+
+        self.spec_version = build_version.split('-')[0]
+        self.spec_release = build_version.split('-')[-1]
         return build_version
 
     def _setup_sources(self):
