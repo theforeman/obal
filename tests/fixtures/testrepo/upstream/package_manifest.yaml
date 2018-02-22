@@ -5,3 +5,7 @@ packages:
       - dist-git
   hosts:
     hello: {}
+
+repoclosures:
+  hosts:
+    core-repoclosure: {}
