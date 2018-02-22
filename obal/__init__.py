@@ -34,7 +34,7 @@ def find_packages(inventory_path):
         ansible_loader = DataLoader()
         ansible_inventory = InventoryManager(loader=ansible_loader,
                                              sources=inventory_path)
-        package_choices = ansible_inventory.hosts.keys()
+        package_choices = list(ansible_inventory.hosts.keys())
         package_choices.extend(ansible_inventory.groups.keys())
         package_choices.extend(['all'])
     return package_choices
