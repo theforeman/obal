@@ -24,7 +24,7 @@ def find_package_data(package, data_dir):
 
 setup(
     name='obal',
-    version='0.0.1',
+    version='0.0.2',
     description='packaging wrapper using ansible',
     long_description=long_description,
     url='https://github.com/theforeman/obal',
@@ -39,6 +39,9 @@ setup(
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     keywords='ansible foreman packaging koji brew mock',
