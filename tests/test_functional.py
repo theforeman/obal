@@ -66,6 +66,7 @@ def assert_obal_failure(args):
 def assert_mockbin_log(content):
     expected_log = "\n".join(content)
     expected_log = expected_log.replace('{bin}', MOCKBIN_DIR)
+    expected_log = expected_log.replace('{pwd}', os.getcwd())
     with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
         log = mockbinlog.read().strip()
         assert log == expected_log
@@ -185,3 +186,13 @@ def test_obal_add_downstream_hello():
     assert_obal_success(['add', 'hello'])
 
     assert os.path.islink('packages/hello/hello-2.10.tar.gz')
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_repoclosure(**kwargs):
+    assert_obal_success(['repoclosure', 'core-repoclosure'])
+
+    expected_log = [
+        "['{bin}/repoclosure', '-c', '{pwd}/repoclosure/el7.conf', '-t', '-r', 'scratch']"
+    ]
+    assert_mockbin_log(expected_log)

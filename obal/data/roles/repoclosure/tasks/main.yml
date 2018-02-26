@@ -1,7 +1,11 @@
 ---
+- name: 'Initialize additional_repos'
+  set_fact:
+    additional_repos: []
+
 - name: 'Build additional repos'
   set_fact:
-    additional_repos: "{{ additional_repos|default([]) + ['--repofrompath=' + item.name + ',' + item.url] }}"
+    additional_repos: "{{ additional_repos + ['--repofrompath=' + item.name + ',' + item.url] }}"
   with_items: "{{ repoclosure_additional_repos }}"
 
 - name: 'Run repoclosure'
@@ -11,8 +15,8 @@
       -t
       -r {{ repoclosure_target_repo }}
       {{ additional_repos | join(' ') }}
-      {{ '-l ' if repoclosure_look_aside_repos else '' }}
-      {{ repoclosure_look_aside_repos | join(' -l ') }}
+      {{ '-l ' if repoclosure_lookaside_repos else '' }}
+      {{ repoclosure_lookaside_repos | join(' -l ') }}
   register: output
   when: output is not defined
   args:
@@ -24,4 +28,4 @@
     path: "{{ inventory_dir }}/{{ repoclosure_target_repo }}/"
 
 - debug:
-    msg: "{{ output.stdout_lines }}"
+    msg: "{{ output.stdout_lines | join('\n') }}"
