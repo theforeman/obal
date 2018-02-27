@@ -19,6 +19,8 @@ from functools import total_ordering
 import yaml
 from pkg_resources import resource_filename
 
+from obal import formatting
+
 try:
     import argcomplete
 except ImportError:
@@ -164,6 +166,13 @@ class Playbook(object):
         return NotImplemented
 
 
+def get_manifest_path():
+    """
+    Return the package manifest path
+    """
+    return os.path.join(os.getcwd(), 'package_manifest.yaml')
+
+
 def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
@@ -306,7 +315,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     global display  # pylint: disable=C0103,W0603
     display = Display()
 
-    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
+    inventory_path = get_manifest_path()
 
     package_choices = find_packages(inventory_path)
 
@@ -330,6 +339,32 @@ def main(cliargs=None):  # pylint: disable=R0914
     cli.parse()
     exit_code = cli.run()
     sys.exit(exit_code)
+
+
+def format_manifest(cliargs=None):
+    """
+    Format your manifest in a standard way.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('manifest', help='Path to the manifest', nargs='?',
+                        default=get_manifest_path())
+
+    if argcomplete:
+        argcomplete.autocomplete(parser)
+
+    args = parser.parse_args(cliargs)
+
+    if not os.path.exists(args.manifest):
+        print("Could not find your package_manifest.yaml")
+        exit(1)
+
+    with open(args.manifest) as manifest_fp:
+        manifest = formatting.load(manifest_fp)
+
+    formatting.reformat(manifest)
+
+    with open(args.manifest, 'w') as manifest_fp:
+        formatting.write(manifest, manifest_fp)
 
 
 if __name__ == '__main__':

@@ -61,7 +61,10 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    install_requires=['ansible >= 2.5'],
+    install_requires=[
+        'ansible >= 2.5',
+        'ruamel.yaml >= 0.15',
+    ],
 
     extras_require={
         'argcomplete': ['argcomplete'],
@@ -74,6 +77,7 @@ setup(
     entry_points={
         'console_scripts': [
             'obal=obal:main',
+            'obal-fmt=obal:format_manifest',
         ],
     },
 )
