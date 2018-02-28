@@ -97,7 +97,7 @@ def test_obal_scratch_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', '--scratch', 'dist-git', '-y']"
+        "['{bin}/tito', 'release', '--test', '--scratch', 'dist-git', '-y']"
     ]
     assert_mockbin_log(expected_log)
 
@@ -121,7 +121,7 @@ def test_obal_scratch_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'obaltest-scratch-rhel-7', '-y']"
+        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']"
     ]
     assert_mockbin_log(expected_log)
 
@@ -146,7 +146,7 @@ def test_obal_scratch_downstream_hello_wait():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'obaltest-scratch-rhel-7', '-y']",
+        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']",
         "['{bin}/brew', 'watch-task']",
         "['{bin}/brew', 'download-logs', '-r']",
     ]
