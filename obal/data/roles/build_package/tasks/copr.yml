@@ -30,7 +30,7 @@
     - set_fact:
         copr_repo_name: "{{ copr_user }}/{{ build_package_scratch_repo}}-{{ 999999999 | random | to_uuid }}"
       run_once: true
-      when: not copr_repo_name
+      when: copr_repo_name is not defined
       tags:
         - always
 
