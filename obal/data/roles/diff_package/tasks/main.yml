@@ -9,3 +9,5 @@
   set_fact:
     diff_package_changed: True
   when: diff_package_skip
+  tags:
+    - always
