@@ -1,7 +1,7 @@
 ---
 - name: 'Set test build'
   set_fact:
-      build_package_tito_args: "{{ build_package_tito_args }} --test"
+    build_package_tito_args: "{{ build_package_tito_args }} --test"
   when: build_package_test|default(false)
   tags:
     - always
@@ -16,6 +16,12 @@
     - include_tasks: tito_release.yml
       tags:
         - always
+
+    - name: 'Wait for tasks to finish'
+      include_tasks: wait.yml
+      when: build_package_normal_execution_check is not defined
+      tags:
+        - wait
   when: not build_package_scratch
 
 - block:
@@ -62,4 +68,6 @@
 
     - debug:
         msg: "{{ build_status.stdout_lines | join('\n') }}"
+      tags:
+        - always
   when: build_package_scratch|default(false)
