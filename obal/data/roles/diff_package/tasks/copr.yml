@@ -1,7 +1,5 @@
 ---
 - include_tasks: git_package_info.yml
-  tags:
-    - always
 
 - name: 'Get latest package info from copr'
   command: >
@@ -12,36 +10,24 @@
       --with-latest-build
   register: copr_package_info
   ignore_errors: true
-  tags:
-    - always
 
 - set_fact:
     copr_package_info: "{{ copr_package_info.stdout | from_json }}"
   when: copr_package_info | success
-  tags:
-    - always
 
 - set_fact:
     copr_package_version: "{{ copr_package_info['name'] + '-' + copr_package_info['latest_build']['pkg_version'] }}"
   when: copr_package_info | success
-  tags:
-    - always
 
 - set_fact:
     copr_package_version: ""
   when: copr_package_info | failed
-  tags:
-    - always
 
 - set_fact:
     diff_package_changed: "{{ not copr_package_version.startswith(git_package_version) }}"
-  tags:
-    - always
 
 - debug:
     msg:
       - "Git version: {{ git_package_version }}"
       - "Copr version: {{ copr_package_version }}"
       - "Changed: {{ diff_package_changed }}"
-  tags:
-    - always

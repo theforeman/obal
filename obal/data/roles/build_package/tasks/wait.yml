@@ -6,23 +6,17 @@
           | select('match', '^Created task:.*') \
           | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
           | list }}"
-      tags:
-        - always
 
     - name: "Watch {{ build_package_koji_command }} task(s)"
       command: "{{ build_package_koji_command }} watch-task {{ build_package_koji_tasks | join(' ') }}"
       ignore_errors: yes
       register: build_package_koji_status
       when: (build_package_tito_release | succeeded)
-      tags:
-        - always
 
     - name: 'Failed build'
       fail:
         msg: "The build in {{ build_package_koji_command }}  has failed"
       when: (build_package_koji_status | failed)
-      tags:
-        - always
   when: build_package_build_system == 'koji'
 
 - block:
@@ -32,21 +26,15 @@
           | select('match', '^Created builds:.*') \
           | map('regex_replace', '^Created builds:\\s(\\d+)', '\\1') \
           | list }}"
-      tags:
-        - always
 
     - name: "Watch copr task(s)"
       command: "copr-cli watch-build {{ build_package_copr_tasks | join(' ') }}"
       ignore_errors: yes
       register: build_package_copr_status
       when: (build_package_tito_release | succeeded)
-      tags:
-        - always
 
     - name: 'Failed build'
       fail:
         msg: "The build in Copr  has failed"
       when: (build_package_copr_status | failed)
-      tags:
-        - always
   when: build_package_build_system == 'copr'

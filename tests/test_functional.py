@@ -97,6 +97,19 @@ def test_obal_scratch_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
+        "['{bin}/tito', 'release', '--test', '--scratch', 'dist-git', '-y']",
+        "['{bin}/koji', 'watch-task']"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_upstream_hello_nowait():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
         "['{bin}/tito', 'release', '--test', '--scratch', 'dist-git', '-y']"
     ]
     assert_mockbin_log(expected_log)
@@ -110,6 +123,44 @@ def test_obal_release_upstream_hello():
 
     expected_log = [
         "['{bin}/tito', 'release', 'dist-git', '-y']",
+        "['{bin}/koji', 'watch-task']"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_release_upstream_hello_nowait():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "['{bin}/tito', 'release', 'dist-git', '-y']",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
+def test_obal_scratch_downstream_hello_nowait():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
+def test_obal_release_downstream_hello_nowait():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
+        "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
     ]
     assert_mockbin_log(expected_log)
 
@@ -121,7 +172,22 @@ def test_obal_scratch_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']"
+        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']",
+        "['{bin}/brew', 'watch-task']",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
+def test_obal_scratch_downstream_hello_wait_download():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_logs=True'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']",
+        "['{bin}/brew', 'watch-task']",
+        "['{bin}/brew', 'download-logs', '-r']",
     ]
     assert_mockbin_log(expected_log)
 
@@ -135,27 +201,14 @@ def test_obal_release_downstream_hello():
     expected_log = [
         "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
         "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
-    ]
-    assert_mockbin_log(expected_log)
-
-
-@obal_cli_test(repotype='downstream')
-def test_obal_scratch_downstream_hello_wait():
-    assert_obal_success(['scratch', 'hello', '--tags', 'wait,download'])
-
-    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
-
-    expected_log = [
-        "['{bin}/tito', 'release', '--test', 'obaltest-scratch-rhel-7', '-y']",
         "['{bin}/brew', 'watch-task']",
-        "['{bin}/brew', 'download-logs', '-r']",
     ]
     assert_mockbin_log(expected_log)
 
 
 @obal_cli_test(repotype='downstream')
-def test_obal_release_downstream_hello_wait():
-    assert_obal_success(['release', 'hello', '--tags', 'wait,download'])
+def test_obal_release_downstream_hello_wait_download():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_download_logs=True'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -199,8 +252,8 @@ def test_obal_repoclosure():
 
 
 @obal_cli_test(repotype='copr')
-def test_obal_scratch_copr_hello():
-    assert_obal_success(['scratch', 'hello'])
+def test_obal_scratch_copr_hello_nowait():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -208,14 +261,14 @@ def test_obal_scratch_copr_hello():
         "['{bin}/copr-cli', 'create', 'copr-repo-scratch', '--chroot', 'epel-7-x86_64', '--description', 'Scratch Builds', '--unlisted-on-hp', 'on', '--repo', 'http://mirror.centos.org/centos/7/sclo/x86_64/rh/']",  # noqa: E501
         "['{bin}/copr-cli', 'edit-chroot', 'copr-repo-scratch/epel-7-x86_64', '--packages', 'scl-utils-build rh-ruby24-build']",  # noqa: E501
         "['{bin}/tito', 'build', '--srpm', '--scl=copr-scl']",
-        "['{bin}/copr-cli', 'build', 'copr-repo-scratch', 'hello.src.rpm']"
+        "['{bin}/copr-cli', 'build', '--nowait', 'copr-repo-scratch', 'hello.src.rpm']"
     ]
     assert_mockbin_log(expected_log)
 
 
 @obal_cli_test(repotype='copr')
-def test_obal_scratch_copr_hello_wait():
-    assert_obal_success(['scratch', 'hello', '--tags', 'wait'])
+def test_obal_scratch_copr_hello():
+    assert_obal_success(['scratch', 'hello'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -230,8 +283,8 @@ def test_obal_scratch_copr_hello_wait():
 
 
 @obal_cli_test(repotype='copr')
-def test_obal_release_copr_hello():
-    assert_obal_success(['release', 'hello'])
+def test_obal_release_copr_hello_nowait():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -242,8 +295,8 @@ def test_obal_release_copr_hello():
 
 
 @obal_cli_test(repotype='copr')
-def test_obal_release_copr_hello_wait():
-    assert_obal_success(['release', 'hello', '--tags', 'wait'])
+def test_obal_release_copr_hello():
+    assert_obal_success(['release', 'hello'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 

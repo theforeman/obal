@@ -4,14 +4,10 @@
     pattern: "*.spec"
     path: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
   register: spec_file
-  tags:
-    - always
 
 - name: "Set spec file path, scl options and releasers"
   set_fact:
     spec_file_path: "{{ spec_file.files[0].path }}"
-  tags:
-    - always
 
 - name: 'Get latest package info from git'
   command: >
@@ -22,10 +18,6 @@
       --srpm
       {{ spec_file_path }}
   register: git_package_info
-  tags:
-    - always
 
 - set_fact:
     git_package_version: "{{ git_package_info.stdout }}"
-  tags:
-    - always

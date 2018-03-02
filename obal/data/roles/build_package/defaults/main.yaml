@@ -4,3 +4,5 @@ build_package_koji_command: koji
 build_package_tito_args: ''
 build_package_scratch: false
 build_package_tito_releaser_args: []
+build_package_wait: true
+build_package_download_logs: false
