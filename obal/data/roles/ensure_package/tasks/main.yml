@@ -4,5 +4,3 @@
     path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: package_dir
   failed_when: not package_dir.stat.exists
-  tags:
-    - always

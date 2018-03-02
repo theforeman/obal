@@ -2,17 +2,11 @@
 - name: 'Set package_dir'
   set_fact:
     package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-  tags:
-    - always
 
 - name: 'Setup sources from specfile'
   include_tasks: specfile.yml
   when: setup_sources_git is not defined
-  tags:
-    - always
 
 - name: 'Clone git repository'
   include_tasks: git.yml
   when: setup_sources_git is defined
-  tags:
-    - always

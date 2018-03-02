@@ -3,21 +3,15 @@
   set_fact:
     setup_sources_source: "{{ item }}"
     setup_sources_sourcebase: "{{ item | basename }}"
-  tags:
-    - always
 
 - name: 'Set source path'
   set_fact:
     setup_sources_sourcepath: "{{ package_dir  }}/{{ setup_sources_sourcebase }}"
-  tags:
-    - always
 
 - name: 'Source exists'
   stat:
     path: "{{ setup_sources_sourcepath }}"
   register: setup_sources_source_exists
-  tags:
-    - always
 
 - name: 'Search annex for web link'
   shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q " web:"'
@@ -27,8 +21,6 @@
   register: setup_sources_search_annex
   ignore_errors: yes
   when: (not setup_sources_source_exists.stat.exists) or ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined and setup_sources_source_exists.stat.islnk )
-  tags:
-    - always
 
 - name: 'Add url to annex for source'
   command: "git annex addurl {{ setup_sources_annex_options }} --file '{{ setup_sources_sourcebase }}' '{{ setup_sources_source }}'"
@@ -36,5 +28,3 @@
     chdir: "{{ package_dir }}"
   ignore_errors: yes
   when: setup_sources_search_annex|failed
-  tags:
-    - always

@@ -3,25 +3,17 @@
   set_fact:
     build_package_tito_args: "{{ build_package_tito_args }} --test"
   when: build_package_test|default(false)
-  tags:
-    - always
 
 - block:
     - name: 'Set tito_releasers for copr release'
       set_fact:
         build_package_tito_releasers: "{{ releasers | join(' ') }}"
-      tags:
-        - always
 
     - include_tasks: tito_release.yml
-      tags:
-        - always
 
     - name: 'Wait for tasks to finish'
       include_tasks: wait.yml
-      when: build_package_normal_execution_check is not defined
-      tags:
-        - wait
+      when: build_package_wait|bool
   when: not build_package_scratch
 
 - block:
@@ -30,15 +22,11 @@
         state: directory
         path: "{{ inventory_dir }}/.tmp"
       run_once: true
-      tags:
-        - always
 
     - set_fact:
         copr_repo_name: "{{ copr_user }}/{{ build_package_scratch_repo}}-{{ 999999999 | random | to_uuid }}"
       run_once: true
       when: copr_repo_name is not defined
-      tags:
-        - always
 
     - name: 'Write copr repo name to vars file'
       copy:
@@ -49,25 +37,17 @@
     - include_role:
         name: copr_repo
       run_once: true
-      tags:
-        - always
 
     - name: 'Build SRPM'
       command: 'tito build --srpm --scl={{ scl }}'
       args:
         chdir: "{{ inventory_dir }}/packages/{{ inventory_hostname }}"
       register: srpm_build
-      tags:
-        - always
 
     - name: 'Run build'
-      command: "copr-cli build {{ copr_repo_name }} {{ srpm_build.stdout.split('Wrote: ')[1] }}"
+      command: "copr-cli build {% if not build_package_wait|bool %}--nowait{% endif %} {{ copr_repo_name }} {{ srpm_build.stdout.split('Wrote: ')[1] }}"
       register: build_status
-      tags:
-        - always
 
     - debug:
         msg: "{{ build_status.stdout_lines | join('\n') }}"
-      tags:
-        - always
   when: build_package_scratch|default(false)

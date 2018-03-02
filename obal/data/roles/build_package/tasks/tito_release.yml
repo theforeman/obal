@@ -5,17 +5,11 @@
     chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: build_package_tito_release
   when: build_package_tito_release is not defined
-  tags:
-    - always
 
 - debug:
     msg: "{{ build_package_tito_release.stdout_lines }}"
   when: build_package_tito_release | succeeded
-  tags:
-    - always
 
 - debug:
     msg: "{{ build_package_tito_release.stderr.split('\n') }}"
   when: build_package_tito_release | failed
-  tags:
-    - always
