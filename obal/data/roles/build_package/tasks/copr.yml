@@ -2,7 +2,7 @@
 - name: 'Set test build'
   set_fact:
     build_package_tito_args: "{{ build_package_tito_args }} --test"
-  when: build_package_test|default(false)
+  when: build_package_test
 
 - block:
     - name: 'Set tito_releasers for copr release'
@@ -50,4 +50,4 @@
 
     - debug:
         msg: "{{ build_status.stdout_lines | join('\n') }}"
-  when: build_package_scratch|default(false)
+  when: build_package_scratch
