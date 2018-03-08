@@ -1,0 +1,21 @@
+---
+- include_tasks: git_package_info.yml
+
+- set_fact:
+    diff_package_changed: False
+
+- name: 'Look up current version of package in {{ diff_package_koji_command }}'
+  shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ inventory_hostname }} | cut -d' ' -f1"
+  register: koji_package_versions
+  with_items: "{{ diff_package_tags }}"
+
+- set_fact:
+    diff_package_changed: "{{ not item.stdout.startswith(git_package_version) or diff_package_changed }}"
+  with_items: "{{ koji_package_versions.results }}"
+
+- debug:
+    msg:
+      - "Git version: {{ git_package_version }}"
+      - "Tagged version: {{ item.stdout }}"
+      - "Changed: {{ diff_package_changed }}"
+  with_items: "{{ koji_package_versions.results }}"

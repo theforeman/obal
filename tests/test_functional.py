@@ -122,6 +122,7 @@ def test_obal_release_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
+        "['{bin}/koji', 'list-tagged', '--quiet', '--latest', 'obaltest-nightly-rhel7', 'hello']",
         "['{bin}/tito', 'release', 'dist-git', '-y']",
         "['{bin}/koji', 'watch-task']"
     ]
@@ -135,6 +136,7 @@ def test_obal_release_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
+        "['{bin}/koji', 'list-tagged', '--quiet', '--latest', 'obaltest-nightly-rhel7', 'hello']",
         "['{bin}/tito', 'release', 'dist-git', '-y']",
     ]
     assert_mockbin_log(expected_log)
