@@ -6,13 +6,14 @@ import os
 import sys
 import argparse
 
+prog = os.path.basename(sys.argv[0])
+sys.argv[0] = prog
+
 mockbin_log = os.environ.get('MOCKBIN_LOG', None)
 
 if mockbin_log:
     with open(mockbin_log, 'a') as logfile:
         logfile.write("%s\n" % sys.argv)
-
-prog = os.path.basename(sys.argv[0])
 
 if prog == 'tito':
     parser = argparse.ArgumentParser()
