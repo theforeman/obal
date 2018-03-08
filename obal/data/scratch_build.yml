@@ -8,6 +8,5 @@
     build_package_test: true
   roles:
     - git_annex_setup
-    - setup_sources
     - ensure_package
     - build_package

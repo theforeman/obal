@@ -1,3 +1,4 @@
 ---
 dependencies:
+  - { role: setup_sources }
   - { role: package_variables }

@@ -5,7 +5,6 @@
   roles:
     - git_annex_setup
     - ensure_package
-    - setup_sources
     - diff_package
     - role: build_package
       when: diff_package_changed
