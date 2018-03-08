@@ -2,22 +2,22 @@
 - name: 'Set tito_releasers for brew scratch'
   set_fact:
     build_package_tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
-  when: build_package_koji_command == 'brew' and build_package_scratch|default(false)
+  when: build_package_koji_command == 'brew' and build_package_scratch
 
 - name: 'Set tito_releasers'
   set_fact:
     build_package_tito_releasers: "{{ releasers | join(' ')  }}"
-  when: build_package_koji_command != 'brew' or not build_package_scratch|default(false)
+  when: build_package_koji_command != 'brew' or not build_package_scratch
 
 - name: 'Set test build'
   set_fact:
       build_package_tito_args: "{{ build_package_tito_args }} --test"
-  when: build_package_test|default(false)
+  when: build_package_test
 
 - name: 'Set scratch build'
   set_fact:
     build_package_tito_args: "{{ build_package_tito_args }} --scratch"
-  when: build_package_koji_command != 'brew' and build_package_scratch|default(false)
+  when: build_package_koji_command != 'brew' and build_package_scratch
 
 - include_tasks: tito_release.yml
 
