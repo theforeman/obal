@@ -5,6 +5,5 @@
   gather_facts: no
   vars:
     build_package_scratch: true
-    build_package_test: true
   roles:
     - build_package
