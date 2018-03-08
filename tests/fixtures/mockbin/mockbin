@@ -5,6 +5,10 @@ from __future__ import print_function
 import os
 import sys
 import argparse
+try:
+    from pipes import quote
+except ImportError:
+    from shlex import quote
 
 prog = os.path.basename(sys.argv[0])
 sys.argv[0] = prog
@@ -13,7 +17,8 @@ mockbin_log = os.environ.get('MOCKBIN_LOG', None)
 
 if mockbin_log:
     with open(mockbin_log, 'a') as logfile:
-        logfile.write("%s\n" % ' '.join(sys.argv))
+        logline = ' '.join([quote(entry) for entry in sys.argv])
+        logfile.write("%s\n" % (logline))
 
 if prog == 'tito':
     parser = argparse.ArgumentParser()
