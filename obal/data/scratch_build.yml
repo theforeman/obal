@@ -7,5 +7,4 @@
     build_package_scratch: true
     build_package_test: true
   roles:
-    - ensure_package
     - build_package

@@ -3,7 +3,6 @@
   serial: 1
   gather_facts: no
   roles:
-    - ensure_package
     - diff_package
     - role: build_package
       when: diff_package_changed
