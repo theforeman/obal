@@ -8,6 +8,7 @@
   shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ inventory_hostname }} | cut -d' ' -f1"
   register: koji_package_versions
   with_items: "{{ diff_package_tags }}"
+  changed_when: False
 
 - set_fact:
     diff_package_changed: "{{ not item.stdout.startswith(git_package_version) or diff_package_changed }}"

@@ -10,6 +10,7 @@
       --with-latest-build
   register: copr_package_info
   ignore_errors: true
+  changed_when: False
 
 - set_fact:
     copr_package_info: "{{ copr_package_info.stdout | from_json }}"
