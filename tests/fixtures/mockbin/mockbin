@@ -13,7 +13,7 @@ mockbin_log = os.environ.get('MOCKBIN_LOG', None)
 
 if mockbin_log:
     with open(mockbin_log, 'a') as logfile:
-        logfile.write("%s\n" % sys.argv)
+        logfile.write("%s\n" % ' '.join(sys.argv))
 
 if prog == 'tito':
     parser = argparse.ArgumentParser()
