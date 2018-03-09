@@ -90,6 +90,16 @@ def test_obal_noargs():
 
 
 @obal_cli_test(repotype='upstream')
+def test_obal_check_upstream_hello():
+    assert_obal_success(['check', 'hello'])
+
+    expected_log = [
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
 def test_obal_scratch_upstream_hello():
     assert_obal_success(['scratch', 'hello'])
 
