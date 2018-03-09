@@ -65,7 +65,6 @@ def assert_obal_failure(args):
 
 def assert_mockbin_log(content):
     expected_log = "\n".join(content)
-    expected_log = expected_log.replace('{bin}', MOCKBIN_DIR)
     expected_log = expected_log.replace('{pwd}', os.getcwd())
     with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
         log = mockbinlog.read().strip()
@@ -97,8 +96,8 @@ def test_obal_scratch_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', '--scratch', 'dist-git', '-y']",
-        "['{bin}/koji', 'watch-task']"
+        "tito release --scratch dist-git -y",
+        "koji watch-task"
     ]
     assert_mockbin_log(expected_log)
 
@@ -110,7 +109,7 @@ def test_obal_scratch_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', '--scratch', 'dist-git', '-y']"
+        "tito release --scratch dist-git -y"
     ]
     assert_mockbin_log(expected_log)
 
@@ -122,9 +121,9 @@ def test_obal_release_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/koji', 'list-tagged', '--quiet', '--latest', 'obaltest-nightly-rhel7', 'hello']",
-        "['{bin}/tito', 'release', 'dist-git', '-y']",
-        "['{bin}/koji', 'watch-task']"
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "tito release dist-git -y",
+        "koji watch-task"
     ]
     assert_mockbin_log(expected_log)
 
@@ -136,8 +135,8 @@ def test_obal_release_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/koji', 'list-tagged', '--quiet', '--latest', 'obaltest-nightly-rhel7', 'hello']",
-        "['{bin}/tito', 'release', 'dist-git', '-y']",
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "tito release dist-git -y",
     ]
     assert_mockbin_log(expected_log)
 
@@ -149,7 +148,7 @@ def test_obal_scratch_downstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'obaltest-scratch-rhel-7', '-y']"
+        "tito release obaltest-scratch-rhel-7 -y"
     ]
     assert_mockbin_log(expected_log)
 
@@ -161,8 +160,8 @@ def test_obal_release_downstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
-        "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "tito release obaltest-dist-git-rhel-7 -y",
     ]
     assert_mockbin_log(expected_log)
 
@@ -174,8 +173,8 @@ def test_obal_scratch_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'obaltest-scratch-rhel-7', '-y']",
-        "['{bin}/brew', 'watch-task']",
+        "tito release obaltest-scratch-rhel-7 -y",
+        "brew watch-task",
     ]
     assert_mockbin_log(expected_log)
 
@@ -187,9 +186,9 @@ def test_obal_scratch_downstream_hello_wait_download():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'obaltest-scratch-rhel-7', '-y']",
-        "['{bin}/brew', 'watch-task']",
-        "['{bin}/brew', 'download-logs', '-r']",
+        "tito release obaltest-scratch-rhel-7 -y",
+        "brew watch-task",
+        "brew download-logs -r",
     ]
     assert_mockbin_log(expected_log)
 
@@ -201,9 +200,9 @@ def test_obal_release_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
-        "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
-        "['{bin}/brew', 'watch-task']",
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "tito release obaltest-dist-git-rhel-7 -y",
+        "brew watch-task",
     ]
     assert_mockbin_log(expected_log)
 
@@ -215,10 +214,10 @@ def test_obal_release_downstream_hello_wait_download():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "['{bin}/brew', 'list-tagged', '--quiet', '--latest', 'obaltest-6.3.0-rhel-7-candidate', 'hello']",  # noqa: E501
-        "['{bin}/tito', 'release', 'obaltest-dist-git-rhel-7', '-y']",
-        "['{bin}/brew', 'watch-task']",
-        "['{bin}/brew', 'download-logs', '-r']",
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "tito release obaltest-dist-git-rhel-7 -y",
+        "brew watch-task",
+        "brew download-logs -r",
     ]
     assert_mockbin_log(expected_log)
 
@@ -248,7 +247,7 @@ def test_obal_repoclosure():
     assert_obal_success(['repoclosure', 'core-repoclosure'])
 
     expected_log = [
-        "['{bin}/repoclosure', '-c', '{pwd}/repoclosure/el7.conf', '-t', '-r', 'scratch']"
+        "repoclosure -c {pwd}/repoclosure/el7.conf -t -r scratch"
     ]
     assert_mockbin_log(expected_log)
 
@@ -260,10 +259,10 @@ def test_obal_scratch_copr_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/copr-cli', 'create', 'copr-repo-scratch', '--chroot', 'epel-7-x86_64', '--description', 'Scratch Builds', '--unlisted-on-hp', 'on', '--repo', 'http://mirror.centos.org/centos/7/sclo/x86_64/rh/']",  # noqa: E501
-        "['{bin}/copr-cli', 'edit-chroot', 'copr-repo-scratch/epel-7-x86_64', '--packages', 'scl-utils-build rh-ruby24-build']",  # noqa: E501
-        "['{bin}/tito', 'build', '--srpm', '--scl=copr-scl']",
-        "['{bin}/copr-cli', 'build', '--nowait', 'copr-repo-scratch', 'hello.src.rpm']"
+        "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
+        "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
+        "tito build --srpm --scl=copr-scl",
+        "copr-cli build --nowait copr-repo-scratch hello.src.rpm"
     ]
     assert_mockbin_log(expected_log)
 
@@ -275,10 +274,10 @@ def test_obal_scratch_copr_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/copr-cli', 'create', 'copr-repo-scratch', '--chroot', 'epel-7-x86_64', '--description', 'Scratch Builds', '--unlisted-on-hp', 'on', '--repo', 'http://mirror.centos.org/centos/7/sclo/x86_64/rh/']",  # noqa: E501
-        "['{bin}/copr-cli', 'edit-chroot', 'copr-repo-scratch/epel-7-x86_64', '--packages', 'scl-utils-build rh-ruby24-build']",  # noqa: E501
-        "['{bin}/tito', 'build', '--srpm', '--scl=copr-scl']",
-        "['{bin}/copr-cli', 'build', 'copr-repo-scratch', 'hello.src.rpm']",
+        "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
+        "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
+        "tito build --srpm --scl=copr-scl",
+        "copr-cli build copr-repo-scratch hello.src.rpm",
         # copr-cli build waits by default, so there is no "watch-build" step here
     ]
     assert_mockbin_log(expected_log)
@@ -291,7 +290,7 @@ def test_obal_release_copr_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'copr', '-y']",
+        "tito release copr -y",
     ]
     assert_mockbin_log(expected_log)
 
@@ -303,7 +302,7 @@ def test_obal_release_copr_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "['{bin}/tito', 'release', 'copr', '-y']",
-        "['{bin}/copr-cli', 'watch-build']"
+        "tito release copr -y",
+        "copr-cli watch-build"
     ]
     assert_mockbin_log(expected_log)
