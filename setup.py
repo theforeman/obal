@@ -24,7 +24,7 @@ def find_package_data(package, data_dir):
 
 setup(
     name='obal',
-    version='0.0.2',
+    version='0.0.3',
     description='packaging wrapper using ansible',
     long_description=long_description,
     url='https://github.com/theforeman/obal',
