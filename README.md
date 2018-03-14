@@ -6,7 +6,7 @@ All `obal` actions should also work with plain Ansible when called like `ansible
 
 ## available action (playbooks)
 
-### add (add_package.yml)
+### add
 
 This action can add a new package from an upstream repo to a downstream onw, e.g. to add a package from `foreman-packaging` to a downstream product repository.
 
@@ -37,31 +37,31 @@ Sometimes `add` won't work due to your new packaging being in a non-standard loc
 1. Scratch build your package with `obal scratch new-manually-added-package`
 1. If your scratch build is successful, then please commit your additions and submit an MR.
 
-### check (check_package.yml)
+### check
 
 This action verifies that the packages defined in git are also built into Koji/Brew/Copr.
 
-### cleanup-copr (cleanup_copr.yml)
+### cleanup-copr
 
 This action cleans up stale Copr scratch repos.
 
-### release (release_package.yml)
+### release
 
 This action releases a package to Koji/Brew/Copr (unless there is already the exact same version present).
 
-### repoclosure (repoclosure.yml)
+### repoclosure
 
 This action runs `repoclosure` for a repository, which ensures that all dependencies are met and all packages are installable.
 
-### scratch (scratch_build.yml)
+### scratch
 
 This action does a scratch build of a package.
 
-### setup (setup.yml)
+### setup
 
 This action installs packages required for proper `obal` usage on your machine.
 
-### update (update_package.yml)
+### update
 
 This action updates a package to a newer version. The newer version is either taken from an upstream repository or can be given via command line options
 
