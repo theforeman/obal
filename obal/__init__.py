@@ -106,8 +106,9 @@ def generate_ansible_args(inventory_path, playbook_path, args):
 
 
 def main(cliargs=None):
-    packaging_playbooks_path = resource_filename(__name__, 'data')
-    cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
+    data_path = resource_filename(__name__, 'data')
+    packaging_playbooks_path = os.path.join(data_path, 'playbooks')
+    cfg_path = os.path.join(data_path, 'ansible.cfg')
 
     if os.path.exists(cfg_path):
         os.environ["ANSIBLE_CONFIG"] = cfg_path

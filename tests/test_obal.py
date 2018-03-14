@@ -24,7 +24,7 @@ def test_find_packages():
 
 
 def _test_generate_ansible_args(cliargs):
-    playbooks_path = resource_filename('obal', 'data')
+    playbooks_path = resource_filename('obal', 'data/playbooks')
     playbooks = obal.find_playbooks(playbooks_path)
     parser = obal.obal_argument_parser(playbooks.keys(), ['testpackage'])
     args = parser.parse_args(cliargs)
