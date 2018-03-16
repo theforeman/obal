@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import argparse
+import glob
 import os
 import sys
 
@@ -14,16 +15,15 @@ try:
 except ImportError:
     argcomplete = None
 
-_PLAYBOOKS = {
-    'add': 'add_package.yml',
-    'check': 'check_package.yml',
-    'cleanup-copr': 'cleanup_copr.yml',
-    'release': 'release_package.yml',
-    'repoclosure': 'repoclosure.yml',
-    'scratch': 'scratch_build.yml',
-    'setup': 'setup.yml',
-    'update': 'update_package.yml'
-}
+
+def find_playbooks(playbooks_path):
+    playbooks = glob.glob(os.path.join(playbooks_path, '*.yml'))
+    playbooks_actions = {}
+    for playbook in playbooks:
+        filename = os.path.basename(playbook)
+        action = os.path.splitext(filename)[0]
+        playbooks_actions[action] = playbook
+    return playbooks_actions
 
 
 def find_packages(inventory_path):
@@ -40,7 +40,7 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(package_choices):
+def obal_argument_parser(actions, package_choices):
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--extra-vars',
                         dest="extra_vars",
@@ -71,7 +71,7 @@ def obal_argument_parser(package_choices):
                         match these values""")
 
     parser.add_argument("action",
-                        choices=_PLAYBOOKS.keys(),
+                        choices=actions,
                         help="""which action to execute""")
 
     parser.add_argument('package',
@@ -106,8 +106,9 @@ def generate_ansible_args(inventory_path, playbook_path, args):
 
 
 def main(cliargs=None):
-    packaging_playbooks_path = resource_filename(__name__, 'data')
-    cfg_path = os.path.join(packaging_playbooks_path, 'ansible.cfg')
+    data_path = resource_filename(__name__, 'data')
+    packaging_playbooks_path = os.path.join(data_path, 'playbooks')
+    cfg_path = os.path.join(data_path, 'ansible.cfg')
 
     if os.path.exists(cfg_path):
         os.environ["ANSIBLE_CONFIG"] = cfg_path
@@ -121,13 +122,13 @@ def main(cliargs=None):
     inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
 
     package_choices = find_packages(inventory_path)
+    playbooks = find_playbooks(packaging_playbooks_path)
 
-    parser = obal_argument_parser(package_choices)
+    parser = obal_argument_parser(playbooks.keys(), package_choices)
 
     args = parser.parse_args(cliargs)
 
-    playbook = _PLAYBOOKS[args.action]
-    playbook_path = os.path.join(packaging_playbooks_path, playbook)
+    playbook_path = playbooks[args.action]
 
     if not os.path.exists(inventory_path):
         print("Could not find your package_manifest.yaml")

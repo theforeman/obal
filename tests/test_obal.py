@@ -1,6 +1,7 @@
 import os
 import pytest
 import obal
+from pkg_resources import resource_filename
 
 
 FIXTURE_DIR = os.path.join(
@@ -23,7 +24,9 @@ def test_find_packages():
 
 
 def _test_generate_ansible_args(cliargs):
-    parser = obal.obal_argument_parser(['testpackage'])
+    playbooks_path = resource_filename('obal', 'data/playbooks')
+    playbooks = obal.find_playbooks(playbooks_path)
+    parser = obal.obal_argument_parser(playbooks.keys(), ['testpackage'])
     args = parser.parse_args(cliargs)
     ansible_args = obal.generate_ansible_args('inventory.yml', 'dummy.yml',
                                               args)
