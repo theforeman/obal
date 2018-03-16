@@ -18,7 +18,9 @@
       register: package_directory_result
 
     - block:
-        - include: ../tasks/download_and_extract_source.yml
+        - name: 'Fetch sources'
+          include_role:
+            name: fetch_sources
 
         - name: 'Git annex add new package'
           command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item }}"

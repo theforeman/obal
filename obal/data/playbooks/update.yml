@@ -29,7 +29,9 @@
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       when: old_source is defined
 
-    - include: ../tasks/download_and_extract_source.yml
+    - name: 'Fetch sources'
+      include_role:
+        name: fetch_sources
 
     - name: Determine new source file from spec
       shell: "spectool --list-files --source 0 *.spec"
