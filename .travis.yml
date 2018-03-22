@@ -6,7 +6,11 @@ python:
 install:
 - pip install -r requirements-test.txt
 - curl --create-dirs -o /home/travis/.local/bin/spectool https://pagure.io/rpmdevtools/raw/master/f/spectool.in
+- curl --create-dirs -o /home/travis/.local/bin/rpmdev-bumpspec https://pagure.io/rpmdevtools/raw/master/f/rpmdev-bumpspec
+- curl --create-dirs -o /home/travis/.local/bin/rpmdev-packager https://pagure.io/rpmdevtools/raw/master/f/rpmdev-packager
 - chmod +x /home/travis/.local/bin/spectool
+- chmod +x /home/travis/.local/bin/rpmdev-bumpspec
+- chmod +x /home/travis/.local/bin/rpmdev-packager
 script:
 - tox
 deploy:
