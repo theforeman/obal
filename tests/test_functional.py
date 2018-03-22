@@ -316,3 +316,10 @@ def test_obal_release_copr_hello():
         "copr-cli watch-build"
     ]
     assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_bump_release_hello():
+    assert_obal_success(['bump-release', 'hello'])
+
+    assert '2' == subprocess.check_output(['rpmspec', '-q', '--queryformat=%{release}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
