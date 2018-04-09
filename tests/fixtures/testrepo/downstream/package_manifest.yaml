@@ -13,7 +13,7 @@ packages:
       - obaltest-6.3.0-rhel-7-candidate
   hosts:
     hello:
-      upstream: "../../upstream/.git"
+      upstream: "file://{{ inventory_dir }}/../upstream/.git"
       branch: "master"
       upstream_files:
         - "packages/hello/"

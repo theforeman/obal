@@ -9,6 +9,7 @@
     dest: "{{ setup_sources_git_checkout_dir }}"
     version: "{{ git_branch|default('master') }}"
     force: yes
+    depth: 1
 
 - name: 'Register source dir tito argument'
   set_fact:
