@@ -10,6 +10,7 @@
         dest: "{{ obal_tmp_dir }}/{{ upstream_directory }}"
         version: "{{ branch }}"
         update: yes
+        depth: 1
 
     - name: 'Copy upstream files'
       synchronize:
