@@ -13,49 +13,41 @@
         - downstream_version is not defined
 
     - name: Determine source file from spec
-      shell: "spectool --list-files --source 0 *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --sources *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      register: old_source_url
-      when: old_source_url is not defined
+      register: old_source_urls
+      when: old_source_urls is not defined
 
-    - name: 'Extract old source file name'
-      set_fact:
-        old_source: "{{ old_source_url.stdout | basename }}"
-
-    - name: "Remove old source"
-      command: "git rm --ignore-unmatch {{ old_source }}"
+    - name: "Remove old sources"
+      command: "git rm --ignore-unmatch {{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      when: old_source is defined
+      with_items: "{{ old_source_urls.stdout_lines | list }}"
 
     - name: 'Fetch sources'
       include_role:
         name: fetch_sources
 
     - name: Determine new source file from spec
-      shell: "spectool --list-files --source 0 *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --sources *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      register: new_source_url
-      when: new_source_url is not defined
+      register: new_source_urls
+      when: new_source_urls is not defined
 
-    - name: 'Extract name of souce file from url'
-      set_fact:
-        new_source: "{{ new_source_url.stdout | basename }}"
-
-    - name: 'Git annex add new package'
-      command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
+    - name: 'Git annex add new sources'
+      command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}"
+      with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
-        - new_source is defined
-        - "'://' in new_source_url.stdout"
+        - "'://' in item"
 
-    - name: 'Git add new package'
-      command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
+    - name: 'Git add new sources'
+      command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}"
+      with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
-        - new_source is defined
-        - "'://' not in new_source_url.stdout"
+        - "'://' not in item"
