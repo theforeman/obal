@@ -13,7 +13,7 @@
         - downstream_version is not defined
 
     - name: Determine source file from spec
-      shell: "spectool --list-files --source 0 *.spec"
+      shell: "spectool --list-files --source 0 *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_url
@@ -34,7 +34,7 @@
         name: fetch_sources
 
     - name: Determine new source file from spec
-      shell: "spectool --list-files --source 0 *.spec"
+      shell: "spectool --list-files --source 0 *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_url
@@ -48,4 +48,14 @@
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
       args:
         chdir: "{{ inventory_dir }}"
-      when: new_source is defined
+      when:
+        - new_source is defined
+        - "'://' in new_source_url.stdout"
+
+    - name: 'Git add new package'
+      command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+      when:
+        - new_source is defined
+        - "'://' not in new_source_url.stdout"
