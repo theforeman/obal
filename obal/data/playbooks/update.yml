@@ -21,7 +21,7 @@
 
     - name: 'Extract old source file name'
       set_fact:
-        old_source: "{{ old_source_url.stdout.split('\n')[0].split('/')[-1] }}"
+        old_source: "{{ old_source_url.stdout | basename }}"
 
     - name: "Remove old source"
       command: "git rm --ignore-unmatch {{ old_source }}"
@@ -42,7 +42,7 @@
 
     - name: 'Extract name of souce file from url'
       set_fact:
-        new_source: "{{ new_source_url.stdout.split('/')[-1] }}"
+        new_source: "{{ new_source_url.stdout | basename }}"
 
     - name: 'Git annex add new package'
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ new_source }}"
