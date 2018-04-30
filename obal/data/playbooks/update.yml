@@ -24,6 +24,8 @@
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       with_items: "{{ old_source_urls.stdout_lines | list }}"
+      when:
+        - "'://' in item"
 
     - name: 'Fetch sources'
       include_role:
