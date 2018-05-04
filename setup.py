@@ -49,7 +49,7 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    install_requires=['ansible >= 2.4'],
+    install_requires=['ansible >= 2.5'],
 
     extras_require={
         'argcomplete': ['argcomplete'],
