@@ -27,6 +27,7 @@ setup(
     version='0.0.3',
     description='packaging wrapper using ansible',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/theforeman/obal',
     author='The Foreman Project',
     author_email='foreman-dev@googlegroups.com',
