@@ -18,6 +18,7 @@
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_urls
       when: old_source_urls is not defined
+      changed_when: False
 
     - name: "Remove old sources"
       command: "git rm --ignore-unmatch {{ item | basename }}"
@@ -37,6 +38,7 @@
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_urls
       when: new_source_urls is not defined
+      changed_when: False
 
     - name: 'Git annex add new sources'
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
