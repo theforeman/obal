@@ -27,4 +27,4 @@
   args:
     chdir: "{{ package_dir }}"
   ignore_errors: yes
-  when: setup_sources_search_annex|failed
+  when: setup_sources_search_annex is failed

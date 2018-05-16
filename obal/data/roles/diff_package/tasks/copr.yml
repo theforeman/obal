@@ -14,15 +14,15 @@
 
 - set_fact:
     copr_package_info: "{{ copr_package_info.stdout | from_json }}"
-  when: copr_package_info | success
+  when: copr_package_info is successful
 
 - set_fact:
     copr_package_version: "{{ copr_package_info['name'] + '-' + copr_package_info['latest_build']['pkg_version'] }}"
-  when: copr_package_info | success and copr_package_info['latest_build']
+  when: copr_package_info is successful and copr_package_info['latest_build']
 
 - set_fact:
     copr_package_version: ""
-  when: copr_package_info | failed or not copr_package_info['latest_build']
+  when: copr_package_info is failed or not copr_package_info['latest_build']
 
 - set_fact:
     diff_package_changed: "{{ not copr_package_version.startswith(git_package_version) }}"

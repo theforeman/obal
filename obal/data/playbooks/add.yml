@@ -51,4 +51,4 @@
           when: git_status.stdout != ''
           args:
             chdir: "{{ inventory_dir }}"
-      when: package_directory_result|changed
+      when: package_directory_result is changed
