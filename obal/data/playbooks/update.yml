@@ -13,7 +13,7 @@
         - downstream_version is not defined
 
     - name: Determine source file from spec
-      shell: "spectool --list-files --sources *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --all *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_urls
@@ -33,7 +33,7 @@
         name: fetch_sources
 
     - name: Determine new source file from spec
-      shell: "spectool --list-files --sources *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --all *.spec | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_urls
