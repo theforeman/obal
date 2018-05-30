@@ -90,10 +90,10 @@ def generate_ansible_args(inventory_path, playbook_path, args):
     limit = ':'.join(args.package)
     ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
                     limit]
-    for extra_var in args.extra_vars:
-        ansible_args.extend(["-e", extra_var])
     if args.verbose:
         ansible_args.append("-%s" % str("v" * args.verbose))
+    for extra_var in args.extra_vars:
+        ansible_args.extend(["-e", extra_var])
     if args.tags:
         ansible_args.append("--tags")
         ansible_args.append(",".join(args.tags))

@@ -323,3 +323,11 @@ def test_obal_bump_release_hello():
     assert_obal_success(['bump-release', 'hello'])
 
     assert '2' == subprocess.check_output(['rpmspec', '-q', '--queryformat=%{release}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_bump_release_hello_with_changelog():
+    assert_obal_success(['bump-release', 'hello', '-e', "changelog='New-package-release'"])
+    output = subprocess.check_output(['rpmspec', '-q', '--queryformat=%{changelogtext}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
+
+    assert 'New-package-release' in output
