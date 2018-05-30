@@ -69,6 +69,10 @@ This action updates a package to a newer version. The newer version is either ta
 
 This action updates a spec file's release field and adds a pre-formatted changelog entry.
 
+### lint
+
+This action runs rpmlint on a spec file and reports the results.
+
 #### Updating a Package from Upstream
 
 To update a package from upstream, start by updating the `package_manifest.yml` entry for that package with the new versions and relevant information. Next run the update action specifying the package:
