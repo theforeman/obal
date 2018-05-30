@@ -13,4 +13,5 @@
 
 - name: 'Register source dir tito argument'
   set_fact:
-    build_package_tito_releaser_args: '--arg source_dir={{ setup_sources_git_checkout_dir }}'
+    build_package_tito_releaser_args: 
+    - '--arg source_dir={{ setup_sources_git_checkout_dir }}'
