@@ -331,3 +331,10 @@ def test_obal_bump_release_hello_with_changelog():
     output = subprocess.check_output(['rpmspec', '-q', '--queryformat=%{changelogtext}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
 
     assert 'New-package-release' in output
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_lint_hello():
+    assert_obal_success(['lint', 'hello'])
+
+    assert_mockbin_log(["rpmlint {pwd}/packages/hello"])
