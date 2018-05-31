@@ -14,7 +14,7 @@
   register: setup_sources_source_exists
 
 - name: 'Search annex for web link'
-  shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q " web:"'
+  shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q "web:"'
   args:
     chdir: "{{ package_dir }}"
   changed_when: False

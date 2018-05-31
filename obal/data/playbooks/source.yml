@@ -1,0 +1,9 @@
+---
+- hosts: packages
+  serial: 1
+  gather_facts: no
+  roles:
+    - setup_workspace
+    - ensure_package
+    - setup_sources
+    - package_variables
