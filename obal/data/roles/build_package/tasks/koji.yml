@@ -27,4 +27,4 @@
 
 - name: 'Download task results'
   include_tasks: download.yml
-  when: build_package_download_logs|bool
+  when: build_package_download_logs|bool or build_package_download_rpms|bool
