@@ -190,7 +190,7 @@ def test_obal_scratch_downstream_hello():
 
 
 @obal_cli_test(repotype='downstream')
-def test_obal_scratch_downstream_hello_wait_download():
+def test_obal_scratch_downstream_hello_wait_download_logs():
     assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_logs=True'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
@@ -199,6 +199,20 @@ def test_obal_scratch_downstream_hello_wait_download():
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task",
         "brew download-logs -r",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
+def test_obal_scratch_downstream_hello_wait_download_rpms():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_rpms=True'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "tito release obaltest-scratch-rhel-7 -y",
+        "brew watch-task",
+        "createrepo ."
     ]
     assert_mockbin_log(expected_log)
 
@@ -218,7 +232,7 @@ def test_obal_release_downstream_hello():
 
 
 @obal_cli_test(repotype='downstream')
-def test_obal_release_downstream_hello_wait_download():
+def test_obal_release_downstream_hello_wait_download_logs():
     assert_obal_success(['release', 'hello', '-e', 'build_package_download_logs=True'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
@@ -228,6 +242,21 @@ def test_obal_release_downstream_hello_wait_download():
         "tito release obaltest-dist-git-rhel-7 -y",
         "brew watch-task",
         "brew download-logs -r",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
+def test_obal_release_downstream_hello_wait_download_rpms():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_download_rpms=True'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "tito release obaltest-dist-git-rhel-7 -y",
+        "brew watch-task",
+        "createrepo ."
     ]
     assert_mockbin_log(expected_log)
 
