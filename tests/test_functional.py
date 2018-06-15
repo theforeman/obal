@@ -212,7 +212,7 @@ def test_obal_scratch_downstream_hello_wait_download_rpms():
     expected_log = [
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task",
-        "createrepo ."
+        "createrepo {pwd}/downloaded_rpms"
     ]
     assert_mockbin_log(expected_log)
 
@@ -256,7 +256,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
         "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
         "tito release obaltest-dist-git-rhel-7 -y",
         "brew watch-task",
-        "createrepo ."
+        "createrepo {pwd}/downloaded_rpms"
     ]
     assert_mockbin_log(expected_log)
 
