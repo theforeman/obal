@@ -31,13 +31,19 @@ def run_module():
     if module.check_mode:
         return result
 
-    specfile = glob.glob(os.path.join(module.params['directory'], "*.spec"))[0]
+    try:
+        specfile = glob.glob(os.path.join(module.params['directory'], "*.spec"))[0]
+    except IndexError:
+        module.fail_json(msg="Could not find specfile", **result)
 
-    cmd = ['rpm', '--query', '--changelog', '--specfile', specfile]
-    result['changelog_version_release'] = subprocess.check_output(cmd).split("\n")[0].split(" ")[-1]
+    try:
+        cmd = ['rpm', '--query', '--changelog', '--specfile', specfile]
+        result['changelog_version_release'] = subprocess.check_output(cmd).split("\n")[0].split(" ")[-1]
 
-    cmd = ['rpmspec', '--query', '--queryformat', '%{version}-%{release}', '--undefine', 'dist', '--srpm', specfile]
-    result['specfile_version_release'] = subprocess.check_output(cmd)
+        cmd = ['rpmspec', '--query', '--queryformat', '%{version}-%{release}', '--undefine', 'dist', '--srpm', specfile]
+        result['specfile_version_release'] = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as err:
+        module.fail_json(msg="An error occured while running [ {} ]".format(err.cmd), **result)
 
     if result['changelog_version_release'] != result['specfile_version_release']:
         module.fail_json(msg="changelog entry missing for {}".format(result['specfile_version_release']), **result)
