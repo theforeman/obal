@@ -2,3 +2,5 @@
   gather_facts: no
   roles:
     - repoclosure
+  # Repoclosure can't run in parallel because it reuses caches
+  serial: 1
