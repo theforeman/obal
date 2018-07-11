@@ -151,6 +151,17 @@ def test_obal_release_upstream_hello_nowait():
     assert_mockbin_log(expected_log)
 
 
+@obal_cli_test(repotype='upstream')
+def test_obal_nightly_upstream_hello():
+    assert_obal_success(['nightly', 'hello'])
+
+    expected_log = [
+        "tito release dist-git-jenkins -y --arg jenkins_job=hello-master-release",
+        "koji watch-task",
+    ]
+    assert_mockbin_log(expected_log)
+
+
 @obal_cli_test(repotype='downstream')
 def test_obal_scratch_downstream_hello_nowait():
     assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
