@@ -1,6 +1,8 @@
 import subprocess
 import time
+
 from ansible.module_utils.basic import AnsibleModule
+
 
 def main():
     module = AnsibleModule(
@@ -33,20 +35,23 @@ def main():
     release = release.strip().replace('"', '')
     version = version.strip().replace('"', '')
 
-    lines = ''
-    with open(spec) as file:
-        lines = file.readlines()
+    with open(spec) as spec_file:
+        lines = spec_file.readlines()
 
-    for i in range(len(lines)):
-        if "%changelog" in lines[i]:
+    changed = False
+
+    for i, line in enumerate(lines):
+        if line.startswith("%changelog"):
             date = time.strftime("%a %b %d %Y", time.gmtime())
             entry = "* %s %s %s-%s\n%s\n\n" % (date, user, version, release, changelog)
             lines[i] += entry
+            changed = True
+            break
 
-    with open(spec, "w") as file:
-        file.writelines(lines)
+    with open(spec, "w") as spec_file:
+        spec_file.writelines(lines)
 
-    module.exit_json(changed=True)
+    module.exit_json(changed=changed)
 
 if __name__ == '__main__':
     main()
