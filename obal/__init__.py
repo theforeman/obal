@@ -70,15 +70,17 @@ def obal_argument_parser(actions, package_choices):
                         help="""only run plays and tasks whose tags do not
                         match these values""")
 
-    parser.add_argument("action",
-                        choices=actions,
-                        help="""which action to execute""")
+    subparsers = parser.add_subparsers(dest='action',
+                                       help="""which action to execute""")
 
-    parser.add_argument('package',
-                        metavar='package',
-                        choices=package_choices,
-                        nargs='+',
-                        help="the package to build")
+    subparsers.add_parser('setup')
+
+    for action in [action for action in list(actions) if action != 'setup']:
+        subparsers.add_parser(action).add_argument('package',
+                                                   metavar='package',
+                                                   choices=package_choices,
+                                                   nargs='+',
+                                                   help="the package to build")
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -87,7 +89,7 @@ def obal_argument_parser(actions, package_choices):
 
 
 def generate_ansible_args(inventory_path, playbook_path, args):
-    limit = ':'.join(args.package)
+    limit = ':'.join(args.package) if hasattr(args, 'package') else ''
     ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
                     limit]
     if args.verbose:
@@ -130,9 +132,10 @@ def main(cliargs=None):
 
     playbook_path = playbooks[args.action]
 
-    if not os.path.exists(inventory_path):
-        print("Could not find your package_manifest.yaml")
-        exit(1)
+    if not args.action == 'setup':
+        if not os.path.exists(inventory_path):
+            print("Could not find your package_manifest.yaml")
+            exit(1)
     if not os.path.exists(playbook_path):
         print("Could not find the packaging playbooks")
         exit(1)
