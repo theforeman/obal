@@ -40,8 +40,7 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(actions, package_choices):
-    parser = argparse.ArgumentParser()
+def add_obal_arguments(parser):
     parser.add_argument('-e', '--extra-vars',
                         dest="extra_vars",
                         action="append",
@@ -70,17 +69,24 @@ def obal_argument_parser(actions, package_choices):
                         help="""only run plays and tasks whose tags do not
                         match these values""")
 
+
+def obal_argument_parser(actions, package_choices):
+    parser = argparse.ArgumentParser()
+    add_bal_arguments(parser)
     subparsers = parser.add_subparsers(dest='action',
                                        help="""which action to execute""")
 
-    subparsers.add_parser('setup')
+    setup_action_subparser = subparsers.add_parser('setup')
+    add_obal_arguments(setup_action_subparser)
 
     for action in [action for action in list(actions) if action != 'setup']:
-        subparsers.add_parser(action).add_argument('package',
-                                                   metavar='package',
-                                                   choices=package_choices,
-                                                   nargs='+',
-                                                   help="the package to build")
+        action_subparser = subparsers.add_parser(action)
+        action_subparser.add_argument('package',
+                                      metavar='package',
+                                      choices=package_choices,
+                                      nargs='+',
+                                      help="the package to build")
+        add_obal_arguments(action_subparser)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
