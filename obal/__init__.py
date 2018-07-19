@@ -72,7 +72,7 @@ def add_obal_arguments(parser):
 
 def obal_argument_parser(actions, package_choices):
     parser = argparse.ArgumentParser()
-    add_bal_arguments(parser)
+    add_obal_arguments(parser)
     subparsers = parser.add_subparsers(dest='action',
                                        help="""which action to execute""")
 
@@ -95,9 +95,10 @@ def obal_argument_parser(actions, package_choices):
 
 
 def generate_ansible_args(inventory_path, playbook_path, args):
-    limit = ':'.join(args.package) if hasattr(args, 'package') else ''
-    ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
-                    limit]
+    ansible_args = [playbook_path, '--inventory', inventory_path]
+    if hasattr(args, 'package'):
+        limit = ':'.join(args.package)
+        ansible_args.extend(['--limit', limit])
     if args.verbose:
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
