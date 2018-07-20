@@ -1,7 +1,22 @@
+import locale
 import subprocess
 import time
+from contextlib import contextmanager
 
 from ansible.module_utils.basic import AnsibleModule
+
+
+@contextmanager
+def en_locale():
+    try:
+        locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
+    except locale.Error:
+        yield
+    else:
+        try:
+            yield
+        finally:
+            locale.resetlocale(locale.LC_TIME)
 
 
 def main():
@@ -42,7 +57,8 @@ def main():
 
     for i, line in enumerate(lines):
         if line.startswith("%changelog"):
-            date = time.strftime("%a %b %d %Y", time.gmtime())
+            with en_locale():
+                date = time.strftime("%a %b %d %Y", time.gmtime())
             entry = "* %s %s %s-%s\n%s\n\n" % (date, user, version, release, changelog)
             lines[i] += entry
             changed = True
