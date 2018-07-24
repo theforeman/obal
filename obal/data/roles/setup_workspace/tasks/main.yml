@@ -6,3 +6,12 @@
   file:
     state: 'directory'
     path: "{{ obal_tmp_dir }}"
+
+- name: 'Define tito.props filepath'
+  set_fact:
+    tito_props_path: "{{ inventory_dir }}/rel-eng/tito.props"
+
+- name: 'Ensure tito.props file exists'
+  file:
+    state: 'file'
+    path: "{{ tito_props_path }}"

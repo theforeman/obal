@@ -1,0 +1,30 @@
+---
+- name: 'Parse tito.props'
+  tito_props_find_package:
+    package: "{{ inventory_hostname }}"
+    tito_props_path: "{{ tito_props_path }}"
+  register: tito_props
+
+- name: "Define SRPM dist option"
+  set_fact:
+    build_srpm_tito_dist: "--dist {{ tito_props.disttag }}"
+  when: tito_props.disttag is defined
+
+- name: "Define SRPM scl option"
+  set_fact:
+    build_srpm_tito_scl: "--scl {{ tito_props.scl }}"
+  when: tito_props.scl is defined
+
+- name: 'Build SRPM'
+  command: "tito build --srpm --offline {{ build_srpm_tito_dist }} {{ build_srpm_tito_scl }}"
+  args:
+    chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+  register: srpm_build
+
+- debug:
+    msg: "{{ srpm_build.stdout_lines }}"
+  when: srpm_build is successful
+
+- debug:
+    msg: "{{ srpm_build.stderr.split('\n') }}"
+  when: srpm_build is failed
