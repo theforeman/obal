@@ -3,4 +3,3 @@ dependencies:
   - { role: setup_workspace }
   - { role: ensure_package }
   - { role: setup_sources }
-  - { role: package_variables }
