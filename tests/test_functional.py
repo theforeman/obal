@@ -401,3 +401,9 @@ def test_obal_changelog_custom():
     output = subprocess.check_output(['rpmspec', '-q', '--queryformat=%{changelogtext}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
 
     assert 'New-package-release' in output
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_srpm():
+    assert_obal_success(['srpm', 'hello'])
+    assert_mockbin_log(['tito build --srpm --offline'])
