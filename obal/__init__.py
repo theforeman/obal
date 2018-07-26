@@ -72,9 +72,9 @@ def add_obal_arguments(parser):
 
 def obal_argument_parser(actions, package_choices):
     parser = argparse.ArgumentParser()
-    add_obal_arguments(parser)
     subparsers = parser.add_subparsers(dest='action',
                                        help="""which action to execute""")
+    subparsers.required = True
 
     setup_action_subparser = subparsers.add_parser('setup')
     add_obal_arguments(setup_action_subparser)

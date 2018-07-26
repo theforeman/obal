@@ -41,17 +41,17 @@ def test_generate_ansible_args_none():
 @pytest.mark.parametrize('cliargs,expected', [
     (['scratch', 'testpackage'],
      DEFAULT_ARGS + ['--limit', 'testpackage']),
-    (['--verbose', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '--verbose'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-v']),
-    (['-vvvv', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '-vvvv'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-vvvv']),
-    (['--step', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '--step'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--step']),
-    (['--skip-tags', 't1,t2', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '--skip-tags', 't1,t2'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--skip-tags', 't1,t2']),
-    (['--tags', 'wait,download', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '--tags', 'wait,download'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--tags', 'wait,download']),
-    (['-e', 'v1=1', '-e', 'v2=2', 'scratch', 'testpackage'],
+    (['scratch', 'testpackage', '-e', 'v1=1', '-e', 'v2=2'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
 ])
 def test_generate_ansible_args(cliargs, expected):
