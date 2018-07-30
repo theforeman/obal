@@ -51,7 +51,7 @@ def obal_cli_test(func=None, repotype='upstream'):
 
 def run_obal(args, exitcode):
     with pytest.raises(SystemExit) as excinfo:
-        obal.main(DEFAULT_ARGS + args)
+        obal.main(args + DEFAULT_ARGS)
     assert excinfo.value.code == exitcode
 
 
