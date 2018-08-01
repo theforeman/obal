@@ -6,9 +6,5 @@
   register: srpm_build
 
 - debug:
-    msg: "{{ srpm_build.stderr.split('\n') }}"
-  when: srpm_build is failed
-
-- debug:
     msg: "{{ srpm_build.stdout }}"
   when: srpm_build is successful
