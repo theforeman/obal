@@ -40,53 +40,53 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def add_obal_arguments(parser):
-    parser.add_argument('-e', '--extra-vars',
+def obal_argument_parser(actions, package_choices):
+    parser = argparse.ArgumentParser()
+
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('-e', '--extra-vars',
                         dest="extra_vars",
                         action="append",
                         default=[],
                         help="""set additional variables as key=value or
                         YAML/JSON, if filename prepend with @""")
-    parser.add_argument("-v", "--verbose",
+    parent_parser.add_argument("-v", "--verbose",
                         action="count",
                         dest="verbose",
                         help="verbose output")
-    parser.add_argument("--step",
+    parent_parser.add_argument("--step",
                         action="store_true",
                         dest="step",
                         default=False,
                         help="interactive: confirm each task before running")
-    parser.add_argument('-t', '--tags',
+    parent_parser.add_argument('-t', '--tags',
                         dest='tags',
                         default=[],
                         action='append',
                         help="""only run plays and tasks tagged with these
                         values""")
-    parser.add_argument('--skip-tags',
+    parent_parser.add_argument('--skip-tags',
                         dest='skip_tags',
                         default=[],
                         action='append',
                         help="""only run plays and tasks whose tags do not
                         match these values""")
 
-
-def obal_argument_parser(actions, package_choices):
-    parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='action',
                                        help="""which action to execute""")
+    # Setting `required` outside of #add_subparser() is needed because
+    # python2's #add_subparser() won't accept `required` as a field (even
+    # though it's in the docs).
     subparsers.required = True
 
-    setup_action_subparser = subparsers.add_parser('setup')
-    add_obal_arguments(setup_action_subparser)
-
-    for action in [action for action in list(actions) if action != 'setup']:
-        action_subparser = subparsers.add_parser(action)
-        action_subparser.add_argument('package',
-                                      metavar='package',
-                                      choices=package_choices,
-                                      nargs='+',
-                                      help="the package to build")
-        add_obal_arguments(action_subparser)
+    for action in actions:
+        action_subparser = subparsers.add_parser(action, parents=[parent_parser])
+        if action != 'setup':
+            action_subparser.add_argument('package',
+                                          metavar='package',
+                                          choices=package_choices,
+                                          nargs='+',
+                                          help="the package to build")
 
     if argcomplete:
         argcomplete.autocomplete(parser)
