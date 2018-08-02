@@ -1,0 +1,10 @@
+---
+- name: 'Build SRPM'
+  command: "tito build --srpm --offline"
+  args:
+    chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+  register: srpm_build
+
+- debug:
+    msg: "{{ srpm_build.stdout }}"
+  when: srpm_build is successful

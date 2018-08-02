@@ -32,6 +32,7 @@ if prog == 'tito':
     parser_build = subparsers.add_parser('build')
     parser_build.add_argument('--srpm', action='store_const', dest='output', const='Wrote: hello.src.rpm')
     parser_build.add_argument('--scl', action='store')
+    parser_build.add_argument('--offline', action='store_true')
     args = parser.parse_args()
     if 'output' in args and args.output:
         print(args.output)
