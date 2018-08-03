@@ -45,32 +45,32 @@ def obal_argument_parser(actions, package_choices):
 
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument('-e', '--extra-vars',
-                        dest="extra_vars",
-                        action="append",
-                        default=[],
-                        help="""set additional variables as key=value or
-                        YAML/JSON, if filename prepend with @""")
+                               dest="extra_vars",
+                               action="append",
+                               default=[],
+                               help="""set additional variables as key=value or
+                               YAML/JSON, if filename prepend with @""")
     parent_parser.add_argument("-v", "--verbose",
-                        action="count",
-                        dest="verbose",
-                        help="verbose output")
+                               action="count",
+                               dest="verbose",
+                               help="verbose output")
     parent_parser.add_argument("--step",
-                        action="store_true",
-                        dest="step",
-                        default=False,
-                        help="interactive: confirm each task before running")
+                               action="store_true",
+                               dest="step",
+                               default=False,
+                               help="interactive: confirm each task before running")
     parent_parser.add_argument('-t', '--tags',
-                        dest='tags',
-                        default=[],
-                        action='append',
-                        help="""only run plays and tasks tagged with these
-                        values""")
+                               dest='tags',
+                               default=[],
+                               action='append',
+                               help="""only run plays and tasks tagged with these
+                               values""")
     parent_parser.add_argument('--skip-tags',
-                        dest='skip_tags',
-                        default=[],
-                        action='append',
-                        help="""only run plays and tasks whose tags do not
-                        match these values""")
+                               dest='skip_tags',
+                               default=[],
+                               action='append',
+                               help="""only run plays and tasks whose tags do not
+                               match these values""")
 
     subparsers = parser.add_subparsers(dest='action',
                                        help="""which action to execute""")
