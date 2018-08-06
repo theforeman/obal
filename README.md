@@ -4,7 +4,16 @@
 
 All `obal` actions should also work with plain Ansible when called like `ansible-playbook <action_playbook>.yml -l <package>` instead of `obal <action> <package>`.
 
+## necessary tools
+
+- `python` (2 or 3)
+- `ansible`
+
 ## available action (playbooks)
+
+### setup
+
+This action installs packages required for proper `obal` usage on your machine.
 
 ### add
 
@@ -57,10 +66,6 @@ This action runs `repoclosure` for a repository, which ensures that all dependen
 
 This action does a scratch build of a package.
 
-### setup
-
-This action installs packages required for proper `obal` usage on your machine.
-
 ### update
 
 This action updates a package to a newer version. The newer version is either taken from an upstream repository or can be given via command line options
@@ -71,7 +76,7 @@ This action updates a spec file's release field and adds a pre-formatted changel
 
 ### lint
 
-This action runs rpmlint on a spec file and reports the results.
+This action runs `rpmlint` on a spec file and reports the results.
 
 #### Updating a Package from Upstream
 

@@ -42,43 +42,51 @@ def find_packages(inventory_path):
 
 def obal_argument_parser(actions, package_choices):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--extra-vars',
-                        dest="extra_vars",
-                        action="append",
-                        default=[],
-                        help="""set additional variables as key=value or
-                        YAML/JSON, if filename prepend with @""")
-    parser.add_argument("-v", "--verbose",
-                        action="count",
-                        dest="verbose",
-                        help="verbose output")
-    parser.add_argument("--step",
-                        action="store_true",
-                        dest="step",
-                        default=False,
-                        help="interactive: confirm each task before running")
-    parser.add_argument('-t', '--tags',
-                        dest='tags',
-                        default=[],
-                        action='append',
-                        help="""only run plays and tasks tagged with these
-                        values""")
-    parser.add_argument('--skip-tags',
-                        dest='skip_tags',
-                        default=[],
-                        action='append',
-                        help="""only run plays and tasks whose tags do not
-                        match these values""")
 
-    parser.add_argument("action",
-                        choices=actions,
-                        help="""which action to execute""")
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('-e', '--extra-vars',
+                               dest="extra_vars",
+                               action="append",
+                               default=[],
+                               help="""set additional variables as key=value or
+                               YAML/JSON, if filename prepend with @""")
+    parent_parser.add_argument("-v", "--verbose",
+                               action="count",
+                               dest="verbose",
+                               help="verbose output")
+    parent_parser.add_argument("--step",
+                               action="store_true",
+                               dest="step",
+                               default=False,
+                               help="interactive: confirm each task before running")
+    parent_parser.add_argument('-t', '--tags',
+                               dest='tags',
+                               default=[],
+                               action='append',
+                               help="""only run plays and tasks tagged with these
+                               values""")
+    parent_parser.add_argument('--skip-tags',
+                               dest='skip_tags',
+                               default=[],
+                               action='append',
+                               help="""only run plays and tasks whose tags do not
+                               match these values""")
 
-    parser.add_argument('package',
-                        metavar='package',
-                        choices=package_choices,
-                        nargs='+',
-                        help="the package to build")
+    subparsers = parser.add_subparsers(dest='action',
+                                       help="""which action to execute""")
+    # Setting `required` outside of #add_subparser() is needed because
+    # python2's #add_subparser() won't accept `required` as a field (even
+    # though it's in the docs).
+    subparsers.required = True
+
+    for action in actions:
+        action_subparser = subparsers.add_parser(action, parents=[parent_parser])
+        if action != 'setup':
+            action_subparser.add_argument('package',
+                                          metavar='package',
+                                          choices=package_choices,
+                                          nargs='+',
+                                          help="the package to build")
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -87,9 +95,10 @@ def obal_argument_parser(actions, package_choices):
 
 
 def generate_ansible_args(inventory_path, playbook_path, args):
-    limit = ':'.join(args.package)
-    ansible_args = [playbook_path, '--inventory', inventory_path, '--limit',
-                    limit]
+    ansible_args = [playbook_path, '--inventory', inventory_path]
+    if hasattr(args, 'package'):
+        limit = ':'.join(args.package)
+        ansible_args.extend(['--limit', limit])
     if args.verbose:
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
@@ -130,9 +139,10 @@ def main(cliargs=None):
 
     playbook_path = playbooks[args.action]
 
-    if not os.path.exists(inventory_path):
-        print("Could not find your package_manifest.yaml")
-        exit(1)
+    if not args.action == 'setup':
+        if not os.path.exists(inventory_path):
+            print("Could not find your package_manifest.yaml")
+            exit(1)
     if not os.path.exists(playbook_path):
         print("Could not find the packaging playbooks")
         exit(1)

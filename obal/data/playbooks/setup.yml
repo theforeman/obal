@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
     - name: install required packages
-      yum:
+      package:
         name: "{{ item }}"
         state: present
       become: true
@@ -18,4 +18,6 @@
         - rhpkg
         - scl-utils
         - scl-utils-build
+        - rpmlint
+        - yum-utils
 
