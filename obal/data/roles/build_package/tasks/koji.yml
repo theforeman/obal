@@ -26,5 +26,5 @@
   when: build_package_wait|bool
 
 - name: 'Download task results'
-  include_tasks: download.yml
-  when: build_package_download_logs|bool or build_package_download_rpms|bool
+  include_tasks: download_rpms.yml
+  when: build_package_download_rpms|bool

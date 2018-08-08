@@ -13,6 +13,10 @@
       register: build_package_koji_status
       when: (build_package_tito_release is successful)
 
+    - name: 'Download task logs'
+      include_tasks: download_logs.yml
+      when: build_package_download_logs|bool
+
     - name: 'Failed build'
       fail:
         msg: "The build in {{ build_package_koji_command }}  has failed"
