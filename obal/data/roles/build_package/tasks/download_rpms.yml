@@ -1,9 +1,3 @@
-- name: "Download {{ build_package_koji_command }} task(s) logs"
-  command: "{{ build_package_koji_command }}  download-logs -r {{ build_package_koji_tasks | join(' ') }}"
-  args:
-    chdir: "{{ inventory_dir }}"
-  when: build_package_build_system == 'koji' and build_package_download_logs
-
 - block:
     - set_fact:
         download_dir: "{{ inventory_dir }}/downloaded_rpms"
