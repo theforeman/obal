@@ -1,6 +1,6 @@
 ---
 - name: 'Build SRPM'
-  command: "tito build --srpm --offline"
+  command: "tito build --srpm --offline {{ build_package_tito_releaser_args | default([]) | join(' ') }}"
   args:
     chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: srpm_build
