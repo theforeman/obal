@@ -17,7 +17,7 @@
       -c {{ inventory_dir }}/{{ repoclosure_config }}
       -t
       -r {{ repoclosure_target_repo }}
-      {{ '--repofrompath=scratch,./scratch' if repoclosure_target_repo == 'scratch' else '' }}
+      {{ '--repofrompath=downloaded_rpms,./downloaded_rpms' if repoclosure_target_repo == 'downloaded_rpms' else '' }}
       {{ additional_repos | join(' ') }}
       {{ '-l ' if repoclosure_lookaside_repos else '' }}
       {{ repoclosure_lookaside_repos | join(' -l ') }}

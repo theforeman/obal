@@ -297,7 +297,7 @@ def test_obal_repoclosure():
     assert_obal_success(['repoclosure', 'core-repoclosure'])
 
     expected_log = [
-        "repoclosure -c {pwd}/repoclosure/el7.conf -t -r scratch --repofrompath=scratch,./scratch"
+        "repoclosure -c {pwd}/repoclosure/el7.conf -t -r downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms"  # noqa: E501
     ]
     assert_mockbin_log(expected_log)
 
