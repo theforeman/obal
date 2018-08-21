@@ -4,9 +4,12 @@
 from __future__ import print_function
 
 import argparse
+import errno
 import glob
 import os
 import sys
+
+import yaml
 
 from pkg_resources import resource_filename
 
@@ -22,7 +25,23 @@ def find_playbooks(playbooks_path):
     for playbook in playbooks:
         filename = os.path.basename(playbook)
         action = os.path.splitext(filename)[0]
-        playbooks_actions[action] = playbook
+
+        metadata = {
+            'help': '',
+            'vars': {},
+        }
+        try:
+            with open(os.path.join(playbooks_path, '{}.obal.yaml'.format(action))) as obal_metadata:
+                metadata.update(yaml.load(obal_metadata))
+        # Python 3 has FileNotFoundError, Python 2 doesn't
+        except IOError as error:
+            if error.errno != errno.ENOENT:
+                raise
+
+        playbooks_actions[action] = {
+            'playbook': playbook,
+            'metadata': metadata,
+        }
     return playbooks_actions
 
 
@@ -79,14 +98,19 @@ def obal_argument_parser(actions, package_choices):
     # though it's in the docs).
     subparsers.required = True
 
-    for action in actions:
-        action_subparser = subparsers.add_parser(action, parents=[parent_parser])
-        if action != 'setup':
+    for name, action in actions.items():
+        action_subparser = subparsers.add_parser(name, parents=[parent_parser],
+                                                 help=action['metadata']['help'])
+        if name != 'setup':
             action_subparser.add_argument('package',
                                           metavar='package',
                                           choices=package_choices,
                                           nargs='+',
                                           help="the package to build")
+
+        for var_name, var_help in action['metadata']['vars'].items():
+            # TODO: expose more than just help?
+            action_subparser.add_argument('--arg-{}'.format(var_name), help=var_help)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -103,6 +127,9 @@ def generate_ansible_args(inventory_path, playbook_path, args):
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
+    for key, value in vars(args).items():
+        if key.startswith('arg_') and value:
+            ansible_args.extend(["-e", "{}={}".format(key[4:], value)])
     if args.tags:
         ansible_args.append("--tags")
         ansible_args.append(",".join(args.tags))
@@ -133,11 +160,11 @@ def main(cliargs=None):
     package_choices = find_packages(inventory_path)
     playbooks = find_playbooks(packaging_playbooks_path)
 
-    parser = obal_argument_parser(playbooks.keys(), package_choices)
+    parser = obal_argument_parser(playbooks, package_choices)
 
     args = parser.parse_args(cliargs)
 
-    playbook_path = playbooks[args.action]
+    playbook_path = playbooks[args.action]['playbook']
 
     if not args.action == 'setup':
         if not os.path.exists(inventory_path):

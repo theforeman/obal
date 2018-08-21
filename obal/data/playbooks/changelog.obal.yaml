@@ -1,0 +1,4 @@
+help: >
+  The changelog command writes a RPM changelog entry for the current version and release.
+vars:
+  changelog: The text for the changelog entry
