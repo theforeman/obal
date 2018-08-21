@@ -1,0 +1,28 @@
+help: >
+  Add a new package from an upstream repo to a downstream one.
+
+
+  Typically this is used to copy a package from `foreman-packaging` to a downstream product repository. It's currently not possible to add a vanilla new package to `foreman-packaging`.
+
+
+  To add a new package from upstream, start by adding an entry to `package_manifest.yml` in the appropriate section (server, client, capsule, etc):
+
+  my-new-package:
+    upstream_files:
+      - "my-new-package/"
+
+  The minimum fields required are the package's name and upstream_files which lists files to copy from the upstream repository. Entries in upstream_files can be file paths, or directories (denoted with a trailing slash).
+
+    obal add my-new-package
+
+  If all goes well, you should have a new directory in packages/ containing the spec and any sources.
+
+
+  Sometimes `add` won't work due to your new packaging being in a non-standard location (in EPEL, for instance) then you'll need to do everything that add_package.yml does manually.
+
+    1. Create a directory for the spec and source(s)
+    2. Download the spec and source(s)
+    3. Add any binary source(s) using git annex add
+    4. Edit the spec setting the release to 1
+    5. Scratch build your package with obal scratch new-manually-added-package
+    6. If your scratch build is successful, then please commit your additions and submit an MR.

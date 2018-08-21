@@ -1,0 +1,11 @@
+help: >
+  Short description
+
+
+  Full text
+variables:
+  automatic:
+    help: Automatically determined parameter
+  mapped:
+    parameter: --explicit
+    help: Explicitly specified parameter

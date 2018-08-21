@@ -24,7 +24,7 @@ def test_find_packages(fixture_dir):
 
 
 def test_playbook_constructor(fixture_dir):
-    path = (fixture_dir / 'playbooks' / 'setup.yml').strpath
+    path = (fixture_dir / 'playbooks' / 'setup' / 'setup.yaml').strpath
     playbook = obal.Playbook(path)
     assert playbook.path == path
     assert playbook.name == 'setup'
@@ -37,7 +37,7 @@ def test_playbook_constructor(fixture_dir):
     ('repoclosure', True),
 ])
 def test_playbook_takes_package_parameter(fixture_dir, playbook, expected):
-    path = (fixture_dir / 'playbooks' / '{}.yml'.format(playbook)).strpath
+    path = (fixture_dir / 'playbooks' / playbook / '{}.yaml'.format(playbook)).strpath
     assert obal.Playbook(path).takes_package_parameter == expected
 
 
@@ -63,9 +63,16 @@ def test_parser_no_arguments(parser):
      ['--limit', 'testpackage', '--tags', 'wait,download']),
     (['dummy', 'testpackage', '-e', 'v1=1', '-e', 'v2=2'],
      ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
+    (['dummy', 'testpackage', '--automatic', 'foo'],
+     ['--limit', 'testpackage', '-e', '{"automatic": "foo"}']),
+    (['dummy', 'testpackage', '--explicit', 'foo'],
+     ['--limit', 'testpackage', '-e', '{"mapped": "foo"}']),
+    (['dummy', 'testpackage', '--automatic', 'foo', '--explicit', 'bar'],
+     ['--limit', 'testpackage', '-e', '{"automatic": "foo", "mapped": "bar"}']),
 ])
 def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
-    base_expected = [(fixture_dir / 'playbooks' / '{}.yml'.format(cliargs[0])).strpath,
+    action = cliargs[0]
+    base_expected = [(fixture_dir / 'playbooks' / action / '{}.yaml'.format(action)).strpath,
                      '--inventory', 'inventory.yml']
 
     args = parser.parse_args(cliargs)

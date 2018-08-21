@@ -1,0 +1,2 @@
+help: >
+  Run rpmlint on a spec file and reports the results

@@ -1,0 +1,5 @@
+help: >
+  This action releases a package to Koji/Brew/Copr
+
+
+  No action is performed if a release of the exact same version already exists.

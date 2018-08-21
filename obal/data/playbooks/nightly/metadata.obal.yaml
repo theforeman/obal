@@ -1,0 +1,5 @@
+help: >
+  Build a nightly version of a package
+
+
+  This typically uses unreleased sources taken from a git repository.

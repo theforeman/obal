@@ -8,9 +8,12 @@ Obal is a wrapper around Ansible playbooks. They are exposed as a command line a
 from __future__ import print_function
 
 import argparse
+import errno
 import glob
+import json
 import os
 import sys
+from collections import namedtuple
 from functools import total_ordering
 
 import yaml
@@ -22,20 +25,88 @@ except ImportError:
     argcomplete = None
 
 
+METADATA_FILENAME = 'metadata.obal.yaml'
+
+
 # Need for PlaybookCLI to set the verbosity
 display = None  # pylint: disable=C0103
 
 
-@total_ordering  # pylint: disable=R0903
+def remove_prefix(text, prefix):
+    """
+    Remove the prefix from the text if present
+
+    >>> remove_prefix('changelog_message', 'changelog_')
+    'message'
+
+    >>> remove_prefix('message', 'changelog')
+    'message'
+    """
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
+
+class VariableAction(argparse.Action):  # pylint: disable=R0903
+    """
+    An action for argparse that stores all values in a shared dict.
+
+    The dict is stored on the namespace as the value of NAMESPACE_DEST.
+    """
+
+    NAMESPACE_DEST = 'variables'
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            variables = getattr(namespace, self.NAMESPACE_DEST)
+        except AttributeError:
+            variables = {}
+            setattr(namespace, self.NAMESPACE_DEST, variables)
+
+        variables[self.dest] = values
+
+
+Variable = namedtuple('Variable', ['name', 'parameter', 'help_text'])
+
+
+@total_ordering
 class Playbook(object):
     """
     An abstraction over an Ansible playbook
     """
     def __init__(self, path):
         self.path = path
+        directory = os.path.dirname(path)
+        self.name = os.path.basename(directory)
+        self._metadata_path = os.path.join(directory, METADATA_FILENAME)
+        self._metadata = None
 
-        filename = os.path.basename(path)
-        self.name = os.path.splitext(filename)[0]
+    @property
+    def metadata(self):
+        """
+        Read metadata about the playbook
+
+        The metadata can contain a global help text as well as variables that should be exposed as
+        command line parameters.
+
+        This data is lazily loaded and cached.
+        """
+        if not self._metadata:
+            try:
+                with open(self._metadata_path) as obal_metadata:
+                    data = yaml.load(obal_metadata)
+            # Python 3 has FileNotFoundError, Python 2 doesn't
+            except IOError as error:
+                if error.errno != errno.ENOENT:
+                    raise
+                data = {}
+
+            self._metadata = {
+                'help': data.get('help'),
+                'variables': list(self._parse_parameters(data.get('variables', {}))),
+            }
+
+        return self._metadata
 
     @property
     def takes_package_parameter(self):
@@ -48,6 +119,52 @@ class Playbook(object):
             plays = yaml.load(playbook_file.read())
 
         return any('packages' in play['hosts'] for play in plays)
+
+    @property
+    def playbook_variables(self):
+        """
+        The playbook variables that should be exposed to the user
+
+        This is extracted from the metadata.
+        """
+        return self.metadata['variables']
+
+    @property
+    def help_text(self):
+        """
+        The help text if available. This is the first line from the help in the metadata.
+        """
+        return self.metadata['help'].split('\n', 1)[0] if self.metadata['help'] else None
+
+    @property
+    def description(self):
+        """
+        The full help text if available. This is extracted from the metadata.
+        """
+        return self.metadata['help']
+
+    def _parse_parameters(self, variables):
+        """
+        Parse parameters from the metadata.
+
+        Automatically determines the parameter if not specified. This is done by looking at the
+        variable and de-namespacing if it's namespaced. Also replaces underscores with dashes. This
+        means that for the playbook changelog we expose changelog_message as --message but
+        other_option as --other-option.
+        """
+        namespace = '{}_'.format(self.name)
+
+        for name, options in variables.items():
+            try:
+                parameter = options['parameter']
+            except KeyError:
+                parameter = '--{}'.format(remove_prefix(name, namespace).replace('_', '-'))
+
+            yield Variable(name, parameter, options.get('help'))
+
+    @property
+    def __doc__(self):
+        return self.description
 
     def __str__(self):
         return self.name
@@ -70,8 +187,9 @@ def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
     """
-    paths = glob.glob(os.path.join(playbooks_path, '*.yml'))
-    return sorted(Playbook(playbook_path) for playbook_path in paths)
+    paths = glob.glob(os.path.join(playbooks_path, '*', '*.yaml'))
+    return sorted(Playbook(playbook_path) for playbook_path in paths if
+                  os.path.basename(playbook_path) != METADATA_FILENAME)
 
 
 def _get_data_path():
@@ -157,7 +275,10 @@ def obal_argument_parser(playbooks, package_choices):
     subparsers.required = True
 
     for playbook in playbooks:
-        subparser = subparsers.add_parser(playbook.name, parents=[parent_parser])
+        subparser = subparsers.add_parser(playbook.name, parents=[parent_parser],
+                                          help=playbook.help_text,
+                                          description=playbook.description,
+                                          formatter_class=argparse.RawDescriptionHelpFormatter)
         subparser.set_defaults(playbook=playbook)
 
         if playbook.takes_package_parameter:
@@ -166,6 +287,10 @@ def obal_argument_parser(playbooks, package_choices):
                                    choices=package_choices,
                                    nargs='+',
                                    help="the package to build")
+
+        for variable in playbook.playbook_variables:
+            subparser.add_argument(variable.parameter, help=variable.help_text, dest=variable.name,
+                                   action=VariableAction, default=argparse.SUPPRESS)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -185,6 +310,8 @@ def generate_ansible_args(inventory_path, args):
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
+    if hasattr(args, 'variables'):
+        ansible_args.extend(["-e", json.dumps(args.variables, sort_keys=True)])
     if args.tags:
         ansible_args.append("--tags")
         ansible_args.append(",".join(args.tags))

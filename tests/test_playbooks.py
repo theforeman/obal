@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import obal
@@ -20,3 +22,13 @@ def playbook(request):
 def test_takes_package_argument(playbook):
     expected = playbook.name not in ('setup', 'cleanup-copr')
     assert playbook.takes_package_parameter == expected
+
+
+def test_is_documented(playbook):
+    assert playbook.help_text is not None
+
+
+def test_filename_matches_directory(playbook):
+    filename = os.path.splitext(os.path.basename(playbook.path))[0]
+    dirname = os.path.basename(os.path.dirname(playbook.path))
+    assert filename == dirname

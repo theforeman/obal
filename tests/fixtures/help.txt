@@ -3,6 +3,10 @@ usage: obal [-h] {dummy,multiple_plays,repoclosure,setup} ...
 positional arguments:
   {dummy,multiple_plays,repoclosure,setup}
                         which action to execute
+    dummy               Short description
+    multiple_plays
+    repoclosure
+    setup
 
 optional arguments:
   -h, --help            show this help message and exit
