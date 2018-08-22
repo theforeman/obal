@@ -6,11 +6,11 @@ from __future__ import print_function
 import argparse
 import errno
 import glob
+import json
 import os
 import sys
 
 import yaml
-
 from pkg_resources import resource_filename
 
 try:
@@ -19,30 +19,69 @@ except ImportError:
     argcomplete = None
 
 
+class VariableAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        variables = getattr(namespace, self.dest)
+        if variables is None:
+            variables = {}
+            setattr(namespace, self.dest, variables)
+
+        if not option_string:
+            # TODO: Can we still know this?
+            raise ValueError('Unknown option')
+        if option_string.startswith('--'):
+            option_string = option_string[2:]
+        variables[option_string] = values
+
+
+class Playbook(object):
+    def __init__(self, path):
+        self.path = path
+
+        filename = os.path.basename(path)
+        self.name = os.path.splitext(filename)[0]
+
+        self._metadata = None
+
+    @property
+    def _metadata_path(self):
+        return os.path.join(os.path.dirname(self.path), '{}.obal.yaml'.format(self.name))
+
+    @property
+    def metadata(self):
+        if not self._metadata:
+            metadata = {
+                'help': '',
+                'vars': {},
+            }
+
+            try:
+                with open(self._metadata_path) as obal_metadata:
+                    metadata.update(yaml.load(obal_metadata))
+            # Python 3 has FileNotFoundError, Python 2 doesn't
+            except IOError as error:
+                if error.errno != errno.ENOENT:
+                    raise
+
+            self._metadata = metadata
+
+        return self._metadata
+
+    @property
+    def playbook_variables(self):
+        return self.metadata['vars']
+
+    @property
+    def __doc__(self):
+        return self.metadata['help']
+
+
 def find_playbooks(playbooks_path):
-    playbooks = glob.glob(os.path.join(playbooks_path, '*.yml'))
-    playbooks_actions = {}
-    for playbook in playbooks:
-        filename = os.path.basename(playbook)
-        action = os.path.splitext(filename)[0]
-
-        metadata = {
-            'help': '',
-            'vars': {},
-        }
-        try:
-            with open(os.path.join(playbooks_path, '{}.obal.yaml'.format(action))) as obal_metadata:
-                metadata.update(yaml.load(obal_metadata))
-        # Python 3 has FileNotFoundError, Python 2 doesn't
-        except IOError as error:
-            if error.errno != errno.ENOENT:
-                raise
-
-        playbooks_actions[action] = {
-            'playbook': playbook,
-            'metadata': metadata,
-        }
-    return playbooks_actions
+    playbooks = {}
+    for playbook_path in glob.glob(os.path.join(playbooks_path, '*.yml')):
+        playbook = Playbook(playbook_path)
+        playbooks[playbook.name] = playbook
+    return playbooks
 
 
 def find_packages(inventory_path):
@@ -98,19 +137,20 @@ def obal_argument_parser(actions, package_choices):
     # though it's in the docs).
     subparsers.required = True
 
-    for name, action in actions.items():
-        action_subparser = subparsers.add_parser(name, parents=[parent_parser],
-                                                 help=action['metadata']['help'])
-        if name != 'setup':
+    for action in actions:
+        action_subparser = subparsers.add_parser(action.name, parents=[parent_parser],
+                                                 help=action.__doc__)
+        if action.name != 'setup':
             action_subparser.add_argument('package',
                                           metavar='package',
                                           choices=package_choices,
                                           nargs='+',
                                           help="the package to build")
 
-        for var_name, var_help in action['metadata']['vars'].items():
+        for var_name, var_help in action.playbook_variables.items():
             # TODO: expose more than just help?
-            action_subparser.add_argument('--arg-{}'.format(var_name), help=var_help)
+            action_subparser.add_argument('--{}'.format(var_name), help=var_help, dest='variables',
+                                          action=VariableAction)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -127,9 +167,8 @@ def generate_ansible_args(inventory_path, playbook_path, args):
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
-    for key, value in vars(args).items():
-        if key.startswith('arg_') and value:
-            ansible_args.extend(["-e", "{}={}".format(key[4:], value)])
+    if args.variables:
+        ansible_args.extend(["-e", json.dumps(args.variables)])
     if args.tags:
         ansible_args.append("--tags")
         ansible_args.append(",".join(args.tags))
@@ -160,11 +199,11 @@ def main(cliargs=None):
     package_choices = find_packages(inventory_path)
     playbooks = find_playbooks(packaging_playbooks_path)
 
-    parser = obal_argument_parser(playbooks, package_choices)
+    parser = obal_argument_parser(playbooks.values(), package_choices)
 
     args = parser.parse_args(cliargs)
 
-    playbook_path = playbooks[args.action]['playbook']
+    playbook_path = playbooks[args.action].path
 
     if not args.action == 'setup':
         if not os.path.exists(inventory_path):
