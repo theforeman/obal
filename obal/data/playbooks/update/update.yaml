@@ -6,15 +6,18 @@
   roles:
     - git_annex_setup
   tasks:
-    - name: 'Ensure upstream_files is defined'
-      fail:
-        msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
-      when:
-        - upstream_files is not defined
-        - downstream_version is not defined
+    - name: get spec file
+      find:
+        pattern: "*.spec"
+        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      register: spec_file
+
+    - name: "Set spec file path"
+      set_fact:
+        spec_file_path: "{{ spec_file.files[0].path }}"
 
     - name: Determine source file from spec
-      shell: "spectool --list-files --all *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_urls
@@ -34,7 +37,7 @@
         name: fetch_sources
 
     - name: Determine new source file from spec
-      shell: "spectool --list-files --all *.spec | awk '{print $2}'"
+      shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_urls
@@ -56,3 +59,21 @@
       with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
         - "'://' not in item"
+
+    - name: 'Get updated version from spec'
+      command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
+      register: updated_version
+
+    - name: 'Get current git branch'
+      command: "git rev-parse --abbrev-ref HEAD"
+      register: git_branch
+
+    - name: 'Create git branch'
+      command: "git checkout -b {{ git_branch.stdout }}-update-{{ inventory_hostname }}-{{ updated_version.stdout }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+
+    - name: 'Create git commit'
+      command: "git commit -a -m 'Update {{ inventory_hostname }} to {{ updated_version.stdout }}'"
+      args:
+        chdir: "{{ inventory_dir }}"
