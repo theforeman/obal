@@ -3,9 +3,38 @@
     - packages
   serial: 1
   gather_facts: no
-  roles:
-    - build_package
   vars:
     releasers:
       - "{{ nightly_releaser }}"
-    build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args }}"
+    build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default('') }}"
+  tasks:
+    - set_fact:
+        nightly_noclean: false
+      when: nightly_noclean is not defined
+
+    - name: copy source file
+      copy:
+        src: "{{ item }}"
+        dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+      with_items: "{{ nightly_sourcefiles.split(',') }}"
+
+    - name: get spec file
+      find:
+        pattern: "*.spec"
+        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      register: spec_file
+
+    - name: set the nightly release in the specfile
+      replace:
+        path: "{{ spec_file.files[0].path }}"
+        regexp: '^Release:\s+(\S*)(%\{\??dist\})'
+        replace: "Release: \\1.{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}\\2"
+
+    - import_role:
+        name: build_package
+
+    - name: Undo nightly release changes in the specfile
+      command: "git checkout -- ./{{ package_base_dir }}/{{ inventory_hostname}}/{{ spec_file.files[0].path | basename }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+      when: not (nightly_noclean | bool)
