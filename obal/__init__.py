@@ -24,6 +24,41 @@ except ImportError:
 display = None  # pylint: disable=C0103
 
 
+class Playbook(object):  # pylint: disable=R0903
+    """
+    An abstraction over an Ansible playbook
+    """
+    def __init__(self, path):
+        self.path = path
+
+        filename = os.path.basename(path)
+        self.name = os.path.splitext(filename)[0]
+
+    @property
+    def takes_package_parameter(self):
+        """
+        Whether this playbook takes a package argument.
+
+        This is determined by a hosts: packages inside the playbook
+        """
+        # TODO: Read this from the playbook itself?
+        return self.name != 'setup'
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "{}('{}')".format(self.__class__.__name__, self.path)
+
+
+def find_playbooks(playbooks_path):
+    """
+    Find all playbooks in the given path.
+    """
+    paths = glob.glob(os.path.join(playbooks_path, '*.yml'))
+    return [Playbook(playbook_path) for playbook_path in paths]
+
+
 def _get_data_path():
     """
     Return the data path. Houses playbooks and configs.
@@ -45,19 +80,6 @@ def get_ansible_config_path():
     return os.path.join(_get_data_path(), 'ansible.cfg')
 
 
-def find_playbooks(playbooks_path):
-    """
-    Find all playbooks in the given path.
-    """
-    playbooks = glob.glob(os.path.join(playbooks_path, '*.yml'))
-    playbooks_actions = {}
-    for playbook in playbooks:
-        filename = os.path.basename(playbook)
-        action = os.path.splitext(filename)[0]
-        playbooks_actions[action] = playbook
-    return playbooks_actions
-
-
 def find_packages(inventory_path):
     """
     Find all packages in the given inventory
@@ -75,7 +97,7 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(actions, package_choices):
+def obal_argument_parser(playbooks, package_choices):
     """
     Construct an argument parser with the given actions and package choices.
     """
@@ -119,14 +141,16 @@ def obal_argument_parser(actions, package_choices):
     # though it's in the docs).
     subparsers.required = True
 
-    for action in actions:
-        action_subparser = subparsers.add_parser(action, parents=[parent_parser])
-        if action != 'setup':
-            action_subparser.add_argument('package',
-                                          metavar='package',
-                                          choices=package_choices,
-                                          nargs='+',
-                                          help="the package to build")
+    for playbook in playbooks:
+        subparser = subparsers.add_parser(playbook.name, parents=[parent_parser])
+        subparser.set_defaults(playbook=playbook)
+
+        if playbook.takes_package_parameter:
+            subparser.add_argument('package',
+                                   metavar='package',
+                                   choices=package_choices,
+                                   nargs='+',
+                                   help="the package to build")
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -134,11 +158,11 @@ def obal_argument_parser(actions, package_choices):
     return parser
 
 
-def generate_ansible_args(inventory_path, playbook_path, args):
+def generate_ansible_args(inventory_path, args):
     """
     Generate the arguments to run ansible based on the parsed command line arguments
     """
-    ansible_args = [playbook_path, '--inventory', inventory_path]
+    ansible_args = [args.playbook.path, '--inventory', inventory_path]
     if hasattr(args, 'package'):
         limit = ':'.join(args.package)
         ansible_args.extend(['--limit', limit])
@@ -177,23 +201,17 @@ def main(cliargs=None):  # pylint: disable=R0914
     package_choices = find_packages(inventory_path)
     playbooks = find_playbooks(get_playbooks_path())
 
-    parser = obal_argument_parser(playbooks.keys(), package_choices)
+    parser = obal_argument_parser(playbooks, package_choices)
 
     args = parser.parse_args(cliargs)
 
-    playbook_path = playbooks[args.action]
-
-    if not args.action == 'setup':
-        if not os.path.exists(inventory_path):
-            print("Could not find your package_manifest.yaml")
-            exit(1)
-    if not os.path.exists(playbook_path):
-        print("Could not find the packaging playbooks")
+    if args.playbook.takes_package_parameter and not os.path.exists(inventory_path):
+        print("Could not find your package_manifest.yaml")
         exit(1)
 
     from ansible.cli.playbook import PlaybookCLI
 
-    ansible_args = generate_ansible_args(inventory_path, playbook_path, args)
+    ansible_args = generate_ansible_args(inventory_path, args)
     ansible_playbook = (["ansible-playbook"] + ansible_args)
 
     if args.verbose:
