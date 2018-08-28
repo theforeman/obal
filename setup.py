@@ -1,21 +1,33 @@
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+"""
+Setup file for obal
+"""
+
 # To use a consistent encoding
-from codecs import open
+import codecs
 import os
 
-here = os.path.abspath(os.path.dirname(__file__))
+# Always prefer setuptools over distutils
+from setuptools import setup, find_packages
 
-# Get the long description from the README file
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+
+def get_long_description():
+    """
+    Get the long description from the README file
+    """
+    here = os.path.abspath(os.path.dirname(__file__))
+
+    with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as readme:
+        return readme.read()
 
 
 def find_package_data(package, data_dir):
+    """
+    Find all the package data
+    """
     package_data = []
     oldcwd = os.getcwd()
     os.chdir(package)
-    for dirpath, dirnames, filenames in os.walk(data_dir):
+    for dirpath, _, filenames in os.walk(data_dir):
         files = [os.path.join(dirpath, filename) for filename in filenames]
         package_data.extend(files)
     os.chdir(oldcwd)
@@ -26,7 +38,7 @@ setup(
     name='obal',
     version='0.0.6',
     description='packaging wrapper using ansible',
-    long_description=long_description,
+    long_description=get_long_description(),
     long_description_content_type='text/markdown',
     url='https://github.com/theforeman/obal',
     author='The Foreman Project',

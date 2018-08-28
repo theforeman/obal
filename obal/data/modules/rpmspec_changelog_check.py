@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 
+# pylint: disable=C0111,C0301,R1710
+
+import os
+import subprocess
+import glob
+
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule  # pylint: disable=C0413
 
-import os
-import subprocess
-import glob
 
 def run_module():
     module_args = dict(
@@ -43,15 +46,19 @@ def run_module():
         cmd = ['rpmspec', '--query', '--queryformat', '%{version}-%{release}', '--undefine', 'dist', '--srpm', specfile]
         result['specfile_version_release'] = subprocess.check_output(cmd)
     except subprocess.CalledProcessError as err:
-        module.fail_json(msg="An error occured while running [ {} ]".format(err.cmd), **result)
+        msg = "An error occured while running [ {} ]".format(err.cmd)
+        module.fail_json(msg=msg, **result)
 
     if result['changelog_version_release'] != result['specfile_version_release']:
-        module.fail_json(msg="changelog entry missing for {}".format(result['specfile_version_release']), **result)
+        msg = "changelog entry missing for {}".format(result['specfile_version_release'])
+        module.fail_json(msg=msg, **result)
 
     module.exit_json(**result)
 
+
 def main():
     run_module()
+
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,4 @@
+# pylint: disable=C0111
 import locale
 import subprocess
 import time
@@ -8,6 +9,10 @@ from ansible.module_utils.basic import AnsibleModule
 
 @contextmanager
 def en_locale():
+    """
+    A context maanger that temporarily sets the LC_TIME locale to
+    en_US.UTF-8 and then resets it.
+    """
     try:
         locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
     except locale.Error:
@@ -21,9 +26,9 @@ def en_locale():
 
 def main():
     module = AnsibleModule(
-        argument_spec = dict(
-            spec = dict(required=True),
-            changelog = dict(default='- rebuilt')
+        argument_spec=dict(
+            spec=dict(required=True),
+            changelog=dict(default='- rebuilt')
         )
     )
 
@@ -68,6 +73,7 @@ def main():
         spec_file.writelines(lines)
 
     module.exit_json(changed=changed)
+
 
 if __name__ == '__main__':
     main()
