@@ -267,7 +267,7 @@ def obal_argument_parser(playbooks, package_choices):
                           help="""only run plays and tasks whose tags do not
                           match these values""")
 
-    subparsers = parser.add_subparsers(dest='action',
+    subparsers = parser.add_subparsers(dest='action', metavar='action',
                                        help="""which action to execute""")
     # Setting `required` outside of #add_subparser() is needed because
     # python2's #add_subparser() won't accept `required` as a field (even
