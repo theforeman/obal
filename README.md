@@ -17,7 +17,7 @@ This action installs packages required for proper `obal` usage on your machine.
 
 ### add
 
-This action can add a new package from an upstream repo to a downstream onw, e.g. to add a package from `foreman-packaging` to a downstream product repository.
+This action can add a new package from an upstream repo to a downstream one, e.g. to add a package from `foreman-packaging` to a downstream product repository.
 
 It's currently not possible to add a vanilla new package to `foreman-packaging`.
 
@@ -77,6 +77,16 @@ This action updates a spec file's release field and adds a pre-formatted changel
 ### lint
 
 This action runs `rpmlint` on a spec file and reports the results.
+
+### nightly
+
+Build a nightly version of a package. This typically uses unreleased sources taken from a git repository.
+
+### source
+
+Setup sources for a package
+
+When using git annex we only store a reference to a the actual source. This command retrieves the sources from the remote. These are usually tarballs or gems.
 
 #### Updating a Package from Upstream
 
