@@ -7,6 +7,7 @@ import argparse
 import glob
 import os
 import sys
+from obal.arguments import ObalArguments
 
 from pkg_resources import resource_filename
 
@@ -79,14 +80,13 @@ def obal_argument_parser(actions, package_choices):
     # though it's in the docs).
     subparsers.required = True
 
-    for action in actions:
-        action_subparser = subparsers.add_parser(action, parents=[parent_parser])
-        if action != 'setup':
-            action_subparser.add_argument('package',
-                                          metavar='package',
-                                          choices=package_choices,
-                                          nargs='+',
-                                          help="the package to build")
+    config = {
+        'subparsers': subparsers,
+        'parents': [parent_parser],
+        'actions': actions,
+        'package_choices': package_choices
+    }
+    ObalArguments.add(config)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
