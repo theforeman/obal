@@ -12,6 +12,7 @@ import glob
 import os
 import sys
 
+import yaml
 from pkg_resources import resource_filename
 
 try:
@@ -41,8 +42,10 @@ class Playbook(object):  # pylint: disable=R0903
 
         This is determined by a hosts: packages inside the playbook
         """
-        # TODO: Read this from the playbook itself?
-        return self.name != 'setup'
+        with open(self.path) as playbook_file:
+            plays = yaml.load(playbook_file.read())
+
+        return any('packages' in play['hosts'] for play in plays)
 
     def __str__(self):
         return self.name

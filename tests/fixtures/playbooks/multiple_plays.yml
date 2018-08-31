@@ -1,0 +1,10 @@
+---
+- hosts:
+    - localhost
+  roles:
+    - setup
+
+- hosts:
+    - packages
+  roles:
+    - diff_package

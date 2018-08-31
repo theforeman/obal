@@ -30,6 +30,17 @@ def test_playbook_constructor():
     assert playbook.name == 'setup'
 
 
+@pytest.mark.parametrize('playbook,expected', [
+    ('setup', False),
+    ('dummy', True),
+    ('multiple_plays', True),
+    ('repoclosure', True),
+])
+def test_playbook_takes_package_parameter(playbook, expected):
+    path = os.path.join(FIXTURE_DIR, 'playbooks', '{}.yml'.format(playbook))
+    assert obal.Playbook(path).takes_package_parameter == expected
+
+
 def _test_generate_ansible_args(cliargs):
     playbooks = obal.find_playbooks(os.path.join(FIXTURE_DIR, 'playbooks'))
     parser = obal.obal_argument_parser(playbooks, ['testpackage'])

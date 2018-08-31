@@ -19,5 +19,5 @@ def playbook(request):
 
 
 def test_takes_package_argument(playbook):
-    expected = playbook.name != 'setup'
+    expected = playbook.name not in ('setup', 'cleanup-copr')
     assert playbook.takes_package_parameter == expected

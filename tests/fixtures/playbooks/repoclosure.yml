@@ -1,0 +1,6 @@
+---
+- hosts:
+    - repoclosure
+    - packages
+  roles:
+    - repoclosure
