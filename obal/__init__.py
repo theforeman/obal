@@ -1,6 +1,10 @@
 #!/usr/bin/env python2
 # PYTHON_ARGCOMPLETE_OK
 
+"""
+Obal is a wrapper around Ansible playbooks. They are exposed as a command line application.
+"""
+
 from __future__ import print_function
 
 import argparse
@@ -16,7 +20,14 @@ except ImportError:
     argcomplete = None
 
 
+# Need for PlaybookCLI to set the verbosity
+display = None  # pylint: disable=C0103
+
+
 def find_playbooks(playbooks_path):
+    """
+    Find all playbooks in the given path.
+    """
     playbooks = glob.glob(os.path.join(playbooks_path, '*.yml'))
     playbooks_actions = {}
     for playbook in playbooks:
@@ -27,6 +38,9 @@ def find_playbooks(playbooks_path):
 
 
 def find_packages(inventory_path):
+    """
+    Find all packages in the given inventory
+    """
     package_choices = None
     if os.path.exists(inventory_path):
         from ansible.inventory.manager import InventoryManager
@@ -41,6 +55,9 @@ def find_packages(inventory_path):
 
 
 def obal_argument_parser(actions, package_choices):
+    """
+    Construct an argument parser with the given actions and package choices.
+    """
     parser = argparse.ArgumentParser()
 
     parent_parser = argparse.ArgumentParser(add_help=False)
@@ -95,6 +112,9 @@ def obal_argument_parser(actions, package_choices):
 
 
 def generate_ansible_args(inventory_path, playbook_path, args):
+    """
+    Generate the arguments to run ansible based on the parsed command line arguments
+    """
     ansible_args = [playbook_path, '--inventory', inventory_path]
     if hasattr(args, 'package'):
         limit = ':'.join(args.package)
@@ -114,7 +134,10 @@ def generate_ansible_args(inventory_path, playbook_path, args):
     return ansible_args
 
 
-def main(cliargs=None):
+def main(cliargs=None):  # pylint: disable=R0914
+    """
+    Main command
+    """
     data_path = resource_filename(__name__, 'data')
     packaging_playbooks_path = os.path.join(data_path, 'playbooks')
     cfg_path = os.path.join(data_path, 'ansible.cfg')
@@ -125,7 +148,7 @@ def main(cliargs=None):
     # this needs to be global, as otherwise PlaybookCLI fails
     # to set the verbosity correctly
     from ansible.utils.display import Display
-    global display
+    global display  # pylint: disable=C0103,W0603
     display = Display()
 
     inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')

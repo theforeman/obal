@@ -1,6 +1,8 @@
-from ansiblelint import AnsibleLintRule
+# pylint: disable=C0103,C0111,R0903
 
 import re
+
+from ansiblelint import AnsibleLintRule
 
 
 class TaskVariableHasSpace(AnsibleLintRule):
@@ -9,8 +11,8 @@ class TaskVariableHasSpace(AnsibleLintRule):
     description = ''
     tags = ['task']
 
-    compiled = re.compile('{{(\w*)}}')
+    compiled = re.compile(r'{{(\w*)}}')
 
-    def match(self, file, text):
+    def match(self, file, text):  # pylint: disable=R0201,W0613,W0622
         m = self.compiled.search(text)
         return bool(m)

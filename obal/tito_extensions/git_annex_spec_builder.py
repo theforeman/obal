@@ -1,6 +1,12 @@
+"""
+A tito plugin to build using git-annex
+"""
+
+# pylint: disable=E0401,R0902,R0903,R0913
+
 import os
 import shutil
-from distutils.version import LooseVersion as loose_version
+from distutils.version import LooseVersion as loose_version  # pylint: disable=E0611
 from pkg_resources import require
 
 from tito.compat import getstatusoutput
@@ -12,6 +18,9 @@ from tito.common import error_out, debug, run_command, get_spec_version_and_rele
 
 
 class GitAnnexSpecBuilder(GitAnnexBuilder):
+    """
+    A tito builder that uses git annex
+    """
 
     def __init__(self, name=None, tag=None, build_dir=None,
                  config=None, user_config=None,
@@ -115,7 +124,7 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
             working_path = os.getcwd()
         debug("working_path: %s" % working_path)
 
-        for directory, unused, filenames in os.walk(working_path):
+        for directory, _, filenames in os.walk(working_path):
             debug('WALK')
             dir_artifacts_with_path = [os.path.join(directory, f) for f in filenames]
 
@@ -134,12 +143,12 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
         self.spec_file = os.path.join(
             self.rpmbuild_sourcedir, self.spec_file_name)
 
-        self.old_cwd = os.getcwd()
+        self.old_cwd = os.getcwd()  # pylint: disable=W0201
         if self.relative_project_dir not in os.path.join(os.getcwd(), ''):
             os.chdir(os.path.join(self.old_cwd, self.relative_project_dir))
 
         # NOTE: 'which' may not be installed... (docker containers)
-        (status, output) = getstatusoutput("which git-annex")
+        status = getstatusoutput("which git-annex")[0]
         if status != 0:
             msg = "Please run '%s' as root." % self.package_manager.install(["git-annex"])
             error_out('%s' % msg)
