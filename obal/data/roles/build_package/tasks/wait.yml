@@ -20,7 +20,7 @@
     - name: 'Failed build'
       fail:
         msg: "The build in {{ build_package_koji_command }}  has failed"
-      when: (build_package_koji_status is failed)
+      when: (build_package_koji_status is failed) and ('Build already exists' not in build_package_koji_status.stdout)
   when: build_package_build_system == 'koji'
 
 - block:
