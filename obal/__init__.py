@@ -24,6 +24,27 @@ except ImportError:
 display = None  # pylint: disable=C0103
 
 
+def _get_data_path():
+    """
+    Return the data path. Houses playbooks and configs.
+    """
+    return resource_filename(__name__, 'data')
+
+
+def get_playbooks_path():
+    """
+    Return the default playbooks path
+    """
+    return os.path.join(_get_data_path(), 'playbooks')
+
+
+def get_ansible_config_path():
+    """
+    Return the default playbooks path
+    """
+    return os.path.join(_get_data_path(), 'ansible.cfg')
+
+
 def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
@@ -140,9 +161,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     """
     Main command
     """
-    data_path = resource_filename(__name__, 'data')
-    packaging_playbooks_path = os.path.join(data_path, 'playbooks')
-    cfg_path = os.path.join(data_path, 'ansible.cfg')
+    cfg_path = get_ansible_config_path()
 
     if os.path.exists(cfg_path):
         os.environ["ANSIBLE_CONFIG"] = cfg_path
@@ -156,7 +175,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
 
     package_choices = find_packages(inventory_path)
-    playbooks = find_playbooks(packaging_playbooks_path)
+    playbooks = find_playbooks(get_playbooks_path())
 
     parser = obal_argument_parser(playbooks.keys(), package_choices)
 
