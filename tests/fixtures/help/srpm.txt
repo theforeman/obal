@@ -1,0 +1,24 @@
+usage: obal srpm [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
+                 [--skip-tags SKIP_TAGS]
+                 package [package ...]
+
+Build a SRPM for packages
+
+Building source RPMs can be useful when locally building packages.
+
+positional arguments:
+  package               the package to build
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         verbose output
+
+advanced arguments:
+  -e EXTRA_VARS, --extra-vars EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @
+  --step                interactive: confirm each task before running
+  -t TAGS, --tags TAGS  only run plays and tasks tagged with these values
+  --skip-tags SKIP_TAGS
+                        only run plays and tasks whose tags do not match these
+                        values

@@ -1,0 +1,23 @@
+usage: obal changelog [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
+                      [--skip-tags SKIP_TAGS] [--message CHANGELOG]
+                      package [package ...]
+
+The changelog command writes a RPM changelog entry for the current version and release.
+
+positional arguments:
+  package               the package to build
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         verbose output
+  --message CHANGELOG   The text for the changelog entry
+
+advanced arguments:
+  -e EXTRA_VARS, --extra-vars EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @
+  --step                interactive: confirm each task before running
+  -t TAGS, --tags TAGS  only run plays and tasks tagged with these values
+  --skip-tags SKIP_TAGS
+                        only run plays and tasks whose tags do not match these
+                        values
