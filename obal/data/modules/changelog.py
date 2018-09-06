@@ -64,7 +64,7 @@ def main():
         if line.startswith("%changelog"):
             with en_locale():
                 date = time.strftime("%a %b %d %Y", time.gmtime())
-            entry = "* %s %s %s-%s\n%s\n\n" % (date, user, version, release, changelog)
+            entry = "* %s %s - %s-%s\n%s\n\n" % (date, user, version, release, changelog)
             lines[i] += entry
             changed = True
             break
