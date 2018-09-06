@@ -71,3 +71,8 @@ def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
     args = parser.parse_args(cliargs)
     ansible_args = obal.generate_ansible_args('inventory.yml', args)
     assert ansible_args == base_expected + expected
+
+
+def test_obal_argument_parser_help(fixture_dir, parser):
+    path = fixture_dir / 'help.txt'
+    assert path.read() == parser.format_help()
