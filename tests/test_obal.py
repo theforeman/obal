@@ -1,7 +1,6 @@
 import os
 import pytest
 import obal
-from pkg_resources import resource_filename
 
 
 FIXTURE_DIR = os.path.join(
@@ -9,7 +8,8 @@ FIXTURE_DIR = os.path.join(
     'fixtures',
 )
 
-DEFAULT_ARGS = ['dummy.yml', '--inventory', 'inventory.yml']
+DEFAULT_ARGS = [os.path.join(FIXTURE_DIR, 'playbooks', 'dummy.yml'),
+                '--inventory', 'inventory.yml']
 
 
 def test_find_no_packages():
@@ -23,13 +23,29 @@ def test_find_packages():
     assert 'testpackage' in packages
 
 
+def test_playbook_constructor():
+    path = os.path.join(FIXTURE_DIR, 'playbooks', 'setup.yml')
+    playbook = obal.Playbook(path)
+    assert playbook.path == path
+    assert playbook.name == 'setup'
+
+
+@pytest.mark.parametrize('playbook,expected', [
+    ('setup', False),
+    ('dummy', True),
+    ('multiple_plays', True),
+    ('repoclosure', True),
+])
+def test_playbook_takes_package_parameter(playbook, expected):
+    path = os.path.join(FIXTURE_DIR, 'playbooks', '{}.yml'.format(playbook))
+    assert obal.Playbook(path).takes_package_parameter == expected
+
+
 def _test_generate_ansible_args(cliargs):
-    playbooks_path = resource_filename('obal', 'data/playbooks')
-    playbooks = obal.find_playbooks(playbooks_path)
-    parser = obal.obal_argument_parser(playbooks.keys(), ['testpackage'])
+    playbooks = obal.find_playbooks(os.path.join(FIXTURE_DIR, 'playbooks'))
+    parser = obal.obal_argument_parser(playbooks, ['testpackage'])
     args = parser.parse_args(cliargs)
-    ansible_args = obal.generate_ansible_args('inventory.yml', 'dummy.yml',
-                                              args)
+    ansible_args = obal.generate_ansible_args('inventory.yml', args)
     return ansible_args
 
 
@@ -39,19 +55,21 @@ def test_generate_ansible_args_none():
 
 
 @pytest.mark.parametrize('cliargs,expected', [
-    (['scratch', 'testpackage'],
+    (['setup'],
+     [os.path.join(FIXTURE_DIR, 'playbooks', 'setup.yml'), '--inventory', 'inventory.yml']),
+    (['dummy', 'testpackage'],
      DEFAULT_ARGS + ['--limit', 'testpackage']),
-    (['scratch', 'testpackage', '--verbose'],
+    (['dummy', 'testpackage', '--verbose'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-v']),
-    (['scratch', 'testpackage', '-vvvv'],
+    (['dummy', 'testpackage', '-vvvv'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-vvvv']),
-    (['scratch', 'testpackage', '--step'],
+    (['dummy', 'testpackage', '--step'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--step']),
-    (['scratch', 'testpackage', '--skip-tags', 't1,t2'],
+    (['dummy', 'testpackage', '--skip-tags', 't1,t2'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--skip-tags', 't1,t2']),
-    (['scratch', 'testpackage', '--tags', 'wait,download'],
+    (['dummy', 'testpackage', '--tags', 'wait,download'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '--tags', 'wait,download']),
-    (['scratch', 'testpackage', '-e', 'v1=1', '-e', 'v2=2'],
+    (['dummy', 'testpackage', '-e', 'v1=1', '-e', 'v2=2'],
      DEFAULT_ARGS + ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
 ])
 def test_generate_ansible_args(cliargs, expected):

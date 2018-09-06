@@ -1,4 +1,6 @@
-- hosts: repoclosures packages
+- hosts:
+    - repoclosures
+    - packages
   gather_facts: no
   roles:
     - repoclosure

@@ -1,7 +1,10 @@
 ---
 - hosts:
+    - localhost
+  roles:
+    - setup
+
+- hosts:
     - packages
-  serial: 1
-  gather_facts: no
   roles:
     - diff_package
