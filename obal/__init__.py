@@ -58,7 +58,7 @@ def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
     """
-    paths = glob.glob(os.path.join(playbooks_path, '*.yml'))
+    paths = sorted(glob.glob(os.path.join(playbooks_path, '*.yml')))
     return [Playbook(playbook_path) for playbook_path in paths]
 
 
