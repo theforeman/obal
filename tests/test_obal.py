@@ -1,30 +1,30 @@
-import os
 import pytest
 import obal
 
 
-FIXTURE_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    'fixtures',
-)
-
-DEFAULT_ARGS = [os.path.join(FIXTURE_DIR, 'playbooks', 'dummy.yml'),
-                '--inventory', 'inventory.yml']
+@pytest.fixture
+def playbooks(fixture_dir):
+    return obal.find_playbooks((fixture_dir / 'playbooks').strpath)
 
 
-def test_find_no_packages():
-    packages = obal.find_packages(os.path.join(FIXTURE_DIR, 'nope.yaml'))
+@pytest.fixture
+def parser(playbooks, package_choices=['testpackage']):
+    return obal.obal_argument_parser(playbooks, package_choices)
+
+
+def test_find_no_packages(fixture_dir):
+    packages = obal.find_packages((fixture_dir / 'nope.yaml').strpath)
     assert packages is None
 
 
-def test_find_packages():
-    packages = obal.find_packages(os.path.join(FIXTURE_DIR, 'inventory.yaml'))
+def test_find_packages(fixture_dir):
+    packages = obal.find_packages((fixture_dir / 'inventory.yaml').strpath)
     assert packages
     assert 'testpackage' in packages
 
 
-def test_playbook_constructor():
-    path = os.path.join(FIXTURE_DIR, 'playbooks', 'setup.yml')
+def test_playbook_constructor(fixture_dir):
+    path = (fixture_dir / 'playbooks' / 'setup.yml').strpath
     playbook = obal.Playbook(path)
     assert playbook.path == path
     assert playbook.name == 'setup'
@@ -36,42 +36,38 @@ def test_playbook_constructor():
     ('multiple_plays', True),
     ('repoclosure', True),
 ])
-def test_playbook_takes_package_parameter(playbook, expected):
-    path = os.path.join(FIXTURE_DIR, 'playbooks', '{}.yml'.format(playbook))
+def test_playbook_takes_package_parameter(fixture_dir, playbook, expected):
+    path = (fixture_dir / 'playbooks' / '{}.yml'.format(playbook)).strpath
     assert obal.Playbook(path).takes_package_parameter == expected
 
 
-def _test_generate_ansible_args(cliargs):
-    playbooks = obal.find_playbooks(os.path.join(FIXTURE_DIR, 'playbooks'))
-    parser = obal.obal_argument_parser(playbooks, ['testpackage'])
-    args = parser.parse_args(cliargs)
-    ansible_args = obal.generate_ansible_args('inventory.yml', args)
-    return ansible_args
-
-
-def test_generate_ansible_args_none():
+def test_parser_no_arguments(parser):
     with pytest.raises(SystemExit):
-        _test_generate_ansible_args([])
+        parser.parse_args([])
 
 
 @pytest.mark.parametrize('cliargs,expected', [
     (['setup'],
-     [os.path.join(FIXTURE_DIR, 'playbooks', 'setup.yml'), '--inventory', 'inventory.yml']),
+     []),
     (['dummy', 'testpackage'],
-     DEFAULT_ARGS + ['--limit', 'testpackage']),
+     ['--limit', 'testpackage']),
     (['dummy', 'testpackage', '--verbose'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '-v']),
+     ['--limit', 'testpackage', '-v']),
     (['dummy', 'testpackage', '-vvvv'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '-vvvv']),
+     ['--limit', 'testpackage', '-vvvv']),
     (['dummy', 'testpackage', '--step'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '--step']),
+     ['--limit', 'testpackage', '--step']),
     (['dummy', 'testpackage', '--skip-tags', 't1,t2'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '--skip-tags', 't1,t2']),
+     ['--limit', 'testpackage', '--skip-tags', 't1,t2']),
     (['dummy', 'testpackage', '--tags', 'wait,download'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '--tags', 'wait,download']),
+     ['--limit', 'testpackage', '--tags', 'wait,download']),
     (['dummy', 'testpackage', '-e', 'v1=1', '-e', 'v2=2'],
-     DEFAULT_ARGS + ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
+     ['--limit', 'testpackage', '-e', 'v1=1', '-e', 'v2=2']),
 ])
-def test_generate_ansible_args(cliargs, expected):
-    ansible_args = _test_generate_ansible_args(cliargs)
-    assert ansible_args == expected
+def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
+    base_expected = [(fixture_dir / 'playbooks' / '{}.yml'.format(cliargs[0])).strpath,
+                     '--inventory', 'inventory.yml']
+
+    args = parser.parse_args(cliargs)
+    ansible_args = obal.generate_ansible_args('inventory.yml', args)
+    assert ansible_args == base_expected + expected

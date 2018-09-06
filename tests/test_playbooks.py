@@ -1,12 +1,11 @@
-import py.path
 import pytest
 
 import obal
 
 
 @pytest.fixture
-def help_dir():
-    return py.path.local(__file__).realpath() / '..' / 'fixtures' / 'help'
+def help_dir(fixture_dir):
+    return fixture_dir / 'help'
 
 
 def playbook_id(fixture_value):
