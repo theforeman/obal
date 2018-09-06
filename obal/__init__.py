@@ -104,7 +104,7 @@ def obal_argument_parser(playbooks, package_choices):
     """
     Construct an argument parser with the given actions and package choices.
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('obal')
 
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("-v", "--verbose",
