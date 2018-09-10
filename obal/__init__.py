@@ -11,6 +11,7 @@ import argparse
 import glob
 import os
 import sys
+from functools import total_ordering
 
 import yaml
 from pkg_resources import resource_filename
@@ -25,7 +26,8 @@ except ImportError:
 display = None  # pylint: disable=C0103
 
 
-class Playbook(object):  # pylint: disable=R0903
+@total_ordering  # pylint: disable=R0903
+class Playbook(object):
     """
     An abstraction over an Ansible playbook
     """
@@ -53,13 +55,23 @@ class Playbook(object):  # pylint: disable=R0903
     def __repr__(self):
         return "{}('{}')".format(self.__class__.__name__, self.path)
 
+    def __eq__(self, other):
+        if hasattr(other, 'path'):
+            return self.path == other.path
+        return NotImplemented
+
+    def __lt__(self, other):
+        if hasattr(other, 'name'):
+            return self.name.__lt__(other.name)
+        return NotImplemented
+
 
 def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
     """
-    paths = sorted(glob.glob(os.path.join(playbooks_path, '*.yml')))
-    return [Playbook(playbook_path) for playbook_path in paths]
+    paths = glob.glob(os.path.join(playbooks_path, '*.yml'))
+    return sorted(Playbook(playbook_path) for playbook_path in paths)
 
 
 def _get_data_path():
