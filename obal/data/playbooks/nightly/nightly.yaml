@@ -6,13 +6,15 @@
   vars:
     build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
   tasks:
-    - set_fact:
+    - name: 'set nightly_releaser'
+      set_fact:
         releasers:
           - "{{ nightly_releaser }}"
       when: nightly_releaser is defined and "--arg jenkins_job=" in (build_package_tito_releaser_args | join(" "))
 
     - block:
-      - set_fact:
+      - name: 'set build_package_tito_releaser_args'
+        set_fact:
           build_package_tito_releaser_args:
             - "{{ build_package_tito_releaser_args }} --arg rpmbuild_options=\"--define 'prerelease .{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}'\""
 
