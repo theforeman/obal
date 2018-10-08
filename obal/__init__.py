@@ -230,10 +230,16 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(playbooks, package_choices):
+def obal_argument_parser(playbooks=None, package_choices=None):
     """
     Construct an argument parser with the given actions and package choices.
     """
+    if playbooks is None:
+        playbooks = find_playbooks(get_playbooks_path())
+
+    if package_choices is None:
+        package_choices = []
+
     parser = argparse.ArgumentParser('obal')
 
     parent_parser = argparse.ArgumentParser(add_help=False)
@@ -341,9 +347,8 @@ def main(cliargs=None):  # pylint: disable=R0914
     inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
 
     package_choices = find_packages(inventory_path)
-    playbooks = find_playbooks(get_playbooks_path())
 
-    parser = obal_argument_parser(playbooks, package_choices)
+    parser = obal_argument_parser(package_choices=package_choices)
 
     args = parser.parse_args(cliargs)
 
