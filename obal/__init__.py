@@ -255,23 +255,6 @@ def obal_argument_parser(playbooks=None, package_choices=None):
                           default=[],
                           help="""set additional variables as key=value or
                           YAML/JSON, if filename prepend with @""")
-    advanced.add_argument("--step",
-                          action="store_true",
-                          dest="step",
-                          default=False,
-                          help="interactive: confirm each task before running")
-    advanced.add_argument('-t', '--tags',
-                          dest='tags',
-                          default=[],
-                          action='append',
-                          help="""only run plays and tasks tagged with these
-                          values""")
-    advanced.add_argument('--skip-tags',
-                          dest='skip_tags',
-                          default=[],
-                          action='append',
-                          help="""only run plays and tasks whose tags do not
-                          match these values""")
 
     subparsers = parser.add_subparsers(dest='action', metavar='action',
                                        help="""which action to execute""")
@@ -318,14 +301,6 @@ def generate_ansible_args(inventory_path, args):
         ansible_args.extend(["-e", extra_var])
     if hasattr(args, 'variables'):
         ansible_args.extend(["-e", json.dumps(args.variables, sort_keys=True)])
-    if args.tags:
-        ansible_args.append("--tags")
-        ansible_args.append(",".join(args.tags))
-    if args.skip_tags:
-        ansible_args.append("--skip-tags")
-        ansible_args.append(",".join(args.skip_tags))
-    if args.step:
-        ansible_args.append("--step")
     return ansible_args
 
 
