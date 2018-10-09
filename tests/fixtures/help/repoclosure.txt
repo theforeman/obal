@@ -1,6 +1,4 @@
-usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
-                        [--skip-tags SKIP_TAGS]
-                        package [package ...]
+usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS] package [package ...]
 
 Run repoclosure for a repository
 
@@ -17,8 +15,3 @@ advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
                         set additional variables as key=value or YAML/JSON, if
                         filename prepend with @
-  --step                interactive: confirm each task before running
-  -t TAGS, --tags TAGS  only run plays and tasks tagged with these values
-  --skip-tags SKIP_TAGS
-                        only run plays and tasks whose tags do not match these
-                        values

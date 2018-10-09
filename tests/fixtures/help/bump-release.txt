@@ -1,5 +1,4 @@
-usage: obal bump-release [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
-                         [--skip-tags SKIP_TAGS] [--changelog CHANGELOG]
+usage: obal bump-release [-h] [-v] [-e EXTRA_VARS] [--changelog CHANGELOG]
                          package [package ...]
 
 This action updates a spec file's release field and adds a pre-formatted changelog entry.
@@ -17,8 +16,3 @@ advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
                         set additional variables as key=value or YAML/JSON, if
                         filename prepend with @
-  --step                interactive: confirm each task before running
-  -t TAGS, --tags TAGS  only run plays and tasks tagged with these values
-  --skip-tags SKIP_TAGS
-                        only run plays and tasks whose tags do not match these
-                        values
