@@ -43,9 +43,8 @@ def test_help(playbook, capsys, help_dir):
 
     help_file = help_dir / '{}.txt'.format(playbook.name)
 
-    try:
+    if help_file.check(exists=1):
         assert help_file.read() == captured.out
-    except IOError:
+    else:
         help_file.write(captured.out)
-
         raise pytest.skip('Written help text')
