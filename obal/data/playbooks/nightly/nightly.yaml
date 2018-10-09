@@ -22,7 +22,7 @@
         copy:
           src: "{{ item }}"
           dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
-        with_items: "{{ nightly_sourcefiles.split(',') }}"
+        with_items: "{{ nightly_sourcefiles }}"
       when: nightly_sourcefiles is defined and nightly_githash is defined
     # end block
 
