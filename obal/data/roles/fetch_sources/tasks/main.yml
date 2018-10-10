@@ -18,8 +18,8 @@
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
+    - upstream is defined
     - upstream.endswith('.git')
-    - downstream_version is not defined
   rescue: #block
     - name: 'Remove package directory'
       file:
@@ -54,8 +54,8 @@
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
+    - upstream is defined
     - upstream.endswith('src.rpm')
-    - downstream_version is not defined
   rescue: #block
     - name: 'Remove package directory'
       file:
@@ -74,60 +74,55 @@
         spec_file_path: "{{ spec_file.files[0].path }}"
         setup_sources_flags: '-f'
 
-    - name: 'Set downstream release'
+    - name: 'Set release'
       set_fact:
-        downstream_release: '1'
+        release: '1'
       when:
-        - downstream_release is not defined
+        - release is not defined
 
-    - name: 'Set default downstream changelog'
+    - name: 'Set default changelog'
       set_fact:
-        downstream_changelog: '- Release {{ inventory_hostname }} {{ downstream_version }}'
+        changelog: '- Release {{ inventory_hostname }} {{ version }}'
       when:
-        - downstream_changelog is not defined
+        - changelog is not defined
+        - version is defined
 
     - name: 'Ensure Source0 specfile points to source server'
       replace:
         path: "{{ spec_file_path }}"
         regexp: '^(?P<prefix>Source0:\s+)http.*/(?P<filename>.*)$'
         replace: '\g<prefix>{{ source_server }}\g<filename>'
+      when:
+        - source_server is defined
+        - version is defined
 
     - name: 'Bump version in specfile'
       replace:
         path: "{{ spec_file_path }}"
         regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
-        replace: '\g<prefix>{{ downstream_version }}\g<suffix>'
+        replace: '\g<prefix>{{ version }}\g<suffix>'
       with_items:
         - 'Version:'
         - '%global _version'
         - '%global mainver'
+      when: version is defined
 
     - name: 'Bump release in specfile'
       replace:
         path: "{{ spec_file_path }}"
         regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
-        replace: '\g<prefix>{{ downstream_release }}\g<suffix>'
+        replace: '\g<prefix>{{ release }}\g<suffix>'
       with_items:
         - 'Release:'
         - '%global _release'
         - '%global release'
 
     - name: 'add changelog entry'
-      lineinfile:
-        path: "{{ spec_file_path }}"
-        line: |
-          * {{ lookup('pipe', 'date +"%a %b %d %Y"') }} {{ downstream_changelog_name | default('Satellite6 Jenkins') }} {{ downstream_version }}-{{ downstream_release }}
-          {{ downstream_changelog }}
-        insertafter: '^%changelog'
+      changelog:
+        spec: "{{ spec_file_path }}"
+        changelog: "{{ changelog }}"
+      when: changelog is defined
 
     - name: 'update source files'
       include_role:
         name: setup_sources
-
-  when: #block
-    - downstream_version is defined
-  rescue: #block
-    - name: 'Remove package directory'
-      file:
-        state: 'absent'
-        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"

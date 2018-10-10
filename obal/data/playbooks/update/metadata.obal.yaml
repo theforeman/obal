@@ -3,3 +3,12 @@ help: >
 
 
   The newer version is either taken from an upstream repository or can be given via command line options.
+
+
+  To update a package to a new version from the command line:
+
+    obal update mypackage -e version=3.4.5
+
+  Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
+
+    obal update mypackage

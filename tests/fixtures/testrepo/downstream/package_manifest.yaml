@@ -11,6 +11,7 @@ packages:
       - obaltest-dist-git-rhel-7
     diff_package_tags:
       - obaltest-6.3.0-rhel-7-candidate
+    source_server: http://sources.example.com/
   hosts:
     hello:
       upstream: "file://{{ inventory_dir }}/../upstream/.git"
