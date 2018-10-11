@@ -3,6 +3,9 @@ help: >
 
 
   Full text
+  on multiple lines
+
+  with an explicit newline
 variables:
   automatic:
     help: Automatically determined parameter
