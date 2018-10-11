@@ -9,7 +9,7 @@
   tasks:
     - name: 'Ensure upstream_files is defined'
       fail:
-        msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yml"
+        msg: "'upstream_files' not defined for {{ inventory_hostname }}. Please define within package_manifest.yaml"
       when: upstream_files is not defined
 
     - name: 'Make package directory'
