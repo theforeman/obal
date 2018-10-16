@@ -5,7 +5,7 @@
   gather_facts: no
   vars:
     build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
-  tasks:
+  pre_tasks:
     - name: 'set nightly_releaser'
       set_fact:
         releasers:
@@ -29,6 +29,5 @@
         with_items: "{{ nightly_sourcefiles }}"
       when: nightly_sourcefiles is defined and nightly_githash is defined
     # end block
-
-    - import_role:
-        name: build_package
+  roles:
+    - build_package
