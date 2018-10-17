@@ -315,6 +315,28 @@ def test_obal_update_downstream_hello():
     assert '- Release hello' not in specfilecontent
 
 
+@obal_cli_test(repotype='downstream')
+def test_obal_update_downstream_with_version_hello():
+    setup_upstream('../upstream/')
+
+    assert_obal_success(['update', 'hello1', '-e', 'version=2.10'])
+
+    assert not os.path.exists('packages/hello1/hello-2.9.tar.gz')
+    assert not os.path.islink('packages/hello1/hello-2.9.tar.gz')
+    assert os.path.islink('packages/hello1/hello-2.10.tar.gz')
+
+    with open('packages/hello1/hello.spec') as specfile:
+        specfilecontent = specfile.read()
+
+    # a downstream update overwrites all the data with whatever is in upstream
+    # thus we expect to see no mention of 2.9 in the specfile anymore
+    # we also don't expect a changelog entry added
+    assert 'Version:        2.10' in specfilecontent
+    assert 'Source0:        http://ftp.gnu.org/gnu' in specfilecontent
+    assert 'Version:        2.9' not in specfilecontent
+    assert '- Release hello' in specfilecontent
+
+
 @obal_cli_test(repotype='empty')
 def test_obal_add_downstream_hello():
     setup_upstream('../upstream/')
