@@ -403,14 +403,14 @@ def test_obal_bump_release_hello_with_changelog():
 def test_obal_lint_hello():
     assert_obal_success(['lint', 'hello'])
 
-    assert_mockbin_log(["rpmlint {pwd}/packages/hello"])
+    assert_mockbin_log(["rpmlint --file {pwd}/packages/hello/.rpmlintrc {pwd}/packages/hello"])
 
 
 @obal_cli_test(repotype='upstream_bad_changelog')
 def test_obal_lint_bad_changelog():
     assert_obal_failure(['lint', 'hello'])
 
-    assert_mockbin_log(["rpmlint {pwd}/packages/hello"])
+    assert_mockbin_log(["rpmlint --file {pwd}/packages/hello/.rpmlintrc {pwd}/packages/hello"])
 
 
 @obal_cli_test(repotype='upstream')
