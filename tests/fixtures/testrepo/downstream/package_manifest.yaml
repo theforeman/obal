@@ -11,9 +11,14 @@ packages:
       - obaltest-dist-git-rhel-7
     diff_package_tags:
       - obaltest-6.3.0-rhel-7-candidate
-    source_server: http://sources.example.com/
+    source_server: http://ftp.gnu.org/gnu/hello/
   hosts:
     hello:
+      upstream: "file://{{ inventory_dir }}/../upstream/.git"
+      branch: "master"
+      upstream_files:
+        - "packages/hello/"
+    hello1:
       upstream: "file://{{ inventory_dir }}/../upstream/.git"
       branch: "master"
       upstream_files:

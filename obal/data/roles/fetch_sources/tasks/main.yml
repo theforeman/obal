@@ -20,6 +20,8 @@
   when: #block
     - upstream is defined
     - upstream.endswith('.git')
+    - upstream_files is defined
+    - version is not defined
   rescue: #block
     - name: 'Remove package directory'
       file:
@@ -56,6 +58,8 @@
   when: #block
     - upstream is defined
     - upstream.endswith('src.rpm')
+    - upstream_files is defined
+    - version is not defined
   rescue: #block
     - name: 'Remove package directory'
       file:
