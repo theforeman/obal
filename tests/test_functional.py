@@ -20,6 +20,13 @@ if os.environ.get('TRAVIS', None):
     DEFAULT_ARGS.extend(['-e', 'ansible_remote_tmp=/tmp/ansible-remote'])
 
 
+def git_init(path):
+    subprocess.check_call(['git', 'init'], cwd=path)
+    subprocess.check_call(['git', 'annex', 'init'], cwd=path)
+    subprocess.check_call(['git', 'add', '.'], cwd=path)
+    subprocess.check_call(['git', 'commit', '-a', '-m', 'init'], cwd=path)
+
+
 def obal_cli_test(func=None, repotype='upstream'):
     if func is None:
         return functools.partial(obal_cli_test, repotype=repotype)
@@ -32,11 +39,12 @@ def obal_cli_test(func=None, repotype='upstream'):
 
         oldcwd = os.getcwd()
         oldpath = os.environ['PATH']
-        os.chdir(os.path.join(repodir, repotype))
+        newcwd = os.path.join(repodir, repotype)
+        os.chdir(newcwd)
         os.environ['PATH'] = "{}:{}".format(MOCKBIN_DIR, oldpath)
         os.environ['MOCKBIN_LOG'] = os.path.join(tempdir, 'mockbin.log')
 
-        subprocess.check_call(['git', 'init'])
+        git_init(newcwd)
 
         func(*args, **kwargs)
 
@@ -73,14 +81,12 @@ def assert_mockbin_log(content):
 
 def setup_upstream(upstream_path):
     # create a cloneable upstream repo, what we ship in fixtures is not
-    subprocess.check_call(['git', 'init'], cwd=upstream_path)
-    subprocess.check_call(['git', 'annex', 'init'], cwd=upstream_path)
-    subprocess.check_call(['git', 'add', '.'], cwd=upstream_path)
+    git_init(upstream_path)
     subprocess.check_call(['git', 'annex', 'addurl', '--file',
                            'packages/hello/hello-2.10.tar.gz',
                            'http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz'],
                           cwd=upstream_path)
-    subprocess.check_call(['git', 'commit', '-a', '-m', 'init'],
+    subprocess.check_call(['git', 'commit', '-a', '-m', 'add hello'],
                           cwd=upstream_path)
 
 
