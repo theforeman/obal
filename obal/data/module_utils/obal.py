@@ -23,6 +23,8 @@ def get_specfile_evr(specfile):
         '%{evr}',
         '--undefine',
         'dist',
+        '--undefine',
+        'foremandist',
         '--srpm',
         specfile
     ])
