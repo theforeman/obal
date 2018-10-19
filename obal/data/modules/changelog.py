@@ -5,6 +5,7 @@ import time
 from contextlib import contextmanager
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.obal import get_specfile_evr  # pylint:disable=import-error,no-name-in-module
 
 
 @contextmanager
@@ -36,24 +37,7 @@ def main():
     changelog = module.params['changelog']
 
     user = subprocess.check_output(['rpmdev-packager']).strip()
-    version = subprocess.check_output([
-        'rpmspec',
-        '--query',
-        '--queryformat="%{version}"',
-        '--srpm',
-        spec
-    ])
-    release = subprocess.check_output([
-        'rpmspec',
-        '--query',
-        '--queryformat="%{release}"',
-        '--srpm',
-        '--undefine=dist',
-        spec
-    ])
-
-    release = release.strip().replace('"', '')
-    version = version.strip().replace('"', '')
+    evr = get_specfile_evr(spec)
 
     with open(spec) as spec_file:
         lines = spec_file.readlines()
@@ -64,7 +48,7 @@ def main():
         if line.startswith("%changelog"):
             with en_locale():
                 date = time.strftime("%a %b %d %Y", time.gmtime())
-            entry = "* %s %s - %s-%s\n%s\n\n" % (date, user, version, release, changelog)
+            entry = "* %s %s - %s\n%s\n\n" % (date, user, evr, changelog)
             lines[i] += entry
             changed = True
             break

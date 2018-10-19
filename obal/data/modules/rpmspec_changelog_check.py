@@ -6,13 +6,15 @@ import os
 import subprocess
 import glob
 
+from ansible.module_utils.basic import AnsibleModule  # pylint: disable=C0413
+from ansible.module_utils.obal import get_changelog_evr, get_specfile_evr  # pylint:disable=import-error,no-name-in-module
+
+
 ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
+    'metadata_version': '1.2',
     'status': ['preview'],
     'supported_by': 'community'
 }
-
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=C0413
 
 
 def run_module():
@@ -22,8 +24,8 @@ def run_module():
 
     result = dict(
         changed=False,
-        changelog_version_release='',
-        specfile_version_release=''
+        changelog_epoch_version_release='',
+        specfile_epoch_version_release=''
     )
 
     module = AnsibleModule(
@@ -40,17 +42,15 @@ def run_module():
         module.fail_json(msg="Could not find specfile", **result)
 
     try:
-        cmd = ['rpm', '--query', '--changelog', '--specfile', specfile]
-        result['changelog_version_release'] = subprocess.check_output(cmd).split("\n")[0].split(" ")[-1]
+        result['changelog_epoch_version_release'] = get_changelog_evr(specfile)
 
-        cmd = ['rpmspec', '--query', '--queryformat', '%{version}-%{release}', '--undefine', 'dist', '--srpm', specfile]
-        result['specfile_version_release'] = subprocess.check_output(cmd)
+        result['specfile_epoch_version_release'] = get_specfile_evr(specfile)
     except subprocess.CalledProcessError as err:
         msg = "An error occured while running [ {} ]".format(err.cmd)
         module.fail_json(msg=msg, **result)
 
-    if result['changelog_version_release'] != result['specfile_version_release']:
-        msg = "changelog entry missing for {}".format(result['specfile_version_release'])
+    if result['changelog_epoch_version_release'] != result['specfile_epoch_version_release']:
+        msg = "changelog entry missing for {}".format(result['specfile_epoch_version_release'])
         module.fail_json(msg=msg, **result)
 
     module.exit_json(**result)
