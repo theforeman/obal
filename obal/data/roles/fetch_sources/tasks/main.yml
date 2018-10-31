@@ -83,6 +83,7 @@
         release: '1'
       when:
         - release is not defined
+        - version is defined
 
     - name: 'Set default changelog'
       set_fact:
@@ -120,6 +121,7 @@
         - 'Release:'
         - '%global _release'
         - '%global release'
+      when: release is defined
 
     - name: 'add changelog entry'
       changelog:
