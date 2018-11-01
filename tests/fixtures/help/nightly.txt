@@ -1,4 +1,8 @@
-usage: obal nightly [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal nightly [-h] [-v] [-e EXTRA_VARS]
+                    [--scratch BUILD_PACKAGE_SCRATCH]
+                    [--githash NIGHTLY_GITHASH]
+                    [--sourcefiles NIGHTLY_SOURCEFILES]
+                    package [package ...]
 
 Build a nightly version of a package
 
@@ -10,6 +14,13 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --scratch BUILD_PACKAGE_SCRATCH
+                        Set 'true' to scratch build.
+  --githash NIGHTLY_GITHASH
+                        Git hash to be included in the package's release.
+  --sourcefiles NIGHTLY_SOURCEFILES
+                        Comma-separated list of absolute filepaths to be
+                        copied and used for RPM sources.
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
