@@ -3,3 +3,11 @@ help: >
 
 
   This typically uses unreleased sources taken from a git repository.
+variables:
+  nightly_sourcefiles:
+    help: Comma-separated list of absolute filepaths to be copied and used for RPM sources.
+  nightly_githash:
+    help: Git hash to be included in the package's release.
+  build_package_scratch:
+    parameter: --scratch
+    help: Set 'true' to scratch build.
