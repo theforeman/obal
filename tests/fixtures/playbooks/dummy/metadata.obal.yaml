@@ -12,3 +12,9 @@ variables:
   mapped:
     parameter: --explicit
     help: Explicitly specified parameter
+  store_true:
+    action: store_true
+    help: Action that stores true if passed
+  store_false:
+    action: store_false
+    help: Action that stores false if passed

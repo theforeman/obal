@@ -61,6 +61,10 @@ def test_parser_no_arguments(parser):
      ['--limit', 'testpackage', '-e', '{"automatic": "foo"}']),
     (['dummy', 'testpackage', '--explicit', 'foo'],
      ['--limit', 'testpackage', '-e', '{"mapped": "foo"}']),
+    (['dummy', 'testpackage', '--store-true'],
+     ['--limit', 'testpackage', '-e', '{"store_true": true}']),
+    (['dummy', 'testpackage', '--store-false'],
+     ['--limit', 'testpackage', '-e', '{"store_false": false}']),
     (['dummy', 'testpackage', '--automatic', 'foo', '--explicit', 'bar'],
      ['--limit', 'testpackage', '-e', '{"automatic": "foo", "mapped": "bar"}']),
 ])

@@ -19,6 +19,8 @@ from functools import total_ordering
 import yaml
 from pkg_resources import resource_filename
 
+from obal.actions import ACTION_MAP
+
 try:
     import argcomplete
 except ImportError:
@@ -47,26 +49,7 @@ def remove_prefix(text, prefix):
     return text
 
 
-class VariableAction(argparse.Action):  # pylint: disable=R0903
-    """
-    An action for argparse that stores all values in a shared dict.
-
-    The dict is stored on the namespace as the value of NAMESPACE_DEST.
-    """
-
-    NAMESPACE_DEST = 'variables'
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        try:
-            variables = getattr(namespace, self.NAMESPACE_DEST)
-        except AttributeError:
-            variables = {}
-            setattr(namespace, self.NAMESPACE_DEST, variables)
-
-        variables[self.dest] = values
-
-
-Variable = namedtuple('Variable', ['name', 'parameter', 'help_text'])
+Variable = namedtuple('Variable', ['name', 'parameter', 'help_text', 'action'])
 
 
 @total_ordering
@@ -160,7 +143,13 @@ class Playbook(object):
             except KeyError:
                 parameter = '--{}'.format(remove_prefix(name, namespace).replace('_', '-'))
 
-            yield Variable(name, parameter, options.get('help'))
+            try:
+                action = ACTION_MAP[options.get('action')]
+            except KeyError:
+                raise AssertionError("Action '{}' for parameter '{}' is invalid".format(
+                    options['action'], name))
+
+            yield Variable(name, parameter, options.get('help'), action)
 
     @property
     def __doc__(self):
@@ -279,7 +268,7 @@ def obal_argument_parser(playbooks=None, package_choices=None):
 
         for variable in playbook.playbook_variables:
             subparser.add_argument(variable.parameter, help=variable.help_text, dest=variable.name,
-                                   action=VariableAction, default=argparse.SUPPRESS)
+                                   action=variable.action, default=argparse.SUPPRESS)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
