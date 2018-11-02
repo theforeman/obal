@@ -103,7 +103,7 @@ class Playbook(object):
 
             self._metadata = {
                 'help': data.get('help'),
-                'variables': list(self._parse_parameters(data.get('variables', {}))),
+                'variables': sorted(self._parse_parameters(data.get('variables', {}))),
             }
 
         return self._metadata
