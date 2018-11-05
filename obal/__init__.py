@@ -283,11 +283,11 @@ def generate_ansible_args(inventory_path, args, obal_arguments):
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
-    if obal_arguments:
-        variables = {obal_arg: getattr(args, obal_arg) for obal_arg in obal_arguments
-                     if hasattr(args, obal_arg)}
-        if variables:
-            ansible_args.extend(["-e", json.dumps(variables, sort_keys=True)])
+
+    variables = {arg: getattr(args, arg) for arg in obal_arguments if hasattr(args, arg)}
+    if variables:
+        ansible_args.extend(["-e", json.dumps(variables, sort_keys=True)])
+
     return ansible_args
 
 
