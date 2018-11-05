@@ -67,6 +67,8 @@ def test_parser_no_arguments(parser):
      ['--limit', 'testpackage', '-e', '{"store_false": false}']),
     (['dummy', 'testpackage', '--automatic', 'foo', '--explicit', 'bar'],
      ['--limit', 'testpackage', '-e', '{"automatic": "foo", "mapped": "bar"}']),
+    (['dummy', 'testpackage', '--my-list', 'foo', '--my-list', 'bar'],
+     ['--limit', 'testpackage', '-e', '{"mapped_list": ["foo", "bar"]}']),
 ])
 def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
     action = cliargs[0]
@@ -74,7 +76,7 @@ def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
                      '--inventory', 'inventory.yml']
 
     args = parser.parse_args(cliargs)
-    ansible_args = obal.generate_ansible_args('inventory.yml', args)
+    ansible_args = obal.generate_ansible_args('inventory.yml', args, parser.obal_arguments)
     assert ansible_args == base_expected + expected
 
 

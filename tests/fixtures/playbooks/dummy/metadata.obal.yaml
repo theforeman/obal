@@ -18,3 +18,10 @@ variables:
   store_false:
     action: store_false
     help: Action that stores false if passed
+  store_list:
+    action: append
+    help: Repeatable action
+  mapped_list:
+    parameter: --my-list
+    action: append
+    help: Repeatable action
