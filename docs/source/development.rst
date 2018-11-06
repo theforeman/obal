@@ -44,7 +44,7 @@ When dealing with packages we typically include the `package_variables` role to 
   :emphasize-lines: 6,7
 
 Exposing playbooks using metadata
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default Obal exposes a playbook based on its name. It can also automatically detect whether it accepts a packages parameter. To provide a better experience we introduce metadata via `metadata.obal.yaml` in the same directory.
 
@@ -190,6 +190,42 @@ When we run this within the changelog playbook, this is translated into:
 
   --author CHANGELOG_AUTHOR
                         The author of the changelog entry
+
+Sometimes you just want to store a boolean. For this we expose the `argparse action`_:
+
+.. _argparse action: https://docs.python.org/3/library/argparse.html#action
+
+.. code-block:: yaml
+  :emphasize-lines: 3
+
+    variables:
+      scratch:
+        action: store_true
+        help: To indicate this is a scratch build
+
+Which translates into:
+
+.. code-block:: none
+
+  --scratch             To indicate this is a scratch build
+
+Calling ``obal release --scratch`` will result in ``ansible-playbook release -e '{"scratch": true}'``.
+
+The ``store_false`` behaves in the same way as ``store_true`` but with a different value.
+
+Storing lists can be done with the ``append`` action. It's exposed as a repeatable argument:
+
+.. code-block:: yaml
+  :emphasize-lines: 4
+
+    variables:
+      releasers:
+        parameter: --releaser
+        action: append
+        help: Specifiy the releasers
+
+Calling ``obal release --releaser first --releaser second`` will translate to ``ansible-playbook release -e '{"releasers": ["first", "second"]}'``.
+
 
 Fixing the tests
 ^^^^^^^^^^^^^^^^
