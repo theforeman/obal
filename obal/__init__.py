@@ -47,26 +47,7 @@ def remove_prefix(text, prefix):
     return text
 
 
-class VariableAction(argparse.Action):  # pylint: disable=R0903
-    """
-    An action for argparse that stores all values in a shared dict.
-
-    The dict is stored on the namespace as the value of NAMESPACE_DEST.
-    """
-
-    NAMESPACE_DEST = 'variables'
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        try:
-            variables = getattr(namespace, self.NAMESPACE_DEST)
-        except AttributeError:
-            variables = {}
-            setattr(namespace, self.NAMESPACE_DEST, variables)
-
-        variables[self.dest] = values
-
-
-Variable = namedtuple('Variable', ['name', 'parameter', 'help_text'])
+Variable = namedtuple('Variable', ['name', 'parameter', 'help_text', 'action'])
 
 
 @total_ordering
@@ -160,7 +141,7 @@ class Playbook(object):
             except KeyError:
                 parameter = '--{}'.format(remove_prefix(name, namespace).replace('_', '-'))
 
-            yield Variable(name, parameter, options.get('help'))
+            yield Variable(name, parameter, options.get('help'), options.get('action'))
 
     @property
     def __doc__(self):
@@ -242,6 +223,8 @@ def obal_argument_parser(playbooks=None, package_choices=None):
 
     parser = argparse.ArgumentParser('obal')
 
+    parser.obal_arguments = []
+
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("-v", "--verbose",
                                action="count",
@@ -279,7 +262,8 @@ def obal_argument_parser(playbooks=None, package_choices=None):
 
         for variable in playbook.playbook_variables:
             subparser.add_argument(variable.parameter, help=variable.help_text, dest=variable.name,
-                                   action=VariableAction, default=argparse.SUPPRESS)
+                                   action=variable.action, default=argparse.SUPPRESS)
+            parser.obal_arguments.append(variable.name)
 
     if argcomplete:
         argcomplete.autocomplete(parser)
@@ -287,7 +271,7 @@ def obal_argument_parser(playbooks=None, package_choices=None):
     return parser
 
 
-def generate_ansible_args(inventory_path, args):
+def generate_ansible_args(inventory_path, args, obal_arguments):
     """
     Generate the arguments to run ansible based on the parsed command line arguments
     """
@@ -299,8 +283,11 @@ def generate_ansible_args(inventory_path, args):
         ansible_args.append("-%s" % str("v" * args.verbose))
     for extra_var in args.extra_vars:
         ansible_args.extend(["-e", extra_var])
-    if hasattr(args, 'variables'):
-        ansible_args.extend(["-e", json.dumps(args.variables, sort_keys=True)])
+
+    variables = {arg: getattr(args, arg) for arg in obal_arguments if hasattr(args, arg)}
+    if variables:
+        ansible_args.extend(["-e", json.dumps(variables, sort_keys=True)])
+
     return ansible_args
 
 
@@ -333,7 +320,7 @@ def main(cliargs=None):  # pylint: disable=R0914
 
     from ansible.cli.playbook import PlaybookCLI
 
-    ansible_args = generate_ansible_args(inventory_path, args)
+    ansible_args = generate_ansible_args(inventory_path, args, parser.obal_arguments)
     ansible_playbook = (["ansible-playbook"] + ansible_args)
 
     if args.verbose:
