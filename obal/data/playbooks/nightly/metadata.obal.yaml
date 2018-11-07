@@ -5,9 +5,11 @@ help: >
   This typically uses unreleased sources taken from a git repository.
 variables:
   nightly_sourcefiles:
-    help: Comma-separated list of absolute filepaths to be copied and used for RPM sources.
+    parameter: --source
+    action: append
+    help: Absolute filepaths to be copied and used for RPM sources. Can be used multiple times.
   nightly_githash:
-    help: Git hash to be included in the package's release.
+    help: Git commit hash to be included in the RPM's release.
   build_package_scratch:
     parameter: --scratch
     action: store_true
