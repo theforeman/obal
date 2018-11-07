@@ -1,5 +1,4 @@
-usage: obal nightly [-h] [-v] [-e EXTRA_VARS]
-                    [--scratch BUILD_PACKAGE_SCRATCH]
+usage: obal nightly [-h] [-v] [-e EXTRA_VARS] [--scratch]
                     [--githash NIGHTLY_GITHASH]
                     [--sourcefiles NIGHTLY_SOURCEFILES]
                     package [package ...]
@@ -14,8 +13,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
-  --scratch BUILD_PACKAGE_SCRATCH
-                        Set 'true' to scratch build.
+  --scratch             Set --scratch for scratch builds.
   --githash NIGHTLY_GITHASH
                         Git hash to be included in the package's release.
   --sourcefiles NIGHTLY_SOURCEFILES

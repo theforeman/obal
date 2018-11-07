@@ -10,4 +10,5 @@ variables:
     help: Git hash to be included in the package's release.
   build_package_scratch:
     parameter: --scratch
-    help: Set 'true' to scratch build.
+    action: store_true
+    help: Set --scratch for scratch builds.
