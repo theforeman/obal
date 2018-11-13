@@ -113,7 +113,7 @@ def test_obal_scratch_upstream_hello():
 
     expected_log = [
         "tito release --scratch dist-git -y",
-        "koji watch-task"
+        "koji watch-task 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -139,7 +139,7 @@ def test_obal_release_upstream_hello():
     expected_log = [
         "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
         "tito release dist-git -y",
-        "koji watch-task"
+        "koji watch-task 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -163,7 +163,7 @@ def test_obal_nightly_upstream_hello():
 
     expected_log = [
         "tito release dist-git-jenkins -y --arg jenkins_job=hello-master-release",
-        "koji watch-task",
+        "koji watch-task 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -201,7 +201,7 @@ def test_obal_scratch_downstream_hello():
 
     expected_log = [
         "tito release obaltest-scratch-rhel-7 -y",
-        "brew watch-task",
+        "brew watch-task 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -214,8 +214,8 @@ def test_obal_scratch_downstream_hello_wait_download_logs():
 
     expected_log = [
         "tito release obaltest-scratch-rhel-7 -y",
-        "brew watch-task",
-        "brew download-logs -r",
+        "brew watch-task 1234",
+        "brew download-logs -r 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -228,7 +228,8 @@ def test_obal_scratch_downstream_hello_wait_download_rpms():
 
     expected_log = [
         "tito release obaltest-scratch-rhel-7 -y",
-        "brew watch-task",
+        "brew watch-task 1234",
+        "brew download-task 1234",
         "createrepo {pwd}/downloaded_rpms"
     ]
     assert_mockbin_log(expected_log)
@@ -243,7 +244,7 @@ def test_obal_release_downstream_hello():
     expected_log = [
         "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
         "tito release obaltest-dist-git-rhel-7 -y",
-        "brew watch-task",
+        "brew watch-task 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -257,8 +258,8 @@ def test_obal_release_downstream_hello_wait_download_logs():
     expected_log = [
         "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
         "tito release obaltest-dist-git-rhel-7 -y",
-        "brew watch-task",
-        "brew download-logs -r",
+        "brew watch-task 1234",
+        "brew download-logs -r 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -272,7 +273,8 @@ def test_obal_release_downstream_hello_wait_download_rpms():
     expected_log = [
         "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
         "tito release obaltest-dist-git-rhel-7 -y",
-        "brew watch-task",
+        "brew watch-task 1234",
+        "brew download-task 1234",
         "createrepo {pwd}/downloaded_rpms"
     ]
     assert_mockbin_log(expected_log)

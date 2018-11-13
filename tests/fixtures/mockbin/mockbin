@@ -27,7 +27,7 @@ if prog == 'tito':
     parser_release.add_argument('dest')
     parser_release.add_argument('--scratch', action='store_true')
     parser_release.add_argument('--test', action='store_true')
-    parser_release.add_argument('-y', action='store_true')
+    parser_release.add_argument('-y', action='store_const', dest='output', const='Created task: 1234')
     parser_release.add_argument('--arg')
     parser_build = subparsers.add_parser('build')
     parser_build.add_argument('--srpm', action='store_const', dest='output', const='Wrote: hello.src.rpm')
