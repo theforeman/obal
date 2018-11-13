@@ -158,6 +158,22 @@ def test_obal_release_upstream_hello_nowait():
 
 
 @obal_cli_test(repotype='upstream')
+def test_obal_release_upstream_hello_waitrepo():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "tito release dist-git -y",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
+        "koji wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
 def test_obal_nightly_upstream_hello():
     assert_obal_success(['nightly', 'hello'])
 
@@ -279,6 +295,22 @@ def test_obal_release_downstream_hello_wait_download_rpms():
     ]
     assert_mockbin_log(expected_log)
 
+@obal_cli_test(repotype='downstream')
+def test_obal_release_downstream_hello_waitrepo():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
+
+    assert os.path.exists('packages/hello/hello-2.9.tar.gz')
+
+    expected_log = [
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",
+        "tito release obaltest-dist-git-rhel-7 -y",
+        "brew watch-task 1234",
+        "brew taskinfo -v 1234",
+        # the build and target in the next command are "wrong" because the
+        # output from our mocked brew is not dynamic
+        "brew wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+    ]
+    assert_mockbin_log(expected_log)
 
 @obal_cli_test(repotype='upstream')
 def test_obal_update_upstream_hello():

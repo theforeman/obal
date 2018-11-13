@@ -10,6 +10,21 @@ try:
 except ImportError:
     from shlex import quote
 
+
+_FAKE_TASKINFO = """Task: 1234
+Type: build
+Request Parameters:
+  Source: hello-2.10-1.el7.src.rpm
+  Build Target: obaltest-nightly-rhel7
+Owner: nobody
+State: closed
+Created: Tue Nov 13 08:50:17 2018
+Started: Tue Nov 13 08:50:26 2018
+Finished: Tue Nov 13 08:51:20 2018
+Host: buildhost
+Build: hello-2.10-1.el7 (12345)"""
+
+
 prog = os.path.basename(sys.argv[0])
 sys.argv[0] = prog
 
@@ -33,6 +48,30 @@ if prog == 'tito':
     parser_build.add_argument('--srpm', action='store_const', dest='output', const='Wrote: hello.src.rpm')
     parser_build.add_argument('--scl', action='store')
     parser_build.add_argument('--offline', action='store_true')
+    args = parser.parse_args()
+    if 'output' in args and args.output:
+        print(args.output)
+elif prog in ['koji', 'brew']:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+    parser_listtagged = subparsers.add_parser('list-tagged')
+    parser_listtagged.add_argument('tag')
+    parser_listtagged.add_argument('pkg')
+    parser_listtagged.add_argument('--quiet', action='store_true')
+    parser_listtagged.add_argument('--latest', action='store_true')
+    parser_waitrepo = subparsers.add_parser('wait-repo')
+    parser_waitrepo.add_argument('repo')
+    parser_waitrepo.add_argument('--build')
+    parser_watchtask = subparsers.add_parser('watch-task')
+    parser_watchtask.add_argument('taskid')
+    parser_taskinfo = subparsers.add_parser('taskinfo')
+    parser_taskinfo.add_argument('taskid')
+    parser_downloadtask = subparsers.add_parser('download-task')
+    parser_downloadtask.add_argument('taskid')
+    parser_downloadlogs = subparsers.add_parser('download-logs')
+    parser_downloadlogs.add_argument('taskid')
+    parser_downloadlogs.add_argument('-r', action='store_true')
+    parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
     if 'output' in args and args.output:
         print(args.output)

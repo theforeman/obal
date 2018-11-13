@@ -21,6 +21,10 @@
       fail:
         msg: "The build in {{ build_package_koji_command }}  has failed"
       when: (build_package_koji_status is failed) and ('Build already exists' not in build_package_koji_status.stdout)
+
+    - name: 'Wait for builds to apear in the repo'
+      include_tasks: waitrepo.yml
+      when: build_package_waitrepo|bool and not build_package_scratch
   when: build_package_build_system == 'koji'
 
 - block:
