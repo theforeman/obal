@@ -180,6 +180,8 @@ def test_obal_nightly_upstream_hello():
     expected_log = [
         "tito release dist-git-jenkins -y --arg jenkins_job=hello-master-release",
         "koji watch-task 1234",
+        "koji taskinfo -v 1234",
+        "koji wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
     ]
     assert_mockbin_log(expected_log)
 
