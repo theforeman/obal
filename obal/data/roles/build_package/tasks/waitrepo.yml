@@ -1,4 +1,5 @@
-- block:
+- when: build_package_build_system == 'koji' and build_package_waitrepo|bool
+  block:
   - name: "Get {{ build_package_koji_command }} build targets"
     command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
     with_items: "{{ build_package_koji_tasks }}"
@@ -11,4 +12,3 @@
   - name: "Wait for {{ build_package_koji_command }} to regenerate the repo"
     command: "{{ build_package_koji_command }} wait-repo --build={{ item['Build'] | regex_replace(' .*', '') }} {{ item['Request Parameters']['Build Target'] | regex_replace('-candidate$', '') }}-build"
     with_items: "{{ build_package_koji_task_data }}"
-  when: build_package_build_system == 'koji' and build_package_waitrepo|bool
