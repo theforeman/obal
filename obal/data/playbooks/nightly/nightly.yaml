@@ -5,14 +5,20 @@
   gather_facts: no
   vars:
     build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
-  pre_tasks:
-    - name: 'set nightly_releaser'
-      set_fact:
-        releasers:
-          - "{{ nightly_releaser }}"
+  tasks:
+    - name: 'legacy nightly building'
+      block:
+        - name: 'set nightly_releaser'
+          set_fact:
+            releasers:
+              - "{{ nightly_releaser }}"
+
+        - import_role:
+            name: build_package
       when: nightly_releaser is defined and '--arg jenkins_job=' in (build_package_tito_releaser_args | join(' '))
 
-    - block:
+    - name: 'nightly building'
+      block:
         - name: 'set package_dir'
           set_fact:
             package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
@@ -44,21 +50,20 @@
             insertbefore: BOF
             backup: yes
           register: original_specfile
+
+        - import_role:
+            name: build_package
       when: nightly_sourcefiles is defined and nightly_githash is defined
-
-  roles:
-    - build_package
-
-  post_tasks:
-    - block:
+      always:
         - name: 'restore spec file'
           copy:
             src: "{{ original_specfile.backup }}"
             dest: "{{ nightly_specfile_path }}"
+          when: original_specfile is defined
 
         - name: 'delete copied source files'
           file:
             state: absent
             path: "{{ package_dir}}/{{ item | basename }}"
           with_items: "{{ nightly_sourcefiles }}"
-      when: nightly_sourcefiles is defined and nightly_githash is defined
+          when: nightly_sourcefiles is defined
