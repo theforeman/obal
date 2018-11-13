@@ -15,7 +15,7 @@
 
         - import_role:
             name: build_package
-      when: nightly_releaser is defined and '--arg jenkins_job=' in (build_package_tito_releaser_args | join(' '))
+      when: nightly_sourcefiles is not defined and nightly_githash is not defined
 
     - name: 'nightly building'
       block:
