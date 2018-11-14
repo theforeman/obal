@@ -8,10 +8,9 @@
   tasks:
     - name: 'legacy nightly building'
       block:
-        - name: 'set nightly_releaser'
-          set_fact:
-            releasers:
-              - "{{ nightly_releaser }}"
+        - fail:
+            msg: 'releasers is undefined'
+          when: releasers is not defined
 
         - import_role:
             name: build_package
