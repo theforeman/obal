@@ -14,6 +14,7 @@ FIXTURE_DIR = os.path.join(
 
 TESTREPO_DIR = os.path.join(FIXTURE_DIR, 'testrepo')
 MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin')
+MOCK_SOURCES_DIR = os.path.join(FIXTURE_DIR, 'mock_sources')
 
 DEFAULT_ARGS = []
 if os.environ.get('TRAVIS', None):
@@ -159,10 +160,10 @@ def test_obal_release_upstream_hello_nowait():
 
 @obal_cli_test(repotype='upstream')
 def test_obal_nightly_upstream_hello():
-    assert_obal_success(['nightly', 'hello'])
+    assert_obal_success(['nightly', 'hello', '--source', os.path.join(MOCK_SOURCES_DIR, 'hello-2.10.tar.gz'), '--githash', '0123456789abcdef'])
 
     expected_log = [
-        "tito release dist-git-jenkins -y --arg jenkins_job=hello-master-release",
+        "tito release dist-git -y --arg jenkins_job=hello-master-release",
         "koji watch-task 1234",
     ]
     assert_mockbin_log(expected_log)
