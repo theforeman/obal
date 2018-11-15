@@ -8,7 +8,8 @@
   tasks:
     - name: 'legacy nightly building'
       block:
-        - fail:
+        - name: 'check for releasers variable'
+          fail:
             msg: 'releasers is undefined'
           when: releasers is not defined
 
