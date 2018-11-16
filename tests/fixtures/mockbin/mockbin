@@ -62,6 +62,7 @@ elif prog in ['koji', 'brew']:
     parser_waitrepo = subparsers.add_parser('wait-repo')
     parser_waitrepo.add_argument('repo')
     parser_waitrepo.add_argument('--build')
+    parser_waitrepo.add_argument('--target', action='store_true')
     parser_watchtask = subparsers.add_parser('watch-task')
     parser_watchtask.add_argument('taskid')
     parser_taskinfo = subparsers.add_parser('taskinfo')

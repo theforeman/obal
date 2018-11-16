@@ -142,7 +142,7 @@ def test_obal_release_upstream_hello():
         "tito release dist-git -y",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
-        "koji wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+        "koji wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -182,7 +182,7 @@ def test_obal_nightly_upstream_hello():
         "tito release dist-git -y --arg jenkins_job=hello-master-release",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
-        "koji wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+        "koji wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -267,7 +267,7 @@ def test_obal_release_downstream_hello():
         "brew taskinfo -v 1234",
         # the build and target in the next command are "wrong" because the
         # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -286,7 +286,7 @@ def test_obal_release_downstream_hello_wait_download_logs():
         "brew taskinfo -v 1234",
         # the build and target in the next command are "wrong" because the
         # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build"
+        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -304,7 +304,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
         "brew taskinfo -v 1234",
         # the build and target in the next command are "wrong" because the
         # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 obaltest-nightly-rhel7-build",
+        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7",
         "brew download-task 1234",
         "createrepo {pwd}/downloaded_rpms",
     ]
