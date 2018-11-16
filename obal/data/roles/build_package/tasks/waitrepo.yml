@@ -10,5 +10,5 @@
       build_package_koji_task_data: "{{ build_package_koji_task_info.results | map(attribute='stdout') | map('from_yaml') | list }}"
 
   - name: "Wait for {{ build_package_koji_command }} to regenerate the repo"
-    command: "{{ build_package_koji_command }} wait-repo --build={{ item['Build'] | regex_replace(' .*', '') }} {{ item['Request Parameters']['Build Target'] | regex_replace('-candidate$', '') }}-build"
+    command: "{{ build_package_koji_command }} wait-repo --build={{ item['Build'] | regex_replace(' .*', '') }} --target {{ item['Request Parameters']['Build Target'] }}"
     with_items: "{{ build_package_koji_task_data }}"
