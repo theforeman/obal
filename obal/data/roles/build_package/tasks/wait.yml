@@ -11,6 +11,7 @@
       command: "{{ build_package_koji_command }} watch-task {{ build_package_koji_tasks | join(' ') }}"
       ignore_errors: yes
       register: build_package_koji_status
+      changed_when: False
       when: (build_package_tito_release is successful)
 
     - name: 'Download task logs'
@@ -42,6 +43,7 @@
       command: "copr-cli watch-build {{ build_package_copr_tasks | join(' ') }}"
       ignore_errors: yes
       register: build_package_copr_status
+      changed_when: False
       when: (build_package_tito_release is successful)
 
     - name: 'Failed build'

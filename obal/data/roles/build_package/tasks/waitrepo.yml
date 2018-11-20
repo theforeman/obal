@@ -3,6 +3,7 @@
   - name: "Get {{ build_package_koji_command }} build targets"
     command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
     with_items: "{{ build_package_koji_tasks }}"
+    changed_when: False
     register: build_package_koji_task_info
 
   - name: "Filter {{ build_package_build_system }} output"
@@ -11,4 +12,5 @@
 
   - name: "Wait for {{ build_package_koji_command }} to regenerate the repo"
     command: "{{ build_package_koji_command }} wait-repo --build={{ item['Build'] | regex_replace(' .*', '') }} --target {{ item['Request Parameters']['Build Target'] }}"
+    changed_when: False
     with_items: "{{ build_package_koji_task_data }}"
