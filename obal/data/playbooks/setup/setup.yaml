@@ -2,21 +2,26 @@
 - hosts:
     - localhost
   connection: local
-  gather_facts: no
   tasks:
     - name: install required packages
-      package:
-        name: "{{ item }}"
-        state: present
       become: true
-      with_items:
-        - rpm-build
-        - koji
-        - git-annex
-        - quvi
-        - tito
-        - scl-utils
-        - scl-utils-build
-        - rpmlint
-        - yum-utils
+      package:
+        state: present
+        name:
+          - rpm-build
+          - koji
+          - git-annex
+          - tito
+          - scl-utils
+          - scl-utils-build
+          - rpmlint
+          - yum-utils
+          - which
 
+    - when: ansible_os_family == 'Fedora'
+      name: install required packages
+      become: true
+      package:
+        state: present
+        name:
+          - quvi
