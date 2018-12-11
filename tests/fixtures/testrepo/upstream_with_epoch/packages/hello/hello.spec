@@ -46,5 +46,5 @@ fi
 %license COPYING
 
 %changelog
-* Tue Sep 06 2011 The Coon of Ty <Ty@coon.org> 2:2.10-1
+* Tue Dec 11 2018 The Coon of Ty <Ty@coon.org> 2:2.10-1
 - Initial version of the package
