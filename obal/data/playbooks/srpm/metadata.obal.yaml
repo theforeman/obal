@@ -3,3 +3,13 @@ help: >
 
 
   Building source RPMs can be useful when locally building packages.
+variables:
+  build_srpm_dist:
+    parameter: --dist
+    help: Dist to set when building a SRPM
+  build_srpm_scl:
+    parameter: --scl
+    help: SCL to set when building a SRPM
+  build_srpm_output_dir:
+    parameter: --dir
+    help: Absolute path to output dir for SRPM. Defaults to <inventory_dir>/SRPMs

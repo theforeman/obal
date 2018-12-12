@@ -411,7 +411,7 @@ def test_obal_scratch_copr_hello_nowait():
         "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
         "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
         "tito build --srpm --scl=copr-scl",
-        "copr-cli build --nowait copr-repo-scratch hello.src.rpm"
+        "copr-cli build --nowait copr-repo-scratch hello-2.10-1.src.rpm"
     ]
     assert_mockbin_log(expected_log)
 
@@ -426,7 +426,7 @@ def test_obal_scratch_copr_hello():
         "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
         "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
         "tito build --srpm --scl=copr-scl",
-        "copr-cli build copr-repo-scratch hello.src.rpm",
+        "copr-cli build copr-repo-scratch hello-2.10-1.src.rpm",
         # copr-cli build waits by default, so there is no "watch-build" step here
     ]
     assert_mockbin_log(expected_log)
@@ -512,4 +512,4 @@ def test_obal_changelog_custom():
 @obal_cli_test(repotype='upstream')
 def test_obal_srpm():
     assert_obal_success(['srpm', 'hello'])
-    assert_mockbin_log(['tito build --srpm --offline'])
+    assert_mockbin_log(['tito build --srpm --offline --output {pwd}/SRPMs'])

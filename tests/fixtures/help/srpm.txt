@@ -1,4 +1,6 @@
-usage: obal srpm [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal srpm [-h] [-v] [-e EXTRA_VARS] [--dist BUILD_SRPM_DIST]
+                 [--dir BUILD_SRPM_OUTPUT_DIR] [--scl BUILD_SRPM_SCL]
+                 package [package ...]
 
 Build a SRPM for packages
 
@@ -10,6 +12,12 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --dist BUILD_SRPM_DIST
+                        Dist to set when building a SRPM
+  --dir BUILD_SRPM_OUTPUT_DIR
+                        Absolute path to output dir for SRPM. Defaults to
+                        <inventory_dir>/SRPMs
+  --scl BUILD_SRPM_SCL  SCL to set when building a SRPM
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS

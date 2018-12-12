@@ -24,6 +24,7 @@ Finished: Tue Nov 13 08:51:20 2018
 Host: buildhost
 Build: hello-2.10-1.el7 (12345)"""
 
+_FAKE_SRPM = 'hello-2.10-1.src.rpm'
 
 prog = os.path.basename(sys.argv[0])
 sys.argv[0] = prog
@@ -38,19 +39,35 @@ if mockbin_log:
 if prog == 'tito':
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+
+    # tito release arguments and options
     parser_release = subparsers.add_parser('release')
     parser_release.add_argument('dest')
     parser_release.add_argument('--scratch', action='store_true')
     parser_release.add_argument('--test', action='store_true')
-    parser_release.add_argument('-y', action='store_const', dest='output', const='Created task: 1234')
+    parser_release.add_argument('-y', '--yes', dest='yes', action='store_true', default=False)
     parser_release.add_argument('--arg')
+
+    # tito build arguments and options
     parser_build = subparsers.add_parser('build')
-    parser_build.add_argument('--srpm', action='store_const', dest='output', const='Wrote: hello.src.rpm')
-    parser_build.add_argument('--scl', action='store')
+    parser_build.add_argument('--srpm', action='store_true', default=False)
+    parser_build.add_argument('--output', default=None)
+    parser_build.add_argument('--scl')
     parser_build.add_argument('--offline', action='store_true')
+
     args = parser.parse_args()
+
+    if 'yes' in args and args.yes:
+        print('Created task: 1234')
     if 'output' in args and args.output:
-        print(args.output)
+        os.makedirs(args.output)
+        srpm_path = os.path.join(args.output, _FAKE_SRPM)
+        open(srpm_path, 'w').close()
+    else:
+        srpm_path = _FAKE_SRPM
+    if 'srpm'in args and args.srpm:
+        print("Wrote: {}".format(srpm_path))
+
 elif prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
