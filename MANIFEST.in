@@ -1,3 +1,4 @@
+exclude .bumpversion.cfg
 include requirements*.txt
 include LICENSE
 include .coveragerc

@@ -235,3 +235,29 @@ First of all, the tests for various playbooks are stored in ``tests/test_playboo
 * ``test_takes_package_argument`` verifies whether there's an action parameter. Most playbooks do, but if yours doesn't then it must be added.
 * ``test_is_documented`` verifies you're written a help text for your playbook.
 * ``test_help`` captures the help texts in ``tests/fixtures/help`` to ensure there are no unintended changes. Rendered output is easier to review. Because manually copying output is stupid, we automatically store the output if the file is missing. To update the content, remove it and run the tests (``pytest tests/test_playbooks.py::test_help -v``). Note it marks that test as skipped. Running it again should mark it as passed.
+
+Releasing obal
+--------------
+
+Before creating a new release, it's best to check if there are `issues`_ or `pull requests`_ that should be merged.
+
+To create a new release, we use `bump2version`_ for version bumping. It can be installed via pip but using the Fedora package is easier. Note it's named after the predecessor that halted development, but we actually need the fork for signed tags:
+
+    $ sudo dnf install bumpversion
+
+Ensure you are on the latest commit:
+
+    $ git checkout master
+    $ git pull
+
+To decide on the next version, the git log is a good indicator. We can either do a *major*, *minor* or *patch* release:
+
+    $ bumpversion patch
+
+This will modify all the files containing the version number, create a git commit and a GPG signed git tag. Once this is pushed, Travis will release it to PyPI:
+
+    $ git push
+
+.. _issues: https://github.com/theforeman/obal/issues
+.. _pull requests: https://github.com/theforeman/obal/pulls
+.. _bump2version: https://github.com/c4urself/bump2version
