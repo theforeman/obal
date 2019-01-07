@@ -64,6 +64,6 @@
         - name: 'delete copied source files'
           file:
             state: absent
-            path: "{{ package_dir}}/{{ item | basename }}"
+            path: "{{ package_dir }}/{{ item | basename }}"
           with_items: "{{ nightly_sourcefiles }}"
           when: nightly_sourcefiles is defined
