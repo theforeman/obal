@@ -20,10 +20,17 @@
   changed_when: False
   register: setup_sources_search_annex
   ignore_errors: yes
-  when: (not setup_sources_source_exists.stat.exists) or ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined and setup_sources_source_exists.stat.islnk )
+  when: "( not setup_sources_source_exists.stat.exists ) or
+    ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined
+    and setup_sources_source_exists.stat.islnk )"
 
 - name: 'Add url to annex for source'
-  command: "git annex addurl {{ setup_sources_annex_options }} --file '{{ setup_sources_sourcebase }}' '{{ setup_sources_source }}'"
+  command: >-
+    git annex addurl
+    {{ setup_sources_annex_options }}
+    --file
+    '{{ setup_sources_sourcebase }}'
+    '{{ setup_sources_source }}'
   args:
     chdir: "{{ package_dir }}"
   ignore_errors: yes

@@ -39,7 +39,11 @@
       register: srpm_build
 
     - name: 'Run build'
-      command: "copr-cli build {% if not build_package_wait|bool %}--nowait{% endif %} {{ copr_repo_name }} {{ srpm_build.stdout.split('Wrote: ')[1] }}"
+      command: >-
+        copr-cli build
+        {% if not build_package_wait | bool %}--nowait{% endif %}
+        {{ copr_repo_name }}
+        {{ srpm_build.stdout.split('Wrote: ')[1] }}
       register: build_status
 
     - debug:
