@@ -8,9 +8,15 @@
 
   - name: "Filter {{ build_package_build_system }} output"
     set_fact:
-      build_package_koji_task_data: "{{ build_package_koji_task_info.results | map(attribute='stdout') | map('from_yaml') | list }}"
+      build_package_koji_task_data:
+        "{{ build_package_koji_task_info.results | map(attribute='stdout') | map('from_yaml') | list }}"
 
   - name: "Wait for {{ build_package_koji_command }} to regenerate the repo"
-    command: "{{ build_package_koji_command }} wait-repo --build={{ item['Build'] | regex_replace(' .*', '') }} --target {{ item['Request Parameters']['Build Target'] }}"
+    command: >-
+      {{ build_package_koji_command }}
+      wait-repo
+      --build={{ item['Build'] | regex_replace(' .*', '') }}
+      --target
+      {{ item['Request Parameters']['Build Target'] }}
     changed_when: False
     with_items: "{{ build_package_koji_task_data }}"

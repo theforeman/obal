@@ -43,13 +43,13 @@
 
         - name: 'Git commit new package'
           command: "git commit ./{{ package_base_dir }}/{{ inventory_hostname }} -m 'Add {{ inventory_hostname }}'"
-          when: git_status.stdout != ''
+          when: git_status.stdout | length > 0
           args:
             chdir: "{{ inventory_dir }}"
 
         - name: 'Git add new package'
           command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/*"
-          when: git_status.stdout != ''
+          when: git_status.stdout | length > 0
           args:
             chdir: "{{ inventory_dir }}"
       when: package_directory_result is changed

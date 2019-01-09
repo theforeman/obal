@@ -10,7 +10,8 @@
 
     - name: 'Extract Copr repository names'
       set_fact:
-        copr_scratch_repos: "{{ copr_repos.stdout.split('\n') | select('match', '^Name:') | list | replace('Name: ', '') }}"
+        copr_scratch_repos:
+          "{{ copr_repos.stdout.split('\n') | select('match', '^Name:') | list | replace('Name: ', '') }}"
 
     - name: 'Extract Copr scratch repositories'
       set_fact:

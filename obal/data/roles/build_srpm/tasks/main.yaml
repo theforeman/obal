@@ -16,7 +16,11 @@
     build_srpm_tito_releaser_args: "{{ build_srpm_tito_releaser_args }} + [ '--output {{ build_srpm_output_dir }}' ]"
 
 - name: 'Build SRPM'
-  command: "tito build --srpm --offline {{ build_srpm_tito_releaser_args | join(' ') }}"
+  command: >-
+    tito build
+    --srpm
+    --offline
+    {{ build_srpm_tito_releaser_args | join(' ') }}
   args:
     chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: srpm_build

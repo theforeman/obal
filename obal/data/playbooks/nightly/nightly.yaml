@@ -25,7 +25,8 @@
 
         - name: 'set global_nightly_macro'
           set_fact:
-            global_nightly_macro: "%global nightly .{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}"
+            global_nightly_macro:
+              "%global nightly .{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}"
 
         - name: 'copy source files'
           copy:
