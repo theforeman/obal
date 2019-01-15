@@ -1,0 +1,3 @@
+---
+build_srpm_tito_releaser_args: "{{ build_package_tito_releaser_args | default([]) }}"
+build_srpm_output_dir: "{{ inventory_dir }}/SRPMs"
