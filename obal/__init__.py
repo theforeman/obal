@@ -177,21 +177,28 @@ def _get_data_path():
     """
     Return the data path. Houses playbooks and configs.
     """
-    return resource_filename(__name__, 'data')
+    return os.environ.get('OBAL_DATA', resource_filename(__name__, 'data'))
+
+
+def get_inventory_path():
+    """
+    Return the inventory path
+    """
+    return os.environ.get('OBAL_INVENTORY', os.path.join(os.getcwd(), 'package_manifest.yaml'))
 
 
 def get_playbooks_path():
     """
     Return the default playbooks path
     """
-    return os.path.join(_get_data_path(), 'playbooks')
+    return os.environ.get('OBAL_PLAYBOOKS', os.path.join(_get_data_path(), 'playbooks'))
 
 
 def get_ansible_config_path():
     """
-    Return the default playbooks path
+    Return the ansible.cfg path
     """
-    return os.path.join(_get_data_path(), 'ansible.cfg')
+    return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(_get_data_path(), 'ansible.cfg'))
 
 
 def find_packages(inventory_path):
@@ -306,7 +313,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     global display  # pylint: disable=C0103,W0603
     display = Display()
 
-    inventory_path = os.path.join(os.getcwd(), 'package_manifest.yaml')
+    inventory_path = get_inventory_path()
 
     package_choices = find_packages(inventory_path)
 
@@ -315,7 +322,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     args = parser.parse_args(cliargs)
 
     if args.playbook.takes_package_parameter and not os.path.exists(inventory_path):
-        print("Could not find your package_manifest.yaml")
+        print("Could not find your inventory at {}".format(inventory_path))
         exit(1)
 
     from ansible.cli.playbook import PlaybookCLI
