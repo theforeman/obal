@@ -64,12 +64,14 @@
       command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
       args:
         chdir: "{{ inventory_dir }}"
+      changed_when: False
       register: updated_version
 
     - name: 'Get current git branch'
       command: "git rev-parse --abbrev-ref HEAD"
       args:
         chdir: "{{ inventory_dir }}"
+      changed_when: False
       register: git_branch
 
     - name: 'Create git branch'
