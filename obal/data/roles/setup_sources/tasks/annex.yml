@@ -24,6 +24,12 @@
     ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined
     and setup_sources_source_exists.stat.islnk )"
 
+- name: 'Remove source'
+  file:
+    name: "{{ setup_sources_sourcepath }}"
+    state: absent
+  when: setup_sources_search_annex is failed
+
 - name: 'Add url to annex for source'
   command: >-
     git annex addurl
@@ -35,3 +41,9 @@
     chdir: "{{ package_dir }}"
   ignore_errors: yes
   when: setup_sources_search_annex is failed
+
+- name: 'Ensure no actual change happened'
+  command: "git diff --exit-code {{ setup_sources_sourcebase }}"
+  changed_when: False
+  args:
+    chdir: "{{ package_dir }}"
