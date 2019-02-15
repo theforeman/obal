@@ -6,4 +6,5 @@ skip_list:
   - ANSIBLE0012
   - '701'
   - '405'
+  - '306'
 parseable: true
