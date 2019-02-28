@@ -28,6 +28,7 @@
   file:
     name: "{{ setup_sources_sourcepath }}"
     state: absent
+  register: setup_sources_remove_source
   when: setup_sources_search_annex is failed
 
 - name: 'Add url to annex for source'
@@ -47,3 +48,4 @@
   changed_when: False
   args:
     chdir: "{{ package_dir }}"
+  when: setup_sources_remove_source is changed
