@@ -72,8 +72,8 @@ When we execute ``obal dummy --help`` we see more show up:
 
 .. code-block:: none
 
-    usage: obal dummy [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
-                  [--skip-tags SKIP_TAGS] [--automatic AUTOMATIC]
+    usage: obal dummy [-h] [-v] [-e EXTRA_VARS]
+                  [--automatic AUTOMATIC]
                   [--explicit MAPPED]
                   package [package ...]
 
@@ -96,11 +96,6 @@ When we execute ``obal dummy --help`` we see more show up:
      -e EXTRA_VARS, --extra-vars EXTRA_VARS
                            set additional variables as key=value or YAML/JSON, if
                            filename prepend with @
-     --step                interactive: confirm each task before running
-     -t TAGS, --tags TAGS  only run plays and tasks tagged with these values
-     --skip-tags SKIP_TAGS
-                           only run plays and tasks whose tags do not match these
-                           values
 
 
 Help
@@ -130,8 +125,8 @@ This results into the following ``obal changelog --help`` output:
 .. code-block:: none
   :emphasize-lines: 13,14
 
-   usage: obal changelog [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
-                         [--skip-tags SKIP_TAGS] [--changelog CHANGELOG]
+   usage: obal changelog [-h] [-v] [-e EXTRA_VARS]
+                         [--changelog CHANGELOG]
                          package [package ...]
 
    The changelog command writes a RPM changelog entry for the current version and release.
@@ -161,8 +156,8 @@ This results into the following help:
 .. code-block:: none
   :emphasize-lines: 13
 
-    usage: obal changelog [-h] [-v] [-e EXTRA_VARS] [--step] [-t TAGS]
-                          [--skip-tags SKIP_TAGS] [--message CHANGELOG]
+    usage: obal changelog [-h] [-v] [-e EXTRA_VARS]
+                          [--message CHANGELOG]
                           package [package ...]
 
     The changelog command writes a RPM changelog entry for the current version and release.
