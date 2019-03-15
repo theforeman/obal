@@ -1,18 +1,10 @@
 ---
 - block:
-    - name: "Get {{ build_package_koji_command }} task ids"
-      set_fact:
-        build_package_koji_tasks: "{{ build_package_tito_release.stdout_lines \
-          | select('match', '^Created task:.*') \
-          | map('regex_replace', '^Created task:\\s(\\d+)', '\\1') \
-          | list }}"
-
     - name: "Watch {{ build_package_koji_command }} task(s)"
-      command: "{{ build_package_koji_command }} watch-task {{ build_package_koji_tasks | join(' ') }}"
+      command: "{{ build_package_koji_command }} watch-task {{ build_package_tito_release.tasks | join(' ') }}"
       ignore_errors: yes
       register: build_package_koji_status
       changed_when: False
-      when: (build_package_tito_release is successful)
 
     - name: 'Download task logs'
       include_tasks: download_logs.yml
@@ -32,19 +24,11 @@
   when: build_package_build_system == 'koji'
 
 - block:
-    - name: "Get copr task IDs"
-      set_fact:
-        build_package_copr_tasks: "{{ build_package_tito_release.stdout_lines \
-          | select('match', '^Created builds:.*') \
-          | map('regex_replace', '^Created builds:\\s(\\d+)', '\\1') \
-          | list }}"
-
     - name: "Watch copr task(s)"
-      command: "copr-cli watch-build {{ build_package_copr_tasks | join(' ') }}"
+      command: "copr-cli watch-build {{ build_package_tito_release.builds | join(' ') }}"
       ignore_errors: yes
       register: build_package_copr_status
       changed_when: False
-      when: (build_package_tito_release is successful)
 
     - name: 'Failed build'
       fail:

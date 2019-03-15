@@ -2,7 +2,7 @@
   block:
   - name: "Get {{ build_package_koji_command }} build targets"
     command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
-    with_items: "{{ build_package_koji_tasks }}"
+    with_items: "{{ build_package_tito_release.tasks }}"
     changed_when: False
     register: build_package_koji_task_info
 
