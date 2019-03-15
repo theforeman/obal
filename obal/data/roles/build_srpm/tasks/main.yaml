@@ -1,30 +1,16 @@
 ---
-- block:
-    - name: 'Set dist from commandline args'
-      set_fact:
-        build_srpm_tito_releaser_args: "{{ build_srpm_tito_releaser_args }} + [ '--dist {{ build_srpm_dist }}' ]"
-      when: build_srpm_dist is defined
-
-    - name: 'Set scl from commandline args'
-      set_fact:
-        build_srpm_tito_releaser_args: "{{ build_srpm_tito_releaser_args }} + [ '--scl {{ build_srpm_scl }}' ]"
-      when: build_srpm_scl is defined
-  when: build_srpm_dist is defined or build_srpm_scl is defined
-
-- name: 'set output dir'
-  set_fact:
-    build_srpm_tito_releaser_args: "{{ build_srpm_tito_releaser_args }} + [ '--output {{ build_srpm_output_dir }}' ]"
-
 - name: 'Build SRPM'
-  command: >-
-    tito build
-    --srpm
-    --offline
-    {{ build_srpm_tito_releaser_args | join(' ') }}
-  args:
-    chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+  tito_build:
+    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    arguments: "{{ build_srpm_tito_releaser_args }}"
+    srpm: true
+    offline: true
+    dist: "{{ build_srpm_dist }}"
+    scl: "{{ build_srpm_scl }}"
+    output: "{{ build_srpm_output_dir }}"
   register: srpm_build
 
-- debug:
-    msg: "{{ srpm_build.stdout }}"
+- name: 'Built SRPM'
+  debug:
+    msg: "Built {{ srpm_build.path }}"
   when: srpm_build is successful
