@@ -1,15 +1,14 @@
 ---
-- name: 'Set test build'
-  set_fact:
-    build_package_tito_args: "{{ build_package_tito_args }} --test"
-  when: build_package_test
-
 - block:
-    - name: 'Set tito_releasers for copr release'
-      set_fact:
-        build_package_tito_releasers: "{{ releasers | join(' ') }}"
-
-    - include_tasks: tito_release.yml
+    - name: 'Release to copr'
+      tito_release:
+        directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        arguments: "{{ build_package_tito_args }}"
+        test: "{{ build_package_test }}"
+        scratch: "{{ build_package_scratch }}"
+        releasers: "{{ releasers }}"
+        releaser_arguments: "{{ build_package_tito_releaser_args }}"
+      register: build_package_tito_release
 
     - name: 'Wait for tasks to finish'
       include_tasks: wait.yml

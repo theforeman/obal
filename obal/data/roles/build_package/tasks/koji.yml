@@ -9,25 +9,27 @@
 
 - name: 'Set tito_releasers for brew scratch'
   set_fact:
-    build_package_tito_releasers: "{{ releasers | join(' ') | replace('dist-git', 'scratch') }}"
+    build_package_tito_releasers: "{{ releasers | map('replace', 'dist-git', 'scratch') | list }}"
   when: build_package_koji_command == 'brew' and build_package_scratch
 
 - name: 'Set tito_releasers'
   set_fact:
-    build_package_tito_releasers: "{{ releasers | join(' ')  }}"
+    build_package_tito_releasers: "{{ releasers }}"
   when: build_package_koji_command != 'brew' or not build_package_scratch
 
-- name: 'Set test build'
-  set_fact:
-      build_package_tito_args: "{{ build_package_tito_args }} --test"
-  when: build_package_test
+- name: 'Release to {{ build_package_koji_command }}'
+  tito_release:
+    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    arguments: "{{ build_package_tito_args }}"
+    scratch: "{{ build_package_scratch and build_package_koji_command != 'brew'}}"
+    test: "{{ build_package_test }}"
+    releasers: "{{ build_package_tito_releasers }}"
+    releaser_arguments: "{{ build_package_tito_releaser_args }}"
+  register: build_package_tito_release
 
-- name: 'Set scratch build'
-  set_fact:
-    build_package_tito_args: "{{ build_package_tito_args }} --scratch"
-  when: build_package_koji_command != 'brew' and build_package_scratch
-
-- include_tasks: tito_release.yml
+- name: 'Created tasks'
+  debug:
+    var: build_package_tito_release.task_urls
 
 - name: 'Wait for tasks to finish'
   include_tasks: wait.yml
