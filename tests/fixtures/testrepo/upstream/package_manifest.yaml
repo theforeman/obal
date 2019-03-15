@@ -13,7 +13,7 @@ packages:
   hosts:
     hello:
       nightly_package_tito_releaser_args:
-        - "--arg jenkins_job=hello-master-release"
+        - "jenkins_job=hello-master-release"
 
 repoclosures:
   vars:
