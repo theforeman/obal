@@ -24,13 +24,20 @@ def main():
         )
     )
 
-    command = ['tito', 'release', '--yes'] + module.params.get('arguments', [])
+    command = ['tito', 'release', '--yes']
+
     for param in ('scratch', 'test'):
         if module.params[param]:
             command.append('--' + param)
+
     command += module.params['releasers']
-    for argument in module.params.get('releaser_arguments', []):
-        command += ['--arg', argument]
+
+    if module.params['releaser_arguments']:
+        for argument in module.params['releaser_arguments']:
+            command += ['--arg', argument]
+
+    if module.params['arguments']:
+        command += module.params['arguments']
 
     directory = module.params['directory']
 
@@ -40,7 +47,6 @@ def main():
         module.fail_json(msg='Failed to tito release', command=error.cmd, directory=directory,
                          output=error.output, code=error.returncode)
 
-    # TODO: task dict?
     tasks = re.findall(r'^Created task:\s(\d+)', output, re.MULTILINE)
     task_urls = re.findall(r'^Task info:\s(.+)', output, re.MULTILINE)
     builds = re.findall(r'^Created builds:\s(\d+)', output, re.MULTILINE)
