@@ -32,9 +32,10 @@
       run_once: true
 
     - name: 'Build SRPM'
-      command: 'tito build --srpm --scl={{ scl }}'
-      args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      tito_build:
+        directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        srpm: true
+        scl: "{{ scl }}"
       register: srpm_build
 
     - name: 'Run build'
@@ -42,7 +43,7 @@
         copr-cli build
         {% if not build_package_wait | bool %}--nowait{% endif %}
         {{ copr_repo_name }}
-        {{ srpm_build.stdout.split('Wrote: ')[1] }}
+        {{ srpm_build.path }}
       register: build_status
 
     - debug:
