@@ -34,6 +34,7 @@ def obal_cli_test(func=None, repotype='upstream'):
 
     @functools.wraps(func)
     def func_wrapper(*args, **kwargs):
+        __tracebackhide__ = True
         tempdir = tempfile.mkdtemp()
         repodir = os.path.join(tempdir, 'repo')
         shutil.copytree(TESTREPO_DIR, repodir)
@@ -73,6 +74,7 @@ def assert_obal_failure(args):
 
 
 def assert_mockbin_log(content):
+    __tracebackhide__ = True
     expected_log = "\n".join(content)
     expected_log = expected_log.replace('{pwd}', os.getcwd())
     with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
