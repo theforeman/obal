@@ -15,7 +15,7 @@ install:
   - chmod +x /home/travis/.local/bin/rpmdev-packager
 script:
   - tox
-  - docker build --build-arg VERSION=master -t quay.io/foreman/obal:latest .
+  - docker build --build-arg VERSION=$TRAVIS_COMMIT -t quay.io/foreman/obal:latest .
 deploy:
   - provider: pypi
     user: theforeman
