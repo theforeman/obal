@@ -5,6 +5,8 @@
   gather_facts: no
   vars:
     build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
+  roles:
+    - package_variables
   tasks:
     - name: 'legacy nightly building'
       block:
@@ -21,7 +23,7 @@
       block:
         - name: 'set package_dir'
           set_fact:
-            package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+            package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
         - name: 'set global_nightly_macro'
           set_fact:
