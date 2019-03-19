@@ -324,7 +324,7 @@ def main(cliargs=None):  # pylint: disable=R0914
     ansible_playbook = (["ansible-playbook"] + ansible_args)
 
     if args.verbose:
-        print(ansible_playbook)
+        print("ANSIBLE_CONFIG={} {}".format(os.environ["ANSIBLE_CONFIG"], ' '.join(ansible_playbook)))
 
     cli = PlaybookCLI(ansible_playbook)
     cli.parse()
