@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: ensure_package }
