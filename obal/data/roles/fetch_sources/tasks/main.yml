@@ -67,11 +67,8 @@
         path: "./{{ package_base_dir }}/{{ inventory_hostname }}"
 
 - block:
-    - name: get spec file
-      find:
-        pattern: "*.spec"
-        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      register: spec_file
+    - include_role:
+        name: spec_file
 
     - name: 'Set spec file path and setup flag'
       set_fact:
