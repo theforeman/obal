@@ -1,4 +1,3 @@
 ---
 dependencies:
-  - { role: ensure_package }
-  - { role: package_variables }
+  - { role: spec_file }

@@ -1,10 +1,4 @@
 ---
-- name: get spec file
-  find:
-    pattern: "*.spec"
-    path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-  register: spec_file
-
 - name: "Set spec file path, scl options and releasers"
   set_fact:
     spec_file_path: "{{ spec_file.files[0].path }}"

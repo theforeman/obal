@@ -4,14 +4,8 @@
   serial: 1
   gather_facts: no
   roles:
-    - package_variables
+    - spec_file
   tasks:
-    - name: get spec file
-      find:
-        pattern: "*.spec"
-        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      register: spec_file
-
     - name: 'ensure changelog'
       changelog:
         spec: "{{ spec_file.files[0].path }}"
