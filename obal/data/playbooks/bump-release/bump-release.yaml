@@ -11,4 +11,4 @@
     - name: 'Bump release'
       command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"{{ changelog }}\""
       args:
-        chdir: "{{ spec_file.files[0].path | dirname }}"
+        chdir: "{{ spec_file_path | dirname }}"
