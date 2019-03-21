@@ -71,6 +71,10 @@ if prog == 'tito':
 elif prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+    parser_listpkgs = subparsers.add_parser('list-pkgs')
+    parser_listpkgs.add_argument('--tag')
+    parser_listpkgs.add_argument('--package')
+    parser_listpkgs.add_argument('--quiet', action='store_true')
     parser_listtagged = subparsers.add_parser('list-tagged')
     parser_listtagged.add_argument('tag')
     parser_listtagged.add_argument('pkg')
