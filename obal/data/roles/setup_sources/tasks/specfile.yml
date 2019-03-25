@@ -1,8 +1,4 @@
 ---
-- name: 'Set spec file path'
-  set_fact:
-    spec_file_path: "{{ spec_file.files[0].path }}"
-
 - name: 'Extract Sources from spec'
   shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
   register: setup_sources_sources

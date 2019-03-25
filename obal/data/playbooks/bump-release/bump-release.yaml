@@ -9,6 +9,6 @@
     - spec_file
   tasks:
     - name: 'Bump release'
-      command: "rpmdev-bumpspec {{ spec_file.files[0].path | basename }} -c \"{{ changelog }}\""
+      command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"{{ changelog }}\""
       args:
         chdir: "{{ spec_file.files[0].path | dirname }}"
