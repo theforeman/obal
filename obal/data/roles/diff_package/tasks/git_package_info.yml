@@ -1,8 +1,4 @@
 ---
-- name: "Set spec file path, scl options and releasers"
-  set_fact:
-    spec_file_path: "{{ spec_file.files[0].path }}"
-
 - name: 'Get latest package info from git'
   command: >
     rpmspec --query

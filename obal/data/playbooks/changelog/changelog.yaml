@@ -8,5 +8,5 @@
   tasks:
     - name: 'ensure changelog'
       changelog:
-        spec: "{{ spec_file.files[0].path }}"
+        spec: "{{ spec_file_path }}"
         changelog: "{{ changelog | default('- rebuilt') }}"

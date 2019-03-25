@@ -7,10 +7,6 @@
     - git_annex_setup
     - spec_file
   tasks:
-    - name: "Set spec file path"
-      set_fact:
-        spec_file_path: "{{ spec_file.files[0].path }}"
-
     - name: Determine source file from spec
       shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
       args:
