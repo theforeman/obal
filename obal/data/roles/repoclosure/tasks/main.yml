@@ -14,13 +14,14 @@
 - name: 'Run repoclosure'
   command: >
     repoclosure
-      -c {{ inventory_dir }}/{{ repoclosure_config }}
-      -t
-      -r {{ repoclosure_target_repo }}
-      {{ '--repofrompath=downloaded_rpms,./downloaded_rpms' if repoclosure_target_repo == 'downloaded_rpms' else '' }}
+      --config {{ inventory_dir }}/{{ repoclosure_config }}
+      --tempcache
+      --newest
+      --repoid {{ repoclosure_target_repos | join(' --repoid ') }}
+      {{ '--repofrompath=downloaded_rpms,./downloaded_rpms' if repoclosure_target_repos[0] == 'downloaded_rpms' else '' }}
       {{ additional_repos | join(' ') }}
-      {{ '-l ' if repoclosure_lookaside_repos else '' }}
-      {{ repoclosure_lookaside_repos | join(' -l ') }}
+      {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
+      {{ repoclosure_lookaside_repos | join(' --lookaside ') }}
   register: output
   when: output is not defined
   args:
