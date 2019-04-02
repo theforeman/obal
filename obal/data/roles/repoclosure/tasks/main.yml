@@ -11,21 +11,22 @@
 - debug:
     msg: "{{ additional_repos }}"
 
-- name: 'Run repoclosure'
-  command: >
-    repoclosure
-      --config {{ inventory_dir }}/{{ repoclosure_config }}
-      --tempcache
-      --newest
-      --repoid {{ repoclosure_target_repos | join(' --repoid ') }}
-      {{ '--repofrompath=downloaded_rpms,./downloaded_rpms' if repoclosure_target_repos[0] == 'downloaded_rpms' else '' }}
-      {{ additional_repos | join(' ') }}
-      {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
-      {{ repoclosure_lookaside_repos | join(' --lookaside ') }}
-  register: output
-  when: output is not defined
-  args:
-    chdir: "{{ inventory_dir }}"
+- name: Find all downloaded repositories
+  find:
+    paths: "{{ inventory_dir }}/downloaded_rpms"
+    recurse: no
+    file_type: directory
+  register: downloaded_rpms_folders
 
-- debug:
-    msg: "{{ output.stdout_lines | join('\n') }}"
+- name: Map repositories to dists
+  set_fact:
+    downloaded_rpms_dists: "{{ downloaded_rpms_folders.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Run repoclosure for all dists
+  include_tasks: dist.yml
+  with_items: "{{ downloaded_rpms_dists }}"
+  when: downloaded_rpms_dists
+
+- name: Run repoclosure for main repo
+  include_tasks: regular.yml
+  when: not downloaded_rpms_dists

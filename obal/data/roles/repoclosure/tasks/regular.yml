@@ -1,0 +1,17 @@
+- name: 'Run repoclosure'
+  command: >
+    repoclosure
+      --config {{ inventory_dir }}/{{ repoclosure_config }}
+      --tempcache
+      --newest
+      --repoid {{ repoclosure_target_repos | join(' --repoid ') }}
+      {{ additional_repos | join(' ') }}
+      {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
+      {{ repoclosure_lookaside_repos | join(' --lookaside ') }}
+  register: output
+  when: output is not defined
+  args:
+    chdir: "{{ inventory_dir }}"
+
+- debug:
+    msg: "{{ output.stdout_lines | join('\n') }}"
