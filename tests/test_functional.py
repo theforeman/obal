@@ -422,6 +422,19 @@ def test_obal_repoclosure():
     assert_mockbin_log(expected_log)
 
 
+@obal_cli_test(repotype='upstream')
+def test_obal_repoclosure_with_downloaded_rpms():
+    # create a folder under downloaded_rpms to pretend we have a repo there
+    os.makedirs('downloaded_rpms/rhel7')
+
+    assert_obal_success(['repoclosure', 'core-repoclosure'])
+
+    expected_log = [
+        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms/rhel7 --lookaside el7-base"  # noqa: E501
+    ]
+    assert_mockbin_log(expected_log)
+
+
 @obal_cli_test(repotype='copr')
 def test_obal_scratch_copr_hello_nowait():
     assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
