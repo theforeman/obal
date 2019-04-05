@@ -16,9 +16,11 @@ packages:
         - "--arg jenkins_job=hello-master-release"
 
 repoclosures:
+  vars:
+    repoclosure_lookaside_repos:
+      rhel7:
+        - el7-base
   hosts:
-    core-repoclosure: {}
-    dist-repoclosure:
-      repoclosure_lookaside_repos:
-        rhel7:
-          - el7-base
+    core-repoclosure:
+      repoclosure_target_dist: rhel7
+    dist-repoclosure: {}

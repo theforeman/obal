@@ -23,12 +23,20 @@
     downloaded_rpms_dists: "{{ downloaded_rpms_folders.files | map(attribute='path') | map('basename') | list }}"
 
 - name: Run repoclosure for all dists
-  include_tasks: dist.yml
+  include_tasks: repoclosure.yml
+  vars:
+    repoclosure_use_downloaded_rpms: True
   loop: "{{ downloaded_rpms_dists }}"
   loop_control:
     loop_var: dist
   when: downloaded_rpms_dists
 
 - name: Run repoclosure for main repo
-  include_tasks: regular.yml
+  include_tasks: repoclosure.yml
+  vars:
+    repoclosure_use_downloaded_rpms: False
+  loop:
+    - "{{ repoclosure_target_dist }}"
+  loop_control:
+    loop_var: dist
   when: not downloaded_rpms_dists
