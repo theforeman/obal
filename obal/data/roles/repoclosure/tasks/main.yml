@@ -24,7 +24,9 @@
 
 - name: Run repoclosure for all dists
   include_tasks: dist.yml
-  with_items: "{{ downloaded_rpms_dists }}"
+  loop: "{{ downloaded_rpms_dists }}"
+  loop_control:
+    loop_var: dist
   when: downloaded_rpms_dists
 
 - name: Run repoclosure for main repo

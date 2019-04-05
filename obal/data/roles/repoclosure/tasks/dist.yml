@@ -1,14 +1,14 @@
-- name: 'Run repoclosure for {{ item }}'
+- name: 'Run repoclosure for {{ dist }}'
   command: >
     repoclosure
       --config {{ inventory_dir }}/{{ repoclosure_config }}
       --tempcache
       --newest
       --repoid {{ repoclosure_target_repos | join(' --repoid ') }}
-      --repofrompath=downloaded_rpms,./downloaded_rpms/{{ item }}
+      --repofrompath=downloaded_rpms,./downloaded_rpms/{{ dist }}
       {{ additional_repos | join(' ') }}
       {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
-      {{ repoclosure_lookaside_repos[item] | join(' --lookaside ') }}
+      {{ repoclosure_lookaside_repos[dist] | join(' --lookaside ') }}
   register: output
   when: output is not defined
   args:
