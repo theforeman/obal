@@ -1,1 +1,2 @@
-help: This action verifies that the packages defined in git are also built into Koji/Brew/Copr.
+help: |
+  This action verifies that the packages defined in git are also built into Koji/Brew/Copr.
