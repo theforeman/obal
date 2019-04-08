@@ -75,7 +75,7 @@ class Playbook(object):
         if not self._metadata:
             try:
                 with open(self._metadata_path) as obal_metadata:
-                    data = yaml.load(obal_metadata)
+                    data = yaml.safe_load(obal_metadata)
             # Python 3 has FileNotFoundError, Python 2 doesn't
             except IOError as error:
                 if error.errno != errno.ENOENT:
@@ -97,7 +97,7 @@ class Playbook(object):
         This is determined by a hosts: packages inside the playbook
         """
         with open(self.path) as playbook_file:
-            plays = yaml.load(playbook_file.read())
+            plays = yaml.safe_load(playbook_file.read())
 
         return any('packages' in play['hosts'] for play in plays)
 
