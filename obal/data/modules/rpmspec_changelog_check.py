@@ -9,6 +9,12 @@ import glob
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=C0413
 from ansible.module_utils.obal import get_changelog_evr, get_specfile_evr  # pylint:disable=import-error,no-name-in-module
 
+ANSIBLE_METADATA = {
+    'metadata_version': '1.2',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
 
 def run_module():
     module = AnsibleModule(
