@@ -2,3 +2,4 @@
 ignore=docs,tests
 # Disable useless-object-inheritance because we still support py2
 disable=R0205
+min-similarity-lines=10

@@ -7,6 +7,12 @@ from contextlib import contextmanager
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.obal import get_specfile_evr  # pylint:disable=import-error,no-name-in-module
 
+ANSIBLE_METADATA = {
+    'metadata_version': '1.2',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
 
 @contextmanager
 def en_locale():
