@@ -1,5 +1,4 @@
-help: >
+help: |
   Create a scratch build of a package
-
 
   A scratch build produces the same result as a normal release would, but it's not tagged in any repository. This allows verification of a change without actually committing it.

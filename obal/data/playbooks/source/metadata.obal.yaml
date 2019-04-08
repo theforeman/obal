@@ -1,5 +1,4 @@
-help: >
+help: |
   Setup sources for a package
-
 
   When using git annex we only store a reference to a the actual source. This command retrieves the sources from the remote. These are usually tarballs or gems.

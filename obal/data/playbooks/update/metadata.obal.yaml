@@ -1,9 +1,7 @@
-help: >
+help: |
   Update a package to a newer version
 
-
   The newer version is either taken from an upstream repository or can be given via command line options.
-
 
   To update a package to a new version from the command line:
 

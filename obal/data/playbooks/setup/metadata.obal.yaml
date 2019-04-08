@@ -1,2 +1,2 @@
-help: >
+help: |
   This action installs packages required for proper obal usage on your machine.
