@@ -1,10 +1,16 @@
 ---
-- name: "Confirm package is whitelisted"
+- name: "Confirm package is whitelisted in {{ build_package_koji_command }}"
   koji_whitelist_check:
     releasers_conf: "{{ inventory_dir }}/rel-eng/releasers.conf"
     spec_file_path: "{{ spec_file_path }}"
     releasers: "{{ releasers }}"
     build_command: "{{ build_package_koji_command }}"
+    branch_replace:
+      regexp: "{{ koji_whitelist_branch_replace.regexp }}"
+      replace: "{{ koji_whitelist_branch_replace.replace }}"
+    package_replace:
+      regexp: "{{ koji_whitelist_package_replace.regexp }}"
+      replace: "{{ koji_whitelist_package_replace.replace }}"
 
 - name: 'Set tito_releasers for brew scratch'
   set_fact:

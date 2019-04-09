@@ -9,3 +9,9 @@ build_package_wait: true
 build_package_download_logs: false
 build_package_download_rpms: false
 build_package_waitrepo: true
+koji_whitelist_branch_replace:
+  regexp: ''
+  replace: ''
+koji_whitelist_package_replace:
+  regexp: ''
+  replace: ''

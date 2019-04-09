@@ -1,6 +1,7 @@
 """
 Ansible module helper functions for obal modules
 """
+import os
 import subprocess
 
 
@@ -18,7 +19,7 @@ def specfile_macro_lookup(specfile, macro_str):
         '--srpm',
         specfile
     ]
-    return subprocess.check_output(cmd)
+    return subprocess.check_output(cmd, stderr=open(os.devnull, "wb"))
 
 
 def get_changelog_evr(specfile):
@@ -59,5 +60,5 @@ def get_whitelist_status(build_command, tag, package):
         package,
         '--quiet'
     ]
-    retcode = subprocess.call(cmd)
+    retcode = subprocess.call(cmd, stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
     return retcode == 0
