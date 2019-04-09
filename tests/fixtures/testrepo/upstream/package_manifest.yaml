@@ -24,3 +24,6 @@ repoclosures:
     core-repoclosure:
       repoclosure_target_dist: rhel7
     dist-repoclosure: {}
+    katello-repoclosure:
+      repoclosure_target_repos:
+        - el7-katello

@@ -1,10 +1,14 @@
+- name: generate list of repositories
+  set_fact:
+    repoclosure_target_repos_all: "{{ repoclosure_target_repos + ['downloaded_rpms'] }}"
+
 - name: 'Run repoclosure for {{ dist }}'
   command: >
     repoclosure
       --config {{ inventory_dir }}/{{ repoclosure_config }}
       --tempcache
       --newest
-      --repoid {{ repoclosure_target_repos | join(' --repoid ') }}
+      --repoid {{ repoclosure_target_repos_all | join(' --repoid ') }}
       {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/'+dist if repoclosure_use_downloaded_rpms else '' }}
       {{ additional_repos | join(' ') }}
       {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
