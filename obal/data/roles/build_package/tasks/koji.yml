@@ -1,6 +1,6 @@
 ---
 - name: "Confirm package is whitelisted"
-  package_whitelist_check:
+  koji_whitelist_check:
     releasers_conf: "{{ inventory_dir }}/rel-eng/releasers.conf"
     spec_file_path: "{{ spec_file_path }}"
     releasers: "{{ releasers }}"
