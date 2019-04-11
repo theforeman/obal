@@ -23,3 +23,8 @@ packages:
       branch: "master"
       upstream_files:
         - "packages/hello/"
+    not_whitelisted:
+      upstream: "file://{{ inventory_dir }}/../upstream/.git"
+      branch: "master"
+      upstream_files:
+        - "packages/hello/"

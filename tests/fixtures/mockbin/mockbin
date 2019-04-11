@@ -95,5 +95,7 @@ elif prog in ['koji', 'brew']:
     parser_downloadlogs.add_argument('-r', action='store_true')
     parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
+    if 'package' in args and args.package == 'not_whitelisted':
+        exit(1)
     if 'output' in args and args.output:
         print(args.output)

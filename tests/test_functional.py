@@ -235,6 +235,16 @@ def test_obal_scratch_downstream_hello():
 
 
 @obal_cli_test(repotype='downstream')
+def test_obal_scratch_downstream_not_whitelisted():
+    assert_obal_failure(['scratch', 'not_whitelisted'])
+
+    expected_log = [
+        "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package not_whitelisted --quiet"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='downstream')
 def test_obal_scratch_downstream_hello_wait_download_logs():
     assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_logs=True'])
 
