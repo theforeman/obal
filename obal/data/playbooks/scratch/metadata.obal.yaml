@@ -2,3 +2,8 @@ help: |
   Create a scratch build of a package
 
   A scratch build produces the same result as a normal release would, but it's not tagged in any repository. This allows verification of a change without actually committing it.
+variables:
+  build_package_koji_whitelist_check:
+    action: store_false
+    parameter: --skip-koji-check
+    help: Ignore Koji whitelist check and scratch build the package anyway
