@@ -5,6 +5,7 @@
     spec_file_path: "{{ spec_file_path }}"
     releasers: "{{ releasers }}"
     build_command: "{{ build_package_koji_command }}"
+  when: build_package_koji_whitelist_check | bool
 
 - name: 'Set tito_releasers for brew scratch'
   set_fact:
