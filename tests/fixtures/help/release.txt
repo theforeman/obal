@@ -1,4 +1,5 @@
-usage: obal release [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal release [-h] [-v] [-e EXTRA_VARS] [--skip-koji-check]
+                    package [package ...]
 
 This action releases a package to Koji/Brew/Copr
 
@@ -10,6 +11,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --skip-koji-check     Ignore Koji whitelist check and release the package
+                        anyway
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
