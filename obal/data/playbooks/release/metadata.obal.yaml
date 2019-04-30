@@ -2,3 +2,8 @@ help: |
   This action releases a package to Koji/Brew/Copr
 
   No action is performed if a release of the exact same version already exists.
+variables:
+  build_package_koji_whitelist_check:
+    action: store_false
+    parameter: --skip-koji-whitelist-check
+    help: ignore koji whitelist check and release the package anyway

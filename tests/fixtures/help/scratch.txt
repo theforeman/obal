@@ -1,4 +1,4 @@
-usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--skip-koji-check]
+usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
                     package [package ...]
 
 Create a scratch build of a package
@@ -11,7 +11,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
-  --skip-koji-check     Ignore Koji whitelist check and scratch build the
+  --skip-koji-whitelist-check
+                        ignore koji whitelist check and scratch build the
                         package anyway
 
 advanced arguments:

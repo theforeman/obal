@@ -5,5 +5,5 @@ help: |
 variables:
   build_package_koji_whitelist_check:
     action: store_false
-    parameter: --skip-koji-check
-    help: Ignore Koji whitelist check and scratch build the package anyway
+    parameter: --skip-koji-whitelist-check
+    help: ignore koji whitelist check and scratch build the package anyway
