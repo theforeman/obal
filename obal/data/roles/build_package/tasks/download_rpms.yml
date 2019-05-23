@@ -1,7 +1,3 @@
-- block:
-    - include_tasks: download_rpms_from_task.yml
-      with_items: "{{ build_package_koji_task_data }}"
-
-    - name: 'Create repo from downloaded RPMs'
-      command: "createrepo {{ download_dir }}"
+- include_tasks: download_rpms_from_task.yml
+  with_items: "{{ build_package_koji_task_data }}"
   when: build_package_build_system == 'koji' and build_package_download_rpms

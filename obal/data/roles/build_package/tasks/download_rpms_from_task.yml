@@ -11,4 +11,7 @@
       command: "{{ build_package_koji_command }} download-task {{ item['Task'] }}"
       args:
         chdir: "{{ download_dir }}"
+
+    - name: 'Create repo from downloaded RPMs'
+      command: "createrepo {{ download_dir }}"
   when: build_package_build_system == 'koji' and build_package_download_rpms
