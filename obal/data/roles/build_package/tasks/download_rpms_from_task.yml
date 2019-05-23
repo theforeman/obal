@@ -1,0 +1,17 @@
+- block:
+    - set_fact:
+        download_dir: "{{ inventory_dir }}/downloaded_rpms/{{ item['Request Parameters']['Build Target'].split('-')[-1] }}"
+
+    - name: 'Create RPM downloads directory'
+      file:
+        state: directory
+        path: "{{ download_dir }}"
+
+    - name: "Download {{ build_package_koji_command }} RPM(s)"
+      command: "{{ build_package_koji_command }} download-task {{ item['Task'] }}"
+      args:
+        chdir: "{{ download_dir }}"
+
+    - name: 'Create repo from downloaded RPMs'
+      command: "createrepo {{ download_dir }}"
+  when: build_package_build_system == 'koji' and build_package_download_rpms

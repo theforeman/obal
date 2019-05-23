@@ -1,5 +1,5 @@
 ---
 repoclosure_additional_repos:  []
 repoclosure_config: repoclosure/el7.conf
-repoclosure_target_repos: [ "{{ repoclosure_target_repo | default('downloaded_rpms') }}" ]
-repoclosure_lookaside_repos: []
+repoclosure_target_repos: {}
+repoclosure_lookaside_repos: {}

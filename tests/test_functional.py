@@ -115,7 +115,8 @@ def test_obal_scratch_upstream_hello():
     expected_log = [
         "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet",
         "tito release --scratch dist-git -y",
-        "koji watch-task 1234"
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -174,7 +175,8 @@ def test_obal_release_upstream_hello_nowaitrepo():
         "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
         "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet",
         "tito release dist-git -y",
-        "koji watch-task 1234"
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -230,6 +232,7 @@ def test_obal_scratch_downstream_hello():
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task 1234",
+        "brew taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -245,6 +248,7 @@ def test_obal_scratch_downstream_hello_wait_download_logs():
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task 1234",
         "brew download-logs -r 1234",
+        "brew taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -259,8 +263,9 @@ def test_obal_scratch_downstream_hello_wait_download_rpms():
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task 1234",
+        "brew taskinfo -v 1234",
         "brew download-task 1234",
-        "createrepo {pwd}/downloaded_rpms"
+        "createrepo {pwd}/downloaded_rpms/rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -320,7 +325,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
         # output from our mocked brew is not dynamic
         "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7",
         "brew download-task 1234",
-        "createrepo {pwd}/downloaded_rpms",
+        "createrepo {pwd}/downloaded_rpms/rhel7",
     ]
     assert_mockbin_log(expected_log)
 
@@ -334,7 +339,8 @@ def test_obal_release_downstream_hello_nowaitrepo():
         "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release obaltest-dist-git-rhel-7 -y",
-        "brew watch-task 1234"
+        "brew watch-task 1234",
+        "brew taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
 
@@ -411,7 +417,33 @@ def test_obal_repoclosure():
     assert_obal_success(['repoclosure', 'core-repoclosure'])
 
     expected_log = [
-        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms"  # noqa: E501
+        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --lookaside el7-base"  # noqa: E501
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_repoclosure_with_downloaded_rpms():
+    # create a folder under downloaded_rpms to pretend we have a repo there
+    os.makedirs('downloaded_rpms/rhel7')
+
+    assert_obal_success(['repoclosure', 'dist-repoclosure'])
+
+    expected_log = [
+        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms/rhel7 --lookaside el7-base"  # noqa: E501
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_repoclosure_katello_with_downloaded_rpms():
+    # create a folder under downloaded_rpms to pretend we have a repo there
+    os.makedirs('downloaded_rpms/rhel7')
+
+    assert_obal_success(['repoclosure', 'katello-repoclosure'])
+
+    expected_log = [
+        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid el7-katello --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms/rhel7 --lookaside el7-base"  # noqa: E501
     ]
     assert_mockbin_log(expected_log)
 
