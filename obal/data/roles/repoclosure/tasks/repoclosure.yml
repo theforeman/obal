@@ -1,6 +1,6 @@
 - name: generate list of repositories
   set_fact:
-    repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist] + ['downloaded_rpms'] }}"
+    repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist]|default([]) + ['downloaded_rpms'] }}"
 
 - name: 'Run repoclosure for {{ dist }}'
   command: >
