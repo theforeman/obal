@@ -90,6 +90,7 @@ elif prog in ['koji', 'brew']:
     parser_taskinfo.add_argument('taskid')
     parser_downloadtask = subparsers.add_parser('download-task')
     parser_downloadtask.add_argument('taskid')
+    parser_downloadtask.add_argument('--arch', action='append')
     parser_downloadlogs = subparsers.add_parser('download-logs')
     parser_downloadlogs.add_argument('taskid')
     parser_downloadlogs.add_argument('-r', action='store_true')

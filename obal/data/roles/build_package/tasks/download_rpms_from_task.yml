@@ -8,7 +8,7 @@
         path: "{{ download_dir }}"
 
     - name: "Download {{ build_package_koji_command }} RPM(s)"
-      command: "{{ build_package_koji_command }} download-task {{ item['Task'] }}"
+      command: "{{ build_package_koji_command }} download-task --arch=noarch --arch=x86_64 {{ item['Task'] }}"
       args:
         chdir: "{{ download_dir }}"
 

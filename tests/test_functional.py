@@ -264,7 +264,7 @@ def test_obal_scratch_downstream_hello_wait_download_rpms():
         "tito release obaltest-scratch-rhel-7 -y",
         "brew watch-task 1234",
         "brew taskinfo -v 1234",
-        "brew download-task 1234",
+        "brew download-task --arch=noarch --arch=x86_64 1234",
         "createrepo {pwd}/downloaded_rpms/rhel7"
     ]
     assert_mockbin_log(expected_log)
@@ -324,7 +324,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
         # the build and target in the next command are "wrong" because the
         # output from our mocked brew is not dynamic
         "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7",
-        "brew download-task 1234",
+        "brew download-task --arch=noarch --arch=x86_64 1234",
         "createrepo {pwd}/downloaded_rpms/rhel7",
     ]
     assert_mockbin_log(expected_log)
