@@ -29,7 +29,9 @@
   loop: "{{ downloaded_rpms_dists }}"
   loop_control:
     loop_var: dist
-  when: downloaded_rpms_dists
+  when:
+    - downloaded_rpms_dists
+    - repoclosure_target_dist is not defined
 
 - name: Run repoclosure for main repo
   include_tasks: repoclosure.yml
@@ -39,4 +41,5 @@
     - "{{ repoclosure_target_dist }}"
   loop_control:
     loop_var: dist
-  when: not downloaded_rpms_dists
+  when:
+    - repoclosure_target_dist is defined
