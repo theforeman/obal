@@ -6,4 +6,4 @@
   roles:
     - diff_package
     - role: build_package
-      when: diff_package_changed
+      when: diff_package_changed|bool
