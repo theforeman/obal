@@ -9,4 +9,4 @@
 
 - name: 'Clone git repository'
   include_tasks: git.yml
-  when: setup_sources_git is defined
+  when: setup_sources_git is defined or setup_sources_git_checkout_dir is defined

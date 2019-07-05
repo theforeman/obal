@@ -2,6 +2,8 @@
 - name: 'Set source checkout location'
   set_fact:
     setup_sources_git_checkout_dir: "/tmp/ansible_git_{{ inventory_hostname }}"
+    setup_sources_git_checkout_dir_autoset: true
+  when: setup_sources_git_checkout_dir is undefined
 
 - name: 'Clone latest git'
   git:
@@ -10,6 +12,7 @@
     version: "{{ git_branch|default('master') }}"
     force: yes
     depth: 1
+  when: setup_sources_git is defined and (setup_sources_git_checkout_dir_autoset is defined and setup_sources_git_checkout_dir_autoset)
 
 - name: 'Register source dir tito argument'
   set_fact:

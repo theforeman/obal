@@ -7,3 +7,15 @@ variables:
     action: store_false
     parameter: --skip-koji-whitelist-check
     help: ignore koji whitelist check and scratch build the package anyway
+  setup_sources_git:
+    action: store
+    parameter: --git-repo
+    help: Used with GitSourceStrategy/FetchBuilder.  specify git repo to use for package source
+  git_branch:
+    action: store
+    parameter: --git-branch
+    help: Used with GitSourceStrategy/FetchBuilder.  specify branch to use with --git-repo (default is master)
+  setup_sources_git_checkout_dir:
+    action: store
+    parameter: --git-source-dir
+    help: Used with GitSourceStrategy/FetchBuilder.  specify local git repo to build source from (utilizes "git archive")
