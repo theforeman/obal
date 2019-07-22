@@ -164,6 +164,48 @@ class Playbook(object):
         return NotImplemented
 
 
+class ApplicationConfig(object):
+    """
+    A class describing the where to find various files
+    """
+
+    @staticmethod
+    def name():
+        """
+        Return the name as shown to the user in the ArgumentParser
+        """
+        return 'obal'
+
+    @staticmethod
+    def data_path():
+        """
+        Return the data path. Houses playbooks and configs.
+        """
+        return os.environ.get('OBAL_DATA', resource_filename(__name__, 'data'))
+
+    @property
+    @staticmethod
+    def inventory_path():
+        """
+        Return the inventory path
+        """
+        return os.environ.get('OBAL_INVENTORY', os.path.join(os.getcwd(), 'package_manifest.yaml'))
+
+    @classmethod
+    def playbooks_path(cls):
+        """
+        Return the default playbooks path
+        """
+        return os.environ.get('OBAL_PLAYBOOKS', os.path.join(cls.data_path, 'playbooks'))
+
+    @classmethod
+    def ansible_config_path(cls):
+        """
+        Return the ansible.cfg path
+        """
+        return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(cls.data_path, 'ansible.cfg'))
+
+
 def find_playbooks(playbooks_path):
     """
     Find all playbooks in the given path.
@@ -171,34 +213,6 @@ def find_playbooks(playbooks_path):
     paths = glob.glob(os.path.join(playbooks_path, '*', '*.yaml'))
     return sorted(Playbook(playbook_path) for playbook_path in paths if
                   os.path.basename(playbook_path) != METADATA_FILENAME)
-
-
-def _get_data_path():
-    """
-    Return the data path. Houses playbooks and configs.
-    """
-    return os.environ.get('OBAL_DATA', resource_filename(__name__, 'data'))
-
-
-def get_inventory_path():
-    """
-    Return the inventory path
-    """
-    return os.environ.get('OBAL_INVENTORY', os.path.join(os.getcwd(), 'package_manifest.yaml'))
-
-
-def get_playbooks_path():
-    """
-    Return the default playbooks path
-    """
-    return os.environ.get('OBAL_PLAYBOOKS', os.path.join(_get_data_path(), 'playbooks'))
-
-
-def get_ansible_config_path():
-    """
-    Return the ansible.cfg path
-    """
-    return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(_get_data_path(), 'ansible.cfg'))
 
 
 def find_packages(inventory_path):
@@ -218,17 +232,17 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(playbooks=None, package_choices=None):
+def obal_argument_parser(application_config, playbooks=None, package_choices=None):
     """
     Construct an argument parser with the given actions and package choices.
     """
     if playbooks is None:
-        playbooks = find_playbooks(get_playbooks_path())
+        playbooks = find_playbooks(application_config.playbooks_path())
 
     if package_choices is None:
         package_choices = []
 
-    parser = argparse.ArgumentParser('obal')
+    parser = argparse.ArgumentParser(application_config.name())
 
     parser.obal_arguments = []
 
@@ -298,11 +312,11 @@ def generate_ansible_args(inventory_path, args, obal_arguments):
     return ansible_args
 
 
-def main(cliargs=None):  # pylint: disable=R0914
+def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable=R0914
     """
     Main command
     """
-    cfg_path = get_ansible_config_path()
+    cfg_path = application_config.ansible_config_path()
 
     if os.path.exists(cfg_path):
         os.environ["ANSIBLE_CONFIG"] = cfg_path
@@ -313,11 +327,11 @@ def main(cliargs=None):  # pylint: disable=R0914
     global display  # pylint: disable=C0103,W0603
     display = Display()
 
-    inventory_path = get_inventory_path()
+    inventory_path = application_config.inventory_path()
 
     package_choices = find_packages(inventory_path)
 
-    parser = obal_argument_parser(package_choices=package_choices)
+    parser = obal_argument_parser(application_config, package_choices=package_choices)
 
     args = parser.parse_args(cliargs)
 

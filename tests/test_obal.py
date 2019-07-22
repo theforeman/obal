@@ -8,13 +8,18 @@ def playbooks_path(fixture_dir):
 
 
 @pytest.fixture
-def playbooks(playbooks_path):
-    return obal.find_playbooks(playbooks_path.strpath)
+def application_config(playbooks_path):
+    class MockApplicationConfig(obal.ApplicationConfig):
+        @staticmethod
+        def playbooks_path():
+            return playbooks_path.strpath
+
+    return MockApplicationConfig
 
 
 @pytest.fixture
-def parser(playbooks, package_choices=['testpackage']):
-    return obal.obal_argument_parser(playbooks, package_choices)
+def parser(application_config, package_choices=['testpackage']):
+    return obal.obal_argument_parser(application_config, package_choices=package_choices)
 
 
 def test_find_no_packages(fixture_dir):
