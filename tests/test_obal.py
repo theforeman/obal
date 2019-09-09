@@ -3,8 +3,13 @@ import obal
 
 
 @pytest.fixture
-def playbooks(fixture_dir):
-    return obal.find_playbooks((fixture_dir / 'playbooks').strpath)
+def playbooks_path(fixture_dir):
+    return fixture_dir / 'playbooks'
+
+
+@pytest.fixture
+def playbooks(playbooks_path):
+    return obal.find_playbooks(playbooks_path.strpath)
 
 
 @pytest.fixture
@@ -23,8 +28,8 @@ def test_find_packages(fixture_dir):
     assert 'testpackage' in packages
 
 
-def test_playbook_constructor(fixture_dir):
-    path = (fixture_dir / 'playbooks' / 'setup' / 'setup.yaml').strpath
+def test_playbook_constructor(playbooks_path):
+    path = (playbooks_path / 'setup' / 'setup.yaml').strpath
     playbook = obal.Playbook(path)
     assert playbook.path == path
     assert playbook.name == 'setup'
@@ -36,8 +41,8 @@ def test_playbook_constructor(fixture_dir):
     ('multiple_plays', True),
     ('repoclosure', True),
 ])
-def test_playbook_takes_package_parameter(fixture_dir, playbook, expected):
-    path = (fixture_dir / 'playbooks' / playbook / '{}.yaml'.format(playbook)).strpath
+def test_playbook_takes_package_parameter(playbooks_path, playbook, expected):
+    path = (playbooks_path / playbook / '{}.yaml'.format(playbook)).strpath
     assert obal.Playbook(path).takes_package_parameter == expected
 
 
@@ -70,9 +75,9 @@ def test_parser_no_arguments(parser):
     (['dummy', 'testpackage', '--my-list', 'foo', '--my-list', 'bar'],
      ['--limit', 'testpackage', '-e', '{"mapped_list": ["foo", "bar"]}']),
 ])
-def test_generate_ansible_args(fixture_dir, parser, cliargs, expected):
+def test_generate_ansible_args(playbooks_path, parser, cliargs, expected):
     action = cliargs[0]
-    base_expected = [(fixture_dir / 'playbooks' / action / '{}.yaml'.format(action)).strpath,
+    base_expected = [(playbooks_path / action / '{}.yaml'.format(action)).strpath,
                      '--inventory', 'inventory.yml']
 
     args = parser.parse_args(cliargs)
