@@ -6,7 +6,7 @@ import re
 from subprocess import CalledProcessError
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.tito import tito  # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.tito_wrapper import tito  # pylint:disable=import-error,no-name-in-module
 
 
 def main():
