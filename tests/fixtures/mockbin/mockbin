@@ -24,7 +24,10 @@ Finished: Tue Nov 13 08:51:20 2018
 Host: buildhost
 Build: hello-2.10-1.el7 (12345)"""
 
-_FAKE_SRPM = 'hello-2.10-1.src.rpm'
+_FAKE_SRPMS = {
+    'hello': 'hello-2.10-1.src.rpm',
+    'foo': 'foo-1.0-1.src.rpm'
+}
 
 prog = os.path.basename(sys.argv[0])
 sys.argv[0] = prog
@@ -57,14 +60,17 @@ if prog == 'tito':
 
     args = parser.parse_args()
 
+    pkg = os.path.basename(os.getcwd())
+
     if 'yes' in args and args.yes:
         print('Created task: 1234')
     if 'output' in args and args.output:
-        os.makedirs(args.output)
-        srpm_path = os.path.join(args.output, _FAKE_SRPM)
+        if not os.path.exists(args.output):
+            os.makedirs(args.output)
+        srpm_path = os.path.join(args.output, _FAKE_SRPMS[pkg])
         open(srpm_path, 'w').close()
     else:
-        srpm_path = _FAKE_SRPM
+        srpm_path = _FAKE_SRPMS[pkg]
     if 'srpm'in args and args.srpm:
         print("Wrote: {}".format(srpm_path))
 

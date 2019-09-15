@@ -1,0 +1,3 @@
+---
+mock_config: mock/el7.cfg
+mock_output_dir: "{{ inventory_dir }}/mock_builds"

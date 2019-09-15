@@ -14,6 +14,7 @@ packages:
     hello:
       nightly_package_tito_releaser_args:
         - "jenkins_job=hello-master-release"
+    foo: {}
 
 repoclosures:
   vars:

@@ -1,0 +1,13 @@
+---
+- hosts:
+    - packages
+  serial: 1
+  gather_facts: no
+  roles:
+    - build_srpm
+
+- hosts:
+    - packages
+  gather_facts: no
+  roles:
+    - mock
