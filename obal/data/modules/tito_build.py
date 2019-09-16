@@ -17,11 +17,13 @@ def main():
         argument_spec=dict(
             directory=dict(type='path', required=True),
             arguments=dict(type='list', required=False),
+            build_arguments=dict(type='list', required=False),
             srpm=dict(type='bool', required=False, default=False),
             offline=dict(type='bool', required=False, default=False),
             dist=dict(type='str', required=False),
             scl=dict(rtype='str', equired=False),
             output=dict(type='path', required=False),
+            builder=dict(type='str', required=False),
         )
     )
 
@@ -31,10 +33,14 @@ def main():
         if module.params[param]:
             command.append('--' + param)
 
-    for param in ('dist', 'scl', 'output'):
+    for param in ('dist', 'scl', 'output', 'builder'):
         value = module.params[param]
         if value:
             command += ['--' + param, value]
+
+    if module.params['build_arguments']:
+        for argument in module.params['build_arguments']:
+            command += ['--arg', argument]
 
     if module.params['arguments']:
         command += module.params['arguments']
