@@ -2,12 +2,14 @@
 - name: 'Build SRPM'
   tito_build:
     directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-    arguments: "{{ build_srpm_tito_releaser_args }}"
+    build_arguments: "{{ build_srpm_tito_build_args }}"
     srpm: true
     offline: true
     dist: "{{ build_srpm_dist }}"
     scl: "{{ build_srpm_scl }}"
     output: "{{ build_srpm_output_dir }}"
+    arguments: "{{ build_srpm_tito_args }}"
+    builder: "{{ build_srpm_tito_builder }}"
   register: srpm_build
 
 - name: 'Built SRPM'
