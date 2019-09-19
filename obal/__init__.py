@@ -183,7 +183,6 @@ class ApplicationConfig(object):
         """
         return os.environ.get('OBAL_DATA', resource_filename(__name__, 'data'))
 
-    @property
     @staticmethod
     def inventory_path():
         """
@@ -196,14 +195,14 @@ class ApplicationConfig(object):
         """
         Return the default playbooks path
         """
-        return os.environ.get('OBAL_PLAYBOOKS', os.path.join(cls.data_path, 'playbooks'))
+        return os.environ.get('OBAL_PLAYBOOKS', os.path.join(cls.data_path(), 'playbooks'))
 
     @classmethod
     def ansible_config_path(cls):
         """
         Return the ansible.cfg path
         """
-        return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(cls.data_path, 'ansible.cfg'))
+        return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(cls.data_path(), 'ansible.cfg'))
 
 
 def find_playbooks(playbooks_path):
