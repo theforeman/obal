@@ -336,7 +336,7 @@ def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable
 
     if args.playbook.takes_package_parameter and not os.path.exists(inventory_path):
         print("Could not find your inventory at {}".format(inventory_path))
-        exit(1)
+        sys.exit(1)
 
     from ansible.cli.playbook import PlaybookCLI
 
