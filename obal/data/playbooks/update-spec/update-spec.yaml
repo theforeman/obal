@@ -1,0 +1,10 @@
+---
+- hosts:
+    - packages
+  serial: 1
+  gather_facts: no
+  roles:
+    - role: setup_sources
+      when: type == 'gem'
+    - spec_file
+    - update_spec_file
