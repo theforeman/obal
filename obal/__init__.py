@@ -17,7 +17,7 @@ from collections import namedtuple
 from functools import total_ordering
 
 import yaml
-from pkg_resources import resource_filename
+import pkg_resources
 
 try:
     import argcomplete
@@ -181,7 +181,16 @@ class ApplicationConfig(object):
         """
         Return the data path. Houses playbooks and configs.
         """
-        return os.environ.get('OBAL_DATA', resource_filename(__name__, 'data'))
+        path = os.environ.get('OBAL_DATA')
+        if path is None:
+            path = pkg_resources.resource_filename(__name__, 'data')
+            if not os.path.isabs(path):
+                # this is essentially a workaround for
+                # https://github.com/pytest-dev/pytest-xdist/issues/414
+                distribution = pkg_resources.get_distribution('obal')
+                path = os.path.join(distribution.location, path)
+
+        return path
 
     @staticmethod
     def inventory_path():
