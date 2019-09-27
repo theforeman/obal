@@ -231,7 +231,7 @@ def find_packages(inventory_path):
     return package_choices
 
 
-def obal_argument_parser(application_config, playbooks=None, package_choices=None):
+def obal_argument_parser(application_config=ApplicationConfig, playbooks=None, package_choices=None):
     """
     Construct an argument parser with the given actions and package choices.
     """
