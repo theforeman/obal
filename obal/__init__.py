@@ -55,9 +55,10 @@ class Playbook(object):
     """
     An abstraction over an Ansible playbook
     """
-    def __init__(self, path):
+    def __init__(self, path, application_config):
         self.path = path
-        directory = os.path.dirname(path)
+        self.application_config = application_config
+        directory = os.path.dirname(self.path)
         self.name = os.path.basename(directory)
         self._metadata_path = os.path.join(directory, METADATA_FILENAME)
         self._metadata = None
@@ -90,16 +91,16 @@ class Playbook(object):
         return self._metadata
 
     @property
-    def takes_package_parameter(self):
+    def takes_target_parameter(self):
         """
-        Whether this playbook takes a package argument.
+        Whether this playbook takes a target argument.
 
-        This is determined by a hosts: packages inside the playbook
+        This is determined by a hosts: targets inside the playbook
         """
         with open(self.path) as playbook_file:
             plays = yaml.safe_load(playbook_file.read())
 
-        return any('packages' in play['hosts'] for play in plays)
+        return any(self.application_config.target_name() in play['hosts'] for play in plays)
 
     @property
     def playbook_variables(self):
@@ -177,6 +178,13 @@ class ApplicationConfig(object):
         return 'obal'
 
     @staticmethod
+    def target_name():
+        """
+        Return the name of the target in the playbook if the playbook takes a parameter.
+        """
+        return 'packages'
+
+    @staticmethod
     def data_path():
         """
         Return the data path. Houses playbooks and configs.
@@ -214,41 +222,41 @@ class ApplicationConfig(object):
         return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(cls.data_path(), 'ansible.cfg'))
 
 
-def find_playbooks(playbooks_path):
+def find_playbooks(application_config):
     """
     Find all playbooks in the given path.
     """
-    paths = glob.glob(os.path.join(playbooks_path, '*', '*.yaml'))
-    return sorted(Playbook(playbook_path) for playbook_path in paths if
+    paths = glob.glob(os.path.join(application_config.playbooks_path(), '*', '*.yaml'))
+    return sorted(Playbook(playbook_path, application_config) for playbook_path in paths if
                   os.path.basename(playbook_path) != METADATA_FILENAME)
 
 
-def find_packages(inventory_path):
+def find_targets(inventory_path):
     """
-    Find all packages in the given inventory
+    Find all targets in the given inventory
     """
-    package_choices = None
+    targets = None
     if os.path.exists(inventory_path):
         from ansible.inventory.manager import InventoryManager
         from ansible.parsing.dataloader import DataLoader
         ansible_loader = DataLoader()
         ansible_inventory = InventoryManager(loader=ansible_loader,
                                              sources=inventory_path)
-        package_choices = list(ansible_inventory.hosts.keys())
-        package_choices.extend(ansible_inventory.groups.keys())
-        package_choices.extend(['all'])
-    return package_choices
+        targets = list(ansible_inventory.hosts.keys())
+        targets.extend(ansible_inventory.groups.keys())
+        targets.extend(['all'])
+    return targets
 
 
-def obal_argument_parser(application_config=ApplicationConfig, playbooks=None, package_choices=None):
+def obal_argument_parser(application_config=ApplicationConfig, playbooks=None, targets=None):
     """
-    Construct an argument parser with the given actions and package choices.
+    Construct an argument parser with the given actions and target choices.
     """
     if playbooks is None:
-        playbooks = find_playbooks(application_config.playbooks_path())
+        playbooks = find_playbooks(application_config)
 
-    if package_choices is None:
-        package_choices = []
+    if targets is None:
+        targets = []
 
     parser = argparse.ArgumentParser(application_config.name())
 
@@ -282,12 +290,12 @@ def obal_argument_parser(application_config=ApplicationConfig, playbooks=None, p
                                           formatter_class=argparse.RawDescriptionHelpFormatter)
         subparser.set_defaults(playbook=playbook)
 
-        if playbook.takes_package_parameter:
-            subparser.add_argument('package',
-                                   metavar='package',
-                                   choices=package_choices,
+        if playbook.takes_target_parameter:
+            subparser.add_argument('target',
+                                   metavar='target',
+                                   choices=targets,
                                    nargs='+',
-                                   help="the package to build")
+                                   help="the target to execute the action against")
 
         for variable in playbook.playbook_variables:
             subparser.add_argument(variable.parameter, help=variable.help_text, dest=variable.name,
@@ -305,8 +313,8 @@ def generate_ansible_args(inventory_path, args, obal_arguments):
     Generate the arguments to run ansible based on the parsed command line arguments
     """
     ansible_args = [args.playbook.path, '--inventory', inventory_path]
-    if hasattr(args, 'package'):
-        limit = ':'.join(args.package)
+    if hasattr(args, 'target'):
+        limit = ':'.join(args.target)
         ansible_args.extend(['--limit', limit])
     if args.verbose:
         ansible_args.append("-%s" % str("v" * args.verbose))
@@ -337,13 +345,13 @@ def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable
 
     inventory_path = application_config.inventory_path()
 
-    package_choices = find_packages(inventory_path)
+    targets = find_targets(inventory_path)
 
-    parser = obal_argument_parser(application_config, package_choices=package_choices)
+    parser = obal_argument_parser(application_config, targets=targets)
 
     args = parser.parse_args(cliargs)
 
-    if args.playbook.takes_package_parameter and not os.path.exists(inventory_path):
+    if args.playbook.takes_target_parameter and not os.path.exists(inventory_path):
         print("Could not find your inventory at {}".format(inventory_path))
         sys.exit(1)
 
