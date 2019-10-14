@@ -221,14 +221,14 @@ class ApplicationConfig(object):
         """
         return os.environ.get('OBAL_ANSIBLE_CFG', os.path.join(cls.data_path(), 'ansible.cfg'))
 
-
-def find_playbooks(application_config):
-    """
-    Find all playbooks in the given path.
-    """
-    paths = glob.glob(os.path.join(application_config.playbooks_path(), '*', '*.yaml'))
-    return sorted(Playbook(playbook_path, application_config) for playbook_path in paths if
-                  os.path.basename(playbook_path) != METADATA_FILENAME)
+    @classmethod
+    def playbooks(cls):
+        """
+        Return all playbooks in the playbook path.
+        """
+        paths = glob.glob(os.path.join(cls.playbooks_path(), '*', '*.yaml'))
+        return sorted(Playbook(playbook_path, cls) for playbook_path in paths if
+                      os.path.basename(playbook_path) != METADATA_FILENAME)
 
 
 def find_targets(inventory_path):
@@ -253,7 +253,7 @@ def obal_argument_parser(application_config=ApplicationConfig, playbooks=None, t
     Construct an argument parser with the given actions and target choices.
     """
     if playbooks is None:
-        playbooks = find_playbooks(application_config)
+        playbooks = application_config.playbooks()
 
     if targets is None:
         targets = []
