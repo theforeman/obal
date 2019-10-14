@@ -1,10 +1,10 @@
 usage: obal changelog [-h] [-v] [-e EXTRA_VARS] [--message CHANGELOG]
-                      package [package ...]
+                      target [target ...]
 
 The changelog command writes a RPM changelog entry for the current version and release.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

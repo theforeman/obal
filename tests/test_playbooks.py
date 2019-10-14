@@ -14,14 +14,14 @@ def playbook_id(fixture_value):
     return fixture_value.name
 
 
-@pytest.fixture(params=obal.find_playbooks(obal.ApplicationConfig.playbooks_path()), ids=playbook_id)
+@pytest.fixture(params=obal.ApplicationConfig.playbooks(), ids=playbook_id)
 def playbook(request):
     yield request.param
 
 
-def test_takes_package_argument(playbook):
+def test_takes_target_argument(playbook):
     expected = playbook.name not in ('setup', 'cleanup-copr')
-    assert playbook.takes_package_parameter == expected
+    assert playbook.takes_target_parameter == expected
 
 
 def test_is_documented(playbook):

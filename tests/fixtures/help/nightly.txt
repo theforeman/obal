@@ -1,14 +1,14 @@
 usage: obal nightly [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
                     [--scratch] [--githash NIGHTLY_GITHASH]
                     [--source NIGHTLY_SOURCEFILES]
-                    package [package ...]
+                    target [target ...]
 
 Build a nightly version of a package
 
 This typically uses unreleased sources taken from a git repository.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

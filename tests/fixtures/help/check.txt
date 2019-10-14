@@ -1,9 +1,9 @@
-usage: obal check [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal check [-h] [-v] [-e EXTRA_VARS] target [target ...]
 
 This action verifies that the packages defined in git are also built into Koji/Brew/Copr.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

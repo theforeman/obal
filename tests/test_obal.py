@@ -18,24 +18,24 @@ def application_config(playbooks_path):
 
 
 @pytest.fixture
-def parser(application_config, package_choices=['testpackage']):
-    return obal.obal_argument_parser(application_config, package_choices=package_choices)
+def parser(application_config, targets=['testpackage']):
+    return obal.obal_argument_parser(application_config, targets=targets)
 
 
-def test_find_no_packages(fixture_dir):
-    packages = obal.find_packages((fixture_dir / 'nope.yaml').strpath)
-    assert packages is None
+def test_find_no_targets(fixture_dir):
+    targets = obal.find_targets((fixture_dir / 'nope.yaml').strpath)
+    assert targets is None
 
 
-def test_find_packages(fixture_dir):
-    packages = obal.find_packages((fixture_dir / 'inventory.yaml').strpath)
-    assert packages
-    assert 'testpackage' in packages
+def test_find_targets(fixture_dir):
+    targets = obal.find_targets((fixture_dir / 'inventory.yaml').strpath)
+    assert targets
+    assert 'testpackage' in targets
 
 
-def test_playbook_constructor(playbooks_path):
+def test_playbook_constructor(application_config, playbooks_path):
     path = (playbooks_path / 'setup' / 'setup.yaml').strpath
-    playbook = obal.Playbook(path)
+    playbook = obal.Playbook(path, application_config)
     assert playbook.path == path
     assert playbook.name == 'setup'
 
@@ -46,9 +46,9 @@ def test_playbook_constructor(playbooks_path):
     ('multiple_plays', True),
     ('repoclosure', True),
 ])
-def test_playbook_takes_package_parameter(playbooks_path, playbook, expected):
+def test_playbook_takes_target_parameter(application_config, playbooks_path, playbook, expected):
     path = (playbooks_path / playbook / '{}.yaml'.format(playbook)).strpath
-    assert obal.Playbook(path).takes_package_parameter == expected
+    assert obal.Playbook(path, application_config).takes_target_parameter == expected
 
 
 def test_parser_no_arguments(parser):
