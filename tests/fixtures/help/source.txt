@@ -1,11 +1,11 @@
-usage: obal source [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal source [-h] [-v] [-e EXTRA_VARS] target [target ...]
 
 Setup sources for a package
 
 When using git annex we only store a reference to a the actual source. This command retrieves the sources from the remote. These are usually tarballs or gems.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

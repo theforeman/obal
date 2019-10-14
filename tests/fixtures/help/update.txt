@@ -1,4 +1,4 @@
-usage: obal update [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal update [-h] [-v] [-e EXTRA_VARS] target [target ...]
 
 Update a package to a newer version
 
@@ -13,7 +13,7 @@ Updating a package that is taken from an upstream repository assumes that the pa
   obal update mypackage
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

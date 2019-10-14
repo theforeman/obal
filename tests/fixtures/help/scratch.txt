@@ -1,12 +1,12 @@
 usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
-                    package [package ...]
+                    target [target ...]
 
 Create a scratch build of a package
 
 A scratch build produces the same result as a normal release would, but it's not tagged in any repository. This allows verification of a change without actually committing it.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

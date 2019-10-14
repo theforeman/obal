@@ -1,13 +1,13 @@
 usage: obal srpm [-h] [-v] [-e EXTRA_VARS] [--dist BUILD_SRPM_DIST]
                  [--dir BUILD_SRPM_OUTPUT_DIR] [--scl BUILD_SRPM_SCL]
-                 package [package ...]
+                 target [target ...]
 
 Build a SRPM for packages
 
 Building source RPMs can be useful when locally building packages.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

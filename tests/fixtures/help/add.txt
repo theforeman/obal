@@ -1,4 +1,4 @@
-usage: obal add [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal add [-h] [-v] [-e EXTRA_VARS] target [target ...]
 
 Add a new package from an upstream repo to a downstream one.
 
@@ -26,7 +26,7 @@ Sometimes `add` won't work due to your new packaging being in a non-standard loc
   6. If your scratch build is successful, then please commit your additions and submit an MR.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

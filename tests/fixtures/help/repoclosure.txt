@@ -1,11 +1,11 @@
-usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS] package [package ...]
+usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS] target [target ...]
 
 Run repoclosure for a repository
 
 Repoclosure ensures that all dependencies are met and all packages are installable.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit

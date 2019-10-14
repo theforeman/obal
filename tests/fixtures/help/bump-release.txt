@@ -1,10 +1,10 @@
 usage: obal bump-release [-h] [-v] [-e EXTRA_VARS] [--changelog CHANGELOG]
-                         package [package ...]
+                         target [target ...]
 
 This action updates a spec file's release field and adds a pre-formatted changelog entry.
 
 positional arguments:
-  package               the package to build
+  target                the target to execute the action against
 
 optional arguments:
   -h, --help            show this help message and exit
