@@ -237,8 +237,8 @@ def find_targets(inventory_path):
     """
     targets = None
     if os.path.exists(inventory_path):
-        from ansible.inventory.manager import InventoryManager
-        from ansible.parsing.dataloader import DataLoader
+        from ansible.inventory.manager import InventoryManager # pylint: disable=all
+        from ansible.parsing.dataloader import DataLoader # pylint: disable=all
         ansible_loader = DataLoader()
         ansible_inventory = InventoryManager(loader=ansible_loader,
                                              sources=inventory_path)
@@ -339,7 +339,7 @@ def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable
 
     # this needs to be global, as otherwise PlaybookCLI fails
     # to set the verbosity correctly
-    from ansible.utils.display import Display
+    from ansible.utils.display import Display # pylint: disable=all
     global display  # pylint: disable=C0103,W0603
     display = Display()
 
@@ -355,7 +355,7 @@ def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable
         print("Could not find your inventory at {}".format(inventory_path))
         sys.exit(1)
 
-    from ansible.cli.playbook import PlaybookCLI
+    from ansible.cli.playbook import PlaybookCLI # pylint: disable=all
 
     ansible_args = generate_ansible_args(inventory_path, args, parser.obal_arguments)
     ansible_playbook = (["ansible-playbook"] + ansible_args)
