@@ -44,7 +44,7 @@
         - "'://' in item"
 
     - name: 'Git add new sources'
-      command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
+      command: "git -c annex.largefiles=nothing add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}"
       with_items: "{{ new_source_urls.stdout_lines | list }}"
