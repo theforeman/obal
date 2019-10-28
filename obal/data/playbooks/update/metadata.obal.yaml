@@ -5,8 +5,17 @@ help: |
 
   To update a package to a new version from the command line:
 
-    obal update mypackage -e version=3.4.5
+    obal update mypackage --version 3.4.5
 
   Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
 
     obal update mypackage
+variables:
+  version:
+    help: Optionally update to an explicit version. When unspecified, the latest version from the upstream will be used
+  release:
+    help: Optionally set the release. When unspecified, the release will be set to 1
+  prerelease:
+    help: Optionally set the prerelease macro. When unspecified, the prerelease macro will be removed
+  changelog:
+    help: Optionally set the changelog. When unspecified, an entry will be generated
