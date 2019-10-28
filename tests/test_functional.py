@@ -359,6 +359,23 @@ def test_obal_update_upstream_hello():
 
     assert 'Version:        2.8' in specfilecontent
     assert '- Release hello 2.8' in specfilecontent
+    assert '%global prerelease' not in specfilecontent
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_update_upstream_hello_prerelease():
+    assert_obal_success(['update', 'hello', '-e', 'version=2.8', '-e', 'prerelease=rc1'])
+
+    assert not os.path.exists('packages/hello/hello-2.10.tar.gz')
+    assert not os.path.islink('packages/hello/hello-2.10.tar.gz')
+    assert os.path.islink('packages/hello/hello-2.8.tar.gz')
+
+    with open('packages/hello/hello.spec') as specfile:
+        specfilecontent = specfile.read()
+
+    assert 'Version:        2.8' in specfilecontent
+    assert '- Release hello 2.8' in specfilecontent
+    assert '%global prerelease rc1' in specfilecontent
 
 
 @obal_cli_test(repotype='downstream')
