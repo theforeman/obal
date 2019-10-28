@@ -1,5 +1,8 @@
 # taken verbatim from
 # https://fedoraproject.org/wiki/How_to_create_a_GNU_Hello_RPM_package
+
+%global prerelease nightly
+
 Name:           hello
 Version:        2.10
 Release:        1%{?dist}

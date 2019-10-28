@@ -108,6 +108,22 @@
         - '%global mainver'
       when: version is defined
 
+    - name: 'Bump prerelease in specfile'
+      replace:
+        path: "{{ spec_file_path }}"
+        regexp: '^(?P<prefix>{{ item }}\s+).*$'
+        replace: '\g<prefix>{{ prerelease }}'
+      with_items:
+        - '%global prerelease'
+      when: prerelease is defined
+
+    - name: 'Remove prerelease in specfile'
+      lineinfile:
+        path: "{{ spec_file_path }}"
+        regexp: '^%global prerelease'
+        state: absent
+      when: prerelease is not defined
+
     - name: 'Bump release in specfile'
       replace:
         path: "{{ spec_file_path }}"
