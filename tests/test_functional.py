@@ -358,6 +358,7 @@ def test_obal_update_upstream_hello():
         specfilecontent = specfile.read()
 
     assert 'Version:        2.8' in specfilecontent
+    assert 'Release:        1' in specfilecontent
     assert '- Release hello 2.8' in specfilecontent
     assert '%global prerelease' not in specfilecontent
 
@@ -374,6 +375,7 @@ def test_obal_update_upstream_hello_prerelease():
         specfilecontent = specfile.read()
 
     assert 'Version:        2.8' in specfilecontent
+    assert 'Release:        1' in specfilecontent
     assert '- Release hello 2.8' in specfilecontent
     assert '%global prerelease rc1' in specfilecontent
 
