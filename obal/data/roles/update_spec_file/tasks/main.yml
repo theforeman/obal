@@ -44,7 +44,9 @@
     - 'Release:'
     - '%global _release'
     - '%global release'
-  when: release is defined
+  when:
+    - release is defined
+    - release != 'keep'
 
 - name: 'add changelog entry'
   changelog:
