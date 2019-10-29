@@ -380,6 +380,22 @@ def test_obal_update_upstream_hello_prerelease():
     assert '%global prerelease rc1' in specfilecontent
 
 
+@obal_cli_test(repotype='upstream')
+def test_obal_update_upstream_hello_keeprelease():
+    assert_obal_success(['update', 'hello', '-e', 'version=2.8', '-e', 'release=keep'])
+
+    assert not os.path.exists('packages/hello/hello-2.10.tar.gz')
+    assert not os.path.islink('packages/hello/hello-2.10.tar.gz')
+    assert os.path.islink('packages/hello/hello-2.8.tar.gz')
+
+    with open('packages/hello/hello.spec') as specfile:
+        specfilecontent = specfile.read()
+
+    assert 'Version:        2.8' in specfilecontent
+    assert 'Release:        2' in specfilecontent
+    assert '- Release hello 2.8' in specfilecontent
+
+
 @obal_cli_test(repotype='downstream')
 def test_obal_update_downstream_hello():
     setup_upstream('../upstream/')
@@ -529,7 +545,7 @@ def test_obal_release_copr_hello():
 def test_obal_bump_release_hello():
     assert_obal_success(['bump-release', 'hello'])
 
-    assert '2' == subprocess.check_output(['rpmspec', '-q', '--queryformat=%{release}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
+    assert '3' == subprocess.check_output(['rpmspec', '-q', '--queryformat=%{release}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
 
 
 @obal_cli_test(repotype='upstream')

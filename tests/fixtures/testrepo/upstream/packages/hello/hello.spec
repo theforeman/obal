@@ -5,7 +5,7 @@
 
 Name:           hello
 Version:        2.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The "Hello World" program from GNU
 
 License:        GPLv3+
@@ -50,5 +50,5 @@ fi
 %license COPYING
 
 %changelog
-* Tue Dec 11 2018 The Coon of Ty <Ty@coon.org> 2.10-1
+* Tue Dec 11 2018 The Coon of Ty <Ty@coon.org> 2.10-2
 - Initial version of the package
