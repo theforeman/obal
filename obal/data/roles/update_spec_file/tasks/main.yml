@@ -1,0 +1,53 @@
+---
+- name: 'Ensure Source0 specfile points to source server'
+  replace:
+    path: "{{ spec_file_path }}"
+    regexp: '^(?P<prefix>Source0:\s+)http.*/(?P<filename>.*)$'
+    replace: '\g<prefix>{{ source_server }}\g<filename>'
+  when:
+    - source_server is defined
+    - version is defined
+
+- name: 'Bump version in specfile'
+  replace:
+    path: "{{ spec_file_path }}"
+    regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
+    replace: '\g<prefix>{{ version }}\g<suffix>'
+  with_items:
+    - 'Version:'
+    - '%global _version'
+    - '%global mainver'
+  when: version is defined
+
+- name: 'Bump prerelease in specfile'
+  replace:
+    path: "{{ spec_file_path }}"
+    regexp: '^(?P<prefix>{{ item }}\s+).*$'
+    replace: '\g<prefix>{{ prerelease }}'
+  with_items:
+    - '%global prerelease'
+  when: prerelease is defined
+
+- name: 'Remove prerelease in specfile'
+  lineinfile:
+    path: "{{ spec_file_path }}"
+    regexp: '^%global prerelease'
+    state: absent
+  when: prerelease is not defined
+
+- name: 'Bump release in specfile'
+  replace:
+    path: "{{ spec_file_path }}"
+    regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
+    replace: '\g<prefix>{{ release }}\g<suffix>'
+  with_items:
+    - 'Release:'
+    - '%global _release'
+    - '%global release'
+  when: release is defined
+
+- name: 'add changelog entry'
+  changelog:
+    spec: "{{ spec_file_path }}"
+    changelog: "{{ changelog }}"
+  when: changelog is defined
