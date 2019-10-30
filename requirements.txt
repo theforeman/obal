@@ -1,2 +1,2 @@
 ansible
-git+https://github.com/evgeni/obsah.git@obsah#egg=obsah
+obsah
