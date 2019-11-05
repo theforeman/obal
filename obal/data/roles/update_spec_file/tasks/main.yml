@@ -33,7 +33,9 @@
     path: "{{ spec_file_path }}"
     regexp: '^%global prerelease'
     state: absent
-  when: prerelease is not defined
+  when:
+    - prerelease is not defined
+    - version is defined
 
 - name: 'Bump release in specfile'
   replace:
