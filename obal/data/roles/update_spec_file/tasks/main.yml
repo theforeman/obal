@@ -25,7 +25,7 @@
     regexp: '^(?P<prefix>{{ item }}\s+).*$'
     replace: '\g<prefix>{{ prerelease }}'
   with_items:
-    - '%global prerelease'
+    - '%global prereleasesource'
   when: prerelease is defined
 
 - name: 'Remove prerelease in specfile'
