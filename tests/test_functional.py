@@ -377,7 +377,7 @@ def test_obal_update_upstream_hello_prerelease():
     assert 'Version:        2.8' in specfilecontent
     assert 'Release:        1' in specfilecontent
     assert '- Release hello 2.8' in specfilecontent
-    assert '%global prerelease rc1' in specfilecontent
+    assert '%global prereleasesource rc1' in specfilecontent
 
 
 @obal_cli_test(repotype='upstream')
