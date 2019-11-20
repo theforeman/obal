@@ -61,7 +61,7 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    install_requires=['ansible >= 2.5'],
+    install_requires=['ansible >= 2.5', 'obsah'],
 
     extras_require={
         'argcomplete': ['argcomplete'],
