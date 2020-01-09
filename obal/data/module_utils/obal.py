@@ -18,7 +18,7 @@ def specfile_macro_lookup(specfile, macro_str):
         '--srpm',
         specfile
     ]
-    return subprocess.check_output(cmd)
+    return subprocess.check_output(cmd, universal_newlines=True)
 
 
 def get_changelog_evr(specfile):
@@ -30,7 +30,7 @@ def get_changelog_evr(specfile):
         '--specfile',
         specfile
     ]
-    evr = subprocess.check_output(cmd)
+    evr = subprocess.check_output(cmd, universal_newlines=True)
     return evr.split("\n")[0].split(" ")[-1]
 
 
