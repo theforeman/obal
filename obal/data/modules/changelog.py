@@ -42,7 +42,7 @@ def main():
     spec = module.params['spec']
     changelog = module.params['changelog']
 
-    user = subprocess.check_output(['rpmdev-packager']).strip()
+    user = subprocess.check_output(['rpmdev-packager'], universal_newlines=True).strip()
     evr = get_specfile_evr(spec)
 
     with open(spec) as spec_file:
