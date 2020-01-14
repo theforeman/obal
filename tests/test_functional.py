@@ -103,7 +103,7 @@ def test_obal_check_upstream_hello():
     assert_obal_success(['check', 'hello'])
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
     ]
     assert_mockbin_log(expected_log)
 
@@ -143,7 +143,7 @@ def test_obal_release_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
         "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet",
         "tito release --yes dist-git",
         "koji watch-task 1234",
@@ -160,7 +160,7 @@ def test_obal_release_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
         "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet",
         "tito release --yes dist-git",
     ]
@@ -174,7 +174,7 @@ def test_obal_release_upstream_hello_nowaitrepo():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 hello",
+        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
         "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet",
         "tito release --yes dist-git",
         "koji watch-task 1234",
@@ -217,7 +217,7 @@ def test_obal_release_downstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",  # noqa: E501
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release --yes obaltest-dist-git-rhel-7",
     ]
@@ -279,7 +279,7 @@ def test_obal_release_downstream_hello():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",  # noqa: E501
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
@@ -298,7 +298,7 @@ def test_obal_release_downstream_hello_wait_download_logs():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",  # noqa: E501
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
@@ -318,7 +318,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",  # noqa: E501
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",  # noqa: E501
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
@@ -338,7 +338,7 @@ def test_obal_release_downstream_hello_nowaitrepo():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate hello",
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",
         "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet",
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",

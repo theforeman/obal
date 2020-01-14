@@ -5,7 +5,7 @@
     diff_package_changed: False
 
 - name: 'Look up current version of package in {{ diff_package_koji_command }}'
-  shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ inventory_hostname }} \
+  shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ scl + '-' if scl else '' }}{{ inventory_hostname }} \
     | cut -d' ' -f1"
   register: koji_package_versions
   with_items: "{{ diff_package_tags }}"
