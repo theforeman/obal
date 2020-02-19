@@ -50,6 +50,9 @@ def main():
 
     changed = False
 
+    if not changelog.startswith('-'):
+        changelog = '- ' + changelog
+
     for i, line in enumerate(lines):
         if line.startswith("%changelog"):
             with en_locale():
