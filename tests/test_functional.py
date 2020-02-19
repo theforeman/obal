@@ -590,7 +590,7 @@ def test_obal_changelog_custom():
     assert_obal_success(['changelog', 'hello', '-e', "changelog='New-package-release'"])
     output = subprocess.check_output(['rpmspec', '-q', '--queryformat=%{changelogtext}', '--srpm', '--undefine=dist', 'packages/hello/hello.spec'], universal_newlines=True)  # noqa: E501
 
-    assert 'New-package-release' in output
+    assert '- New-package-release' in output
 
 
 @obal_cli_test(repotype='upstream')
