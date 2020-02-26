@@ -9,5 +9,5 @@ build_package_wait: true
 build_package_download_logs: false
 build_package_download_rpms: false
 build_package_waitrepo: true
-build_package_koji_whitelist_check: true
+build_package_koji_whitelist_check: false
 build_package_tito_builder:
