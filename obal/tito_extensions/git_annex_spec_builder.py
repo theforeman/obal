@@ -132,8 +132,11 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
             for artifact in dir_artifacts_with_path:
                 debug("  Copying source file %s" % artifact)
                 if os.path.isfile(artifact):
-                    shutil.copy(artifact, self.rpmbuild_gitcopy)
-                    shutil.copy(artifact, self.rpmbuild_sourcedir)
+                    if not os.path.exists("/".join([self.rpmbuild_gitcopy, os.path.basename(artifact)])):
+                        shutil.copy(artifact, self.rpmbuild_gitcopy)
+                    if not os.path.exists("/".join([self.rpmbuild_sourcedir, os.path.basename(artifact)])):
+                        shutil.copy(artifact, self.rpmbuild_sourcedir)
+
 
         # NOTE: The spec file we actually use is the one exported by git
         # archive into the temp build directory. This is done so we can
