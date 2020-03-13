@@ -1,4 +1,4 @@
-usage: obal mock [-h] [-v] [-e EXTRA_VARS] [--config CONFIG]
+usage: obal mock [-h] [-v] [-e EXTRA_VARS] [--config MOCK_CONFIG]
                  target [target ...]
 
 This action builds SRPMs for each package specified and then uses mock to attempt to build RPMs locally for each.
@@ -9,7 +9,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
-  --config CONFIG       The mock config file to use
+  --config MOCK_CONFIG  The mock config file to use
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
