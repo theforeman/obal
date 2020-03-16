@@ -1,2 +1,3 @@
 ---
 setup_sources_annex_options: ""
+setup_sources_skip: false

@@ -4,6 +4,6 @@
   serial: 1
   gather_facts: false
   roles:
-    - diff_package
+    - role: diff_package
     - role: build_package
-      when: diff_package_changed|bool
+      when: diff_package_changed

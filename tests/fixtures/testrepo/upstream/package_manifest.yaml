@@ -3,7 +3,6 @@ packages:
   vars:
     releasers:
       - dist-git
-    nightly_releaser: dist-git-jenkins
     diff_package_skip: false
     diff_package_type: 'koji'
     diff_package_koji_command: 'koji'
@@ -11,9 +10,7 @@ packages:
       - name: obaltest-nightly-rhel7
         dist: '.el7'
   hosts:
-    hello:
-      nightly_package_tito_releaser_args:
-        - "jenkins_job=hello-master-release"
+    hello: {}
     foo: {}
 
 repoclosures:

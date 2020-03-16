@@ -1,0 +1,44 @@
+---
+- name: "Package name"
+  rpm_nevr:
+    spec_file: "{{ spec_file_path }}"
+    scl: "{{ tag.scl | default(omit) }}"
+    dist: "{{ tag.dist | default(omit) }}"
+    macros: "{{ tag.macros | default(omit) }}"
+  register: package_nevr
+
+- name: create temporary build directory
+  tempfile:
+    state: directory
+    suffix: srpms
+  register: srpm_directory
+  when: srpm_directory is not defined
+
+- name: 'Build SRPM'
+  srpm:
+    package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    output: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
+    scl: "{{ scl | default(omit) }}"
+    source_location: "{{ source_location | default(omit) }}"
+    source_system: "{{ source_system | default(omit) }}"
+  register: srpm_build
+
+- name: "Scratch build"
+  koji_build:
+    scratch: "{{ build_package_scratch }}"
+    tag: "{{ tag.name }}"
+    srpm: "{{ srpm_build.path }}"
+    package: "{{ package_nevr.name }}"
+    nevr: "{{ package_nevr.nevr }}"
+    koji_executable: "{{ build_package_koji_command }}"
+    tag_check: "{{ build_package_koji_tag_check }}"
+  register: build_package_tito_release
+
+- name: 'Created tasks'
+  debug:
+    var: build_package_tito_release.task_urls
+  when: build_package_tito_release.changed
+
+- name: 'Wait for tasks to finish'
+  include_tasks: wait.yml
+  when: build_package_wait|bool and build_package_tito_release.changed

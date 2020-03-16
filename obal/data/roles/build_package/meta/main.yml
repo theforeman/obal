@@ -2,3 +2,4 @@
 dependencies:
   - role: setup_workspace
   - role: setup_sources
+    when: not setup_sources_skip

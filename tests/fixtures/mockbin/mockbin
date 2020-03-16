@@ -76,7 +76,7 @@ if prog == 'tito':
 
 elif prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='command')
 
     parser_listpkgs = subparsers.add_parser('list-pkgs')
     parser_listpkgs.add_argument('--tag')
@@ -113,10 +113,19 @@ elif prog in ['koji', 'brew']:
     parser_latest_build.add_argument('pkg')
     parser_latest_build.add_argument('--quiet', action='store_true')
 
+    parser_build = subparsers.add_parser('build')
+    parser_build.add_argument('tag')
+    parser_build.add_argument('pkg')
+    parser_build.add_argument('--scratch', action='store_true')
+
     parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
+
     if 'output' in args and args.output:
         print(args.output)
+
+    if args.command == 'build':
+        print('Created task: 1234')
 
 elif prog in ['copr-cli']:
     print({})

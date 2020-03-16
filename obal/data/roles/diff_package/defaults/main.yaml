@@ -3,3 +3,4 @@ diff_package_type: koji
 diff_package_koji_command: koji
 diff_package_skip: false
 scl: false
+diff_package_changed: false

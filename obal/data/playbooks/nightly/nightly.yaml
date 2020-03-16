@@ -3,24 +3,15 @@
     - packages
   serial: 1
   gather_facts: false
-  vars:
-    build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
   roles:
     - package_variables
   tasks:
-    - name: 'legacy nightly building'
-      block:
-        - name: 'set nightly_releaser'
-          set_fact:
-            releasers:
-              - "{{ nightly_releaser }}"
+    - name: 'Check for nightly_sourcefiles and nightly_githash'
+      fail:
+        msg: "nightly_sourcefiles and nightly_githash must be defined"
+      when: nightly_sourcefiles is not defined or nightly_githash is not defined
 
-        - import_role:
-            name: build_package
-      when: nightly_sourcefiles is not defined and nightly_githash is not defined
-
-    - name: 'nightly building'
-      block:
+    - block:
         - name: 'set package_dir'
           set_fact:
             package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
@@ -30,12 +21,24 @@
             global_nightly_macro:
               "%global nightly .{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}"
 
+        - name: 'get source files'
+          find:
+            pattern: "*"
+            path: "{{ nightly_sourcefiles }}"
+          register: source_files
+
         - name: 'copy source files'
           copy:
-            src: "{{ item }}"
+            src: "{{ item.path }}"
             dest: "{{ package_dir }}"
             mode: preserve
-          with_items: "{{ nightly_sourcefiles }}"
+          with_items: "{{ source_files.files }}"
+
+        - name: 'Annex source files'
+          command: "git annex add {{ item.path | basename }}"
+          args:
+            chdir: "{{ package_dir }}"
+          with_items: "{{ source_files.files }}"
 
         - name: 'get nightly_specfile'
           find:
@@ -43,13 +46,13 @@
             path: "{{ package_dir }}"
           register: nightly_specfile
 
-        - name: 'set nightly_specfile_path'
+        - name: 'set spec_file_path'
           set_fact:
-            nightly_specfile_path: "{{ nightly_specfile.files[0].path }}"
+            spec_file_path: "{{ nightly_specfile.files[0].path }}"
 
         - name: 'add nightly macro to specfile'
           lineinfile:
-            path: "{{ nightly_specfile_path }}"
+            path: "{{ spec_file_path }}"
             line: "{{ global_nightly_macro }}"
             insertbefore: BOF
             backup: true
@@ -57,18 +60,35 @@
 
         - import_role:
             name: build_package
-      when: nightly_sourcefiles is defined and nightly_githash is defined
+          vars:
+            setup_sources_skip: true
       always:
+        - name: 'set package_dir'
+          set_fact:
+            package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+
         - name: 'restore spec file'
           copy:
             src: "{{ original_specfile.backup }}"
-            dest: "{{ nightly_specfile_path }}"
+            dest: "{{ spec_file_path }}"
             mode: preserve
           when: original_specfile is defined
+
+        - name: 'delete spec file copy'
+          file:
+            state: absent
+            path: "{{ package_dir }}/{{ original_specfile.backup }}"
+
+        - name: 'remote annexed source files'
+          command: "git annex undo {{ item.path | basename }}"
+          with_items: "{{ source_files.files }}"
+          when: source_files is defined
+          args:
+            chdir: "{{ package_dir }}"
 
         - name: 'delete copied source files'
           file:
             state: absent
-            path: "{{ package_dir }}/{{ item | basename }}"
-          with_items: "{{ nightly_sourcefiles }}"
-          when: nightly_sourcefiles is defined
+            path: "{{ package_dir }}/{{ item.path | basename }}"
+          with_items: "{{ source_files.files }}"
+          when: source_files is defined

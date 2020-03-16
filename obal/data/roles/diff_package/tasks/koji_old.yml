@@ -1,9 +1,4 @@
 ---
-- name: Set koji_tags if diff_package_tags is defined
-  set_fact:
-    koji_tags: "{{ diff_package_tags }}"
-  when: diff_package_tags is defined
-
 - include_tasks: git_package_info.yml
 
 - name: Initialize diff_package_changed
@@ -14,7 +9,7 @@
   shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ scl + '-' if scl else '' }}{{ inventory_hostname }} \
     | cut -d' ' -f1"
   register: koji_package_versions
-  with_items: "{{ koji_tags }}"
+  with_items: "{{ diff_package_tags if diff_package_tags is defined else koji_tags }}"
   changed_when: false
 
 - name: "Set koji_package_versions"
