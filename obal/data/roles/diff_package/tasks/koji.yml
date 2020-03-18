@@ -11,13 +11,20 @@
   with_items: "{{ diff_package_tags }}"
   changed_when: False
 
-- set_fact:
-    diff_package_changed: "{{ not item.stdout.startswith(git_package_version) or diff_package_changed }}"
-  with_items: "{{ koji_package_versions.results }}"
+- name: "Set koji_package_versions"
+  set_fact:
+    koji_package_versions: "{{ koji_package_versions.results | map(attribute='stdout') | list }}"
+  no_log: True
+
+- name: "Calculate diff_package_changed"
+  set_fact:
+    diff_package_changed: "{{ not item.startswith(git_package_version) or diff_package_changed }}"
+  with_items: "{{ koji_package_versions }}"
+  no_log: True
 
 - debug:
     msg:
       - "Git version: {{ git_package_version }}"
-      - "Tagged version: {{ item.stdout }}"
+      - "Tagged version: {{ item }}"
       - "Changed: {{ diff_package_changed }}"
-  with_items: "{{ koji_package_versions.results }}"
+  with_items: "{{ koji_package_versions }}"
