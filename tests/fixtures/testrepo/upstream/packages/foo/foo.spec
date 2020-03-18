@@ -19,7 +19,7 @@ A fake RPM for foos and bars.
 %install
 cp . %{buildroot}/
 
-%files foo
+%files
 foo-source
 
 %changelog

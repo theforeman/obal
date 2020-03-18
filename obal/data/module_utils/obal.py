@@ -2,6 +2,8 @@
 Ansible module helper functions for obal modules
 """
 import subprocess
+import os
+from contextlib import contextmanager
 
 
 def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None):
@@ -75,3 +77,17 @@ def get_whitelist_status(build_command, tag, package):
     ]
     retcode = subprocess.call(cmd)
     return retcode == 0
+
+
+@contextmanager
+def chdir(directory):
+    """
+    Change the directory in a context manager. Automatically switches back even if an exception
+    occurs.
+    """
+    old = os.getcwd()
+    os.chdir(directory)
+    try:
+        yield
+    finally:
+        os.chdir(old)
