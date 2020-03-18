@@ -1,18 +1,12 @@
 ---
 - name: 'Build SRPM'
-  tito_build:
-    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-    build_arguments: "{{ build_srpm_tito_build_args }}"
-    srpm: true
-    offline: true
-    dist: "{{ build_srpm_dist }}"
-    scl: "{{ build_srpm_scl }}"
+  srpm:
+    package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
     output: "{{ build_srpm_output_dir }}"
-    arguments: "{{ build_srpm_tito_args }}"
-    builder: "{{ build_srpm_tito_builder }}"
+    scl: "{{ scl | default(omit) }}"
   register: srpm_build
 
-- name: 'Built SRPM'
+- name: 'Built srpm path'
   debug:
     msg: "Built {{ srpm_build.path }}"
   when: srpm_build is successful

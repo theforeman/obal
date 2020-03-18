@@ -657,10 +657,9 @@ def test_obal_changelog_custom():
 @obal_cli_test(repotype='upstream')
 def test_obal_srpm():
     assert_obal_success(['srpm', 'hello', 'foo'])
-    assert_mockbin_log([
-        'tito build --srpm --offline --output {pwd}/SRPMs',
-        'tito build --srpm --offline --output {pwd}/SRPMs'
-    ])
+
+    assert os.path.exists('SRPMs/foo-1.0-1.src.rpm')
+    assert os.path.exists('SRPMs/hello-2.10-2.src.rpm')
 
 
 @obal_cli_test(repotype='upstream')
@@ -668,8 +667,6 @@ def test_obal_mock():
     assert_obal_success(['mock', 'hello', 'foo', '--config', 'mock/el7.cfg'])
 
     expected_log = [
-        "tito build --srpm --offline --output {pwd}/SRPMs",
-        "tito build --srpm --offline --output {pwd}/SRPMs",
-        "mock --recurse --chain -r mock/el7.cfg --localrepo {pwd}/mock_builds SRPMs/foo-1.0-1.src.rpm SRPMs/hello-2.10-1.src.rpm"
+        "mock --recurse --chain -r mock/el7.cfg --localrepo {pwd}/mock_builds SRPMs/foo-1.0-1.src.rpm SRPMs/hello-2.10-2.src.rpm"
     ]
     assert_mockbin_log(expected_log)
