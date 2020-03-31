@@ -1,21 +1,51 @@
-- name: generate list of repositories
-  set_fact:
-    repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist]|default([]) + ['downloaded_rpms'] }}"
+- block:
+    - name: generate list of repositories
+      set_fact:
+        repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist]|default([]) + ['downloaded_rpms'] }}"
 
-- name: 'Run repoclosure for {{ dist }}'
-  command: >
-    repoclosure
-      --config {{ inventory_dir }}/{{ repoclosure_config }}
-      --tempcache
-      --newest
-      --repoid {{ repoclosure_target_repos_all | join(' --repoid ') }}
-      {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/'+dist if repoclosure_use_downloaded_rpms else '' }}
-      {{ additional_repos | join(' ') }}
-      {{ '--lookaside ' if repoclosure_lookaside_repos else '' }}
-      {{ repoclosure_lookaside_repos[dist] | join(' --lookaside ') }}
-  register: output
-  args:
-    chdir: "{{ inventory_dir }}"
+    - name: Create temp directory
+      tempfile:
+        state: directory
+        suffix: repoclosure
+      register: temp_directory
 
-- debug:
-    msg: "{{ output.stdout_lines | join('\n') }}"
+    - name:
+      set_fact:
+        config_filename: "{{ repoclosure_config | basename }}"
+
+    - name: Copy repoclosure config to temp directory
+      copy:
+        src: "{{ inventory_dir }}/{{ repoclosure_config }}"
+        dest: "{{ temp_directory.path }}/{{ config_filename }}"
+        remote_src: true
+
+    - name: Replace cachedir with temp directory
+      replace:
+        path: "{{ temp_directory.path }}/{{ config_filename }}"
+        regexp: "^cachedir.*"
+        replace: "cachedir={{ temp_directory.path }}"
+
+    - name: 'Run repoclosure for {{ dist }}'
+      command:
+        cmd: >
+          dnf repoclosure
+            --config {{ temp_directory.path }}/{{ config_filename }}
+            --refresh
+            --newest
+            --check {{ repoclosure_target_repos_all | join(' --check ') }}
+            {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/'+dist if repoclosure_use_downloaded_rpms else '' }}
+            {{ additional_repos | join(' ') }}
+            {{ '--repo ' if repoclosure_lookaside_repos else '' }}
+            {{ repoclosure_lookaside_repos[dist] | join(' --repo ') }}
+        warn: false
+      register: output
+      args:
+        chdir: "{{ inventory_dir }}"
+
+    - debug:
+        msg: "{{ output.stdout_lines | join('\n') }}"
+  always:
+    - name: Clean up temporary directory
+      file:
+        state: absent
+        path: "{{ temp_directory.path }}"
