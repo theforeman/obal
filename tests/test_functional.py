@@ -75,10 +75,20 @@ def assert_obal_failure(args):
 
 def assert_in_mockbin_log(content):
     __tracebackhide__ = True
-    expected_log_entry = content.replace('{pwd}', os.getcwd())
-    with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
-        log = mockbinlog.read().strip()
-        assert expected_log_entry in log
+
+    if isinstance(content, list):
+        for entry in content:
+            expected_log_entry = entry.replace('{pwd}', os.getcwd())
+
+            with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
+                log = mockbinlog.read().strip()
+                assert expected_log_entry in log
+    else:
+        expected_log_entry = content.replace('{pwd}', os.getcwd())
+
+        with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
+            log = mockbinlog.read().strip()
+            assert expected_log_entry in log
 
 
 def assert_not_in_mockbin_log(content):
@@ -487,9 +497,14 @@ def test_obal_repoclosure():
     assert_obal_success(['repoclosure', 'core-repoclosure'])
 
     expected_log = [
-        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --lookaside el7-base"  # noqa: E501
+        "dnf repoclosure",
+        "--config",
+        "repoclosure/el7.conf",
+        "--newest",
+        "--check downloaded_rpms",
+        "--repo el7-base"
     ]
-    assert_mockbin_log(expected_log)
+    assert_in_mockbin_log(expected_log)
 
 
 @obal_cli_test(repotype='upstream')
@@ -500,9 +515,15 @@ def test_obal_repoclosure_with_downloaded_rpms():
     assert_obal_success(['repoclosure', 'dist-repoclosure'])
 
     expected_log = [
-        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms/rhel7 --lookaside el7-base"  # noqa: E501
+        "dnf repoclosure",
+        "--config",
+        "repoclosure/el7.conf",
+        "--newest",
+        "--check downloaded_rpms",
+        "--repofrompath=downloaded_rpms,./downloaded_rpms/rhel7",
+        "--repo el7-base"
     ]
-    assert_mockbin_log(expected_log)
+    assert_in_mockbin_log(expected_log)
 
 
 @obal_cli_test(repotype='upstream')
@@ -513,9 +534,16 @@ def test_obal_repoclosure_katello_with_downloaded_rpms():
     assert_obal_success(['repoclosure', 'katello-repoclosure'])
 
     expected_log = [
-        "repoclosure --config {pwd}/repoclosure/el7.conf --tempcache --newest --repoid el7-katello --repoid downloaded_rpms --repofrompath=downloaded_rpms,./downloaded_rpms/rhel7 --lookaside el7-base"  # noqa: E501
+        "dnf repoclosure",
+        "--config",
+        "repoclosure/el7.conf",
+        "--newest",
+        "--check el7-katello",
+        "--check downloaded_rpms",
+        "--repofrompath=downloaded_rpms,./downloaded_rpms/rhel7",
+        "--repo el7-base"
     ]
-    assert_mockbin_log(expected_log)
+    assert_in_mockbin_log(expected_log)
 
 
 @obal_cli_test(repotype='copr')
