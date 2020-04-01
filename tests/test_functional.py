@@ -76,19 +76,15 @@ def assert_obal_failure(args):
 def assert_in_mockbin_log(content):
     __tracebackhide__ = True
 
-    if isinstance(content, list):
-        for entry in content:
-            expected_log_entry = entry.replace('{pwd}', os.getcwd())
+    with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
+        log = mockbinlog.read().strip()
 
-            with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
-                log = mockbinlog.read().strip()
-                assert expected_log_entry in log
-    else:
-        expected_log_entry = content.replace('{pwd}', os.getcwd())
+    if not isinstance(content, list):
+        content = [content]
 
-        with open(os.environ['MOCKBIN_LOG']) as mockbinlog:
-            log = mockbinlog.read().strip()
-            assert expected_log_entry in log
+    for entry in content:
+        expected_log_entry = entry.replace('{pwd}', os.getcwd())
+        assert expected_log_entry in log
 
 
 def assert_not_in_mockbin_log(content):
