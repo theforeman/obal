@@ -17,6 +17,8 @@
           - rpmlint
           - yum-utils
           - which
+          - dnf
+          - dnf-plugins-core
 
     - when: ansible_os_family == 'Fedora'
       name: install required packages
