@@ -18,11 +18,11 @@
 
 - set_fact:
     copr_package_version: "{{ copr_package_info['name'] + '-' + copr_package_info['latest_build']['pkg_version'] }}"
-  when: copr_package_info is successful and copr_package_info['latest_build']
+  when: copr_package_info is successful and 'latest_build' in copr_package_info
 
 - set_fact:
     copr_package_version: ""
-  when: copr_package_info is failed or not copr_package_info['latest_build']
+  when: copr_package_info is failed or 'latest_build' not in copr_package_info
 
 - set_fact:
     diff_package_changed: "{{ not copr_package_version.startswith(git_package_version) }}"
