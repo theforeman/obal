@@ -580,6 +580,7 @@ def test_obal_release_copr_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
+        "copr-cli get-package @fake-user/copr-repo-staging --name hello --with-latest-build",
         "tito release --yes copr",
     ]
     assert_mockbin_log(expected_log)
@@ -592,6 +593,7 @@ def test_obal_release_copr_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
+        "copr-cli get-package @fake-user/copr-repo-staging --name hello --with-latest-build",
         "tito release --yes copr",
         "copr-cli watch-build"
     ]

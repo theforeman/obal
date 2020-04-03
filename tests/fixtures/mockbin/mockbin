@@ -104,3 +104,6 @@ elif prog in ['koji', 'brew']:
     args = parser.parse_args()
     if 'output' in args and args.output:
         print(args.output)
+
+elif prog in ['copr-cli']:
+    print({})
