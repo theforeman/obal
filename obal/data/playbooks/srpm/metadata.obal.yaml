@@ -11,4 +11,4 @@ variables:
     help: SCL to set when building a SRPM
   build_srpm_output_dir:
     parameter: --dir
-    help: Absolute path to output dir for SRPM. Defaults to <inventory_dir>/SRPMs
+    help: Absolute path to output dir for SRPM. Defaults to <project_dir>/SRPMs

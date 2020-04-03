@@ -15,7 +15,7 @@
 
     - name: Copy repoclosure config to temp directory
       copy:
-        src: "{{ inventory_dir }}/{{ repoclosure_config }}"
+        src: "{{ project_dir }}/{{ repoclosure_config }}"
         dest: "{{ temp_directory.path }}/{{ config_filename }}"
         remote_src: true
 
@@ -40,7 +40,7 @@
         warn: false
       register: output
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
 
     - debug:
         msg: "{{ output.stdout_lines | join('\n') }}"

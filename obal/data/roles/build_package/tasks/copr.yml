@@ -2,7 +2,7 @@
 - block:
     - name: 'Release to copr'
       tito_release:
-        directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        directory: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
         arguments: "{{ build_package_tito_args }}"
         test: "{{ build_package_test }}"
         scratch: "{{ build_package_scratch }}"
@@ -33,7 +33,7 @@
 
     - name: 'Build SRPM'
       tito_build:
-        directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        directory: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
         srpm: true
         scl: "{{ scl }}"
       register: srpm_build

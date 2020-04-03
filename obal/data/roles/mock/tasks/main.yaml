@@ -2,5 +2,5 @@
 - name: Build with mock
   shell: "mock --recurse --chain -r {{ mock_config }} --localrepo {{ mock_output_dir }} SRPMs/*"
   args:
-    chdir: "{{ inventory_dir }}"
+    chdir: "{{ project_dir }}"
   run_once: true

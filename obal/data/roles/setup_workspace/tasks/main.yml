@@ -1,6 +1,6 @@
 - name: 'Define tmp directory'
   set_fact:
-    obal_tmp_dir: "{{ inventory_dir }}/.tmp"
+    obal_tmp_dir: "{{ project_dir }}/.tmp"
 
 - name: 'Ensure .tmp directory'
   file:

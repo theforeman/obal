@@ -15,7 +15,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: "{{ obal_tmp_dir }}/{{ upstream_directory }}/{{ item }}"
-        dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+        dest: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream is defined
@@ -26,7 +26,7 @@
     - name: 'Remove package directory'
       file:
         state: 'absent'
-        path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        path: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
 - block:
     - name: 'Make package download directory'
@@ -53,7 +53,7 @@
     - name: 'Copy upstream files'
       synchronize:
         src: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/{{ item }}"
-        dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+        dest: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
   when: #block
     - upstream is defined

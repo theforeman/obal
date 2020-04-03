@@ -1,7 +1,7 @@
 ---
 - name: 'Build SRPM'
   tito_build:
-    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    directory: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
     build_arguments: "{{ build_srpm_tito_build_args }}"
     srpm: true
     offline: true

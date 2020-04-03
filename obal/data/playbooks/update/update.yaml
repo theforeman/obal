@@ -10,7 +10,7 @@
     - name: Determine source file from spec
       shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
       args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        chdir: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_urls
       when: old_source_urls is not defined
       changed_when: False
@@ -18,7 +18,7 @@
     - name: "Remove old sources"
       command: "git rm --ignore-unmatch {{ item | basename }}"
       args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        chdir: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       with_items: "{{ old_source_urls.stdout_lines | list }}"
       when:
         - "'://' in item"
@@ -30,7 +30,7 @@
     - name: Determine new source file from spec
       shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
       args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        chdir: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_urls
       when: new_source_urls is not defined
       changed_when: False
@@ -38,7 +38,7 @@
     - name: 'Git annex add new sources'
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
       with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
         - "'://' in item"
@@ -46,7 +46,7 @@
     - name: 'Git add new sources'
       command: "git -c annex.largefiles=nothing add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
       with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
         - "'://' not in item"
@@ -54,23 +54,23 @@
     - name: 'Get updated version from spec'
       command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
       changed_when: False
       register: updated_version
 
     - name: 'Get current git branch'
       command: "git rev-parse --abbrev-ref HEAD"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
       changed_when: False
       register: git_branch
 
     - name: 'Create git branch'
       command: "git checkout -b {{ git_branch.stdout }}-update-{{ inventory_hostname }}-{{ updated_version.stdout }}"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
 
     - name: 'Create git commit'
       command: "git commit -a -m 'Update {{ inventory_hostname }} to {{ updated_version.stdout }}'"
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ project_dir }}"
