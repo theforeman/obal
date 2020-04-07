@@ -125,7 +125,7 @@ def test_obal_check_upstream_hello():
     assert_obal_success(['check', 'hello'])
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
     ]
     assert_mockbin_log(expected_log)
 
@@ -163,7 +163,7 @@ def test_obal_release_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
@@ -195,7 +195,7 @@ def test_obal_release_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
         "tito release --yes dist-git",
     ]
     assert_mockbin_log(expected_log)
@@ -208,7 +208,7 @@ def test_obal_release_upstream_hello_nowaitrepo():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji list-tagged --quiet --latest obaltest-nightly-rhel7 tfm-hello",
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
@@ -378,7 +378,7 @@ def test_obal_release_downstream_hello_nowaitrepo():
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
     expected_log = [
-        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",
+        "brew list-tagged --quiet --latest obaltest-6.3.0-rhel-7-candidate tfm-hello",  # noqa: E501
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
         "brew taskinfo -v 1234",

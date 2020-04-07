@@ -1,0 +1,34 @@
+---
+- set_fact:
+    koji_tags: "{{ diff_package_tags }}"
+  when: diff_package_tags is defined
+
+- include_tasks: git_package_info.yml
+
+- set_fact:
+    diff_package_changed: False
+
+- name: 'Look up current version of package in {{ diff_package_koji_command }}'
+  shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ scl + '-' if scl else '' }}{{ inventory_hostname }} \
+    | cut -d' ' -f1"
+  register: koji_package_versions
+  with_items: "{{ koji_tags }}"
+  changed_when: False
+
+- name: "Set koji_package_versions"
+  set_fact:
+    koji_package_versions: "{{ koji_package_versions.results | map(attribute='stdout') | list }}"
+  no_log: True
+
+- name: "Calculate diff_package_changed"
+  set_fact:
+    diff_package_changed: "{{ not item.startswith(git_package_version) or diff_package_changed }}"
+  with_items: "{{ koji_package_versions }}"
+  no_log: True
+
+- debug:
+    msg:
+      - "Git version: {{ git_package_version }}"
+      - "Tagged version: {{ item }}"
+      - "Changed: {{ diff_package_changed }}"
+  with_items: "{{ koji_package_versions }}"
