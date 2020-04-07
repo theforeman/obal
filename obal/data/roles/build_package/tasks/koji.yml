@@ -1,7 +1,7 @@
 ---
 - name: "Confirm package is whitelisted"
   package_whitelist_check:
-    releasers_conf: "{{ inventory_dir }}/rel-eng/releasers.conf"
+    releasers_conf: "{{ project_dir }}/rel-eng/releasers.conf"
     spec_file_path: "{{ spec_file_path }}"
     releasers: "{{ releasers }}"
     build_command: "{{ build_package_koji_command }}"
@@ -19,7 +19,7 @@
 
 - name: 'Release to {{ build_package_koji_command }}'
   tito_release:
-    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    directory: "{{ project_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
     arguments: "{{ build_package_tito_args }}"
     scratch: "{{ build_package_scratch and build_package_koji_command != 'brew'}}"
     test: "{{ build_package_test }}"

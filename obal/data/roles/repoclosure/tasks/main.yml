@@ -13,7 +13,7 @@
 
 - name: Find all downloaded repositories
   find:
-    paths: "{{ inventory_dir }}/downloaded_rpms"
+    paths: "{{ project_dir }}/downloaded_rpms"
     recurse: no
     file_type: directory
   register: downloaded_rpms_folders

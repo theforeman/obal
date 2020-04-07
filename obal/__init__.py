@@ -60,7 +60,12 @@ class ApplicationConfig(obsah.ApplicationConfig):
         """
         Return the inventory path
         """
-        return os.environ.get('OBAL_INVENTORY', os.path.join(os.getcwd(), 'package_manifest.yaml'))
+        inventory = os.path.join(os.getcwd(), 'package_manifest.yaml')
+
+        if os.path.isdir('package_manifests'):
+            inventory = os.path.join(os.getcwd(), 'package_manifests')
+
+        return os.environ.get('OBAL_INVENTORY', inventory)
 
 
 def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable=R0914

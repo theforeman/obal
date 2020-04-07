@@ -8,16 +8,16 @@
   tasks:
     - name: 'Set default rpmlint RC file'
       set_fact:
-        rpmlint_rc_file: "{{ inventory_dir }}/{{ package_base_dir }}{{ inventory_hostname }}/.rpmlintrc"
+        rpmlint_rc_file: "{{ project_dir }}/{{ package_base_dir }}{{ inventory_hostname }}/.rpmlintrc"
       when: rpmlint_rc_file is not defined
 
     - name: "RPM lint spec file"
-      command: "rpmlint --file {{ rpmlint_rc_file }} {{ inventory_dir }}/{{ package_base_dir }}{{ inventory_hostname }}"
+      command: "rpmlint --file {{ rpmlint_rc_file }} {{ project_dir }}/{{ package_base_dir }}{{ inventory_hostname }}"
       register: output
 
     - name: "Check for a new changelog entry"
       rpmspec_changelog_check:
-        directory: "{{ inventory_dir }}/{{ package_base_dir }}{{ inventory_hostname }}"
+        directory: "{{ project_dir }}/{{ package_base_dir }}{{ inventory_hostname }}"
 
     - name: 'Print rpmlint output'
       debug:
