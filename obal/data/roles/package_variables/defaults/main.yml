@@ -1,3 +1,4 @@
 ---
 package_base_dir: "packages/"
 koji_tags: []
+koij_executable: 'koji'

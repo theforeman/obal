@@ -3,6 +3,7 @@ packages:
   vars:
     diff_package_skip: false
     build_package_koji_command: 'brew'
+    koji_executable: 'brew'
     releasers:
       - obaltest-dist-git-rhel-7
   hosts:

@@ -77,29 +77,42 @@ if prog == 'tito':
 elif prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+
     parser_listpkgs = subparsers.add_parser('list-pkgs')
     parser_listpkgs.add_argument('--tag')
     parser_listpkgs.add_argument('--package')
     parser_listpkgs.add_argument('--quiet', action='store_true')
+
     parser_listtagged = subparsers.add_parser('list-tagged')
     parser_listtagged.add_argument('tag')
     parser_listtagged.add_argument('pkg')
     parser_listtagged.add_argument('--quiet', action='store_true')
     parser_listtagged.add_argument('--latest', action='store_true')
+
     parser_waitrepo = subparsers.add_parser('wait-repo')
     parser_waitrepo.add_argument('repo')
     parser_waitrepo.add_argument('--build')
     parser_waitrepo.add_argument('--target', action='store_true')
+
     parser_watchtask = subparsers.add_parser('watch-task')
     parser_watchtask.add_argument('taskid')
+
     parser_taskinfo = subparsers.add_parser('taskinfo')
     parser_taskinfo.add_argument('taskid')
+
     parser_downloadtask = subparsers.add_parser('download-task')
     parser_downloadtask.add_argument('taskid')
     parser_downloadtask.add_argument('--arch', action='append')
+
     parser_downloadlogs = subparsers.add_parser('download-logs')
     parser_downloadlogs.add_argument('taskid')
     parser_downloadlogs.add_argument('-r', action='store_true')
+
+    parser_latest_build = subparsers.add_parser('latest-build')
+    parser_latest_build.add_argument('tag')
+    parser_latest_build.add_argument('pkg')
+    parser_latest_build.add_argument('--quiet', action='store_true')
+
     parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
     if 'output' in args and args.output:

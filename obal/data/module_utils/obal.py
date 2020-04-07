@@ -4,21 +4,30 @@ Ansible module helper functions for obal modules
 import subprocess
 
 
-def specfile_macro_lookup(specfile, macro_str):
+def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None):
     """expand a given macro from a specfile"""
-    cmd = [
+    command = [
         'rpmspec',
         '--query',
         '--queryformat',
         macro_str,
-        '--undefine',
-        'dist',
-        '--undefine',
-        'foremandist',
         '--srpm',
         specfile
     ]
-    return subprocess.check_output(cmd, universal_newlines=True)
+
+    if dist:
+        command += ['--define', '"dist %s"' % dist]
+    else:
+        command += ['--undefine', 'dist']
+
+    if scl:
+        command += ['--define', '"scl %s"' % scl]
+
+    if macros is not None:
+        for (macro, value) in macros.items():
+            command += ['--define', '"%s %s"' % (macro, value)]
+
+    return subprocess.check_output(' '.join(command), universal_newlines=True, shell=True)
 
 
 def get_changelog_evr(specfile):
@@ -39,9 +48,14 @@ def get_specfile_evr(specfile):
     return specfile_macro_lookup(specfile, '%{evr}')
 
 
-def get_specfile_name(specfile):
+def get_specfile_name(specfile, scl=None):
     """get the name from the specfile"""
-    return specfile_macro_lookup(specfile, '%{name}')
+    return specfile_macro_lookup(specfile, '%{name}', scl=scl)
+
+
+def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
+    """get the name from the specfile"""
+    return specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
 
 
 def get_whitelist_status(build_command, tag, package):
