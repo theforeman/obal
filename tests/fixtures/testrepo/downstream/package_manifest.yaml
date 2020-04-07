@@ -4,13 +4,13 @@ packages:
     diff_package_skip: false
     diff_package_type: 'koji'
     diff_package_koji_command: 'brew'
-    scl: tfm
     build_package_koji_command: 'brew'
     build_package_build_system: 'koji'
     releasers:
       - obaltest-dist-git-rhel-7
-    diff_package_tags:
-      - obaltest-6.3.0-rhel-7-candidate
+    koji_tags:
+      obaltest-6.3.0-rhel-7-candidate:
+        scl: tfm
     source_server: http://ftp.gnu.org/gnu/hello/
   hosts:
     hello:

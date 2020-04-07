@@ -1,7 +1,8 @@
 ---
 - set_fact:
-    koji_tags: "{{ diff_package_tags }}"
+    koji_tags: "{{ koji_tags| default({}) | combine({ item: {} }) }}"
   when: diff_package_tags is defined
+  loop: "{{ diff_package_tags }}"
 
 - include_tasks: git_package_info.yml
 
@@ -9,10 +10,15 @@
     diff_package_changed: False
 
 - name: 'Look up current version of package in {{ diff_package_koji_command }}'
-  shell: "{{ diff_package_koji_command }} list-tagged --quiet --latest {{ item }} {{ scl + '-' if scl else '' }}{{ inventory_hostname }} \
-    | cut -d' ' -f1"
+  shell: >
+    {{ diff_package_koji_command }} list-tagged
+    --quiet
+    --latest
+    {{ item.key }}
+    {{ item.value.scl + '-' if item.value.scl is defined else '' }}{{ inventory_hostname }}
+    | cut -d' ' -f1
   register: koji_package_versions
-  with_items: "{{ koji_tags }}"
+  loop: "{{ koji_tags|dict2items }}"
   changed_when: False
 
 - name: "Set koji_package_versions"
@@ -22,8 +28,8 @@
 
 - name: "Calculate diff_package_changed"
   set_fact:
-    diff_package_changed: "{{ not item.startswith(git_package_version) or diff_package_changed }}"
-  with_items: "{{ koji_package_versions }}"
+    diff_package_changed: "{{ git_package_version not in item or diff_package_changed }}"
+  loop: "{{ koji_package_versions }}"
   no_log: True
 
 - debug:
@@ -31,4 +37,4 @@
       - "Git version: {{ git_package_version }}"
       - "Tagged version: {{ item }}"
       - "Changed: {{ diff_package_changed }}"
-  with_items: "{{ koji_package_versions }}"
+  loop: "{{ koji_package_versions }}"

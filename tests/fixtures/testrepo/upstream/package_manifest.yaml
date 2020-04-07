@@ -7,9 +7,9 @@ packages:
     diff_package_skip: false
     diff_package_type: 'koji'
     diff_package_koji_command: 'koji'
-    scl: tfm
-    diff_package_tags:
-      - obaltest-nightly-rhel7
+    koji_tags:
+      obaltest-nightly-rhel7:
+        scl: tfm
   hosts:
     hello:
       nightly_package_tito_releaser_args:
