@@ -1,0 +1,8 @@
+---
+- when: tag != 'all'
+  include_tasks: "verify.yaml"
+  vars:
+    tag_name: "{{ tag }}"
+
+- when: tag == 'all'
+  include_tasks: "all.yaml"

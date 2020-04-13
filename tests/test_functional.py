@@ -129,6 +129,8 @@ def test_obal_check_upstream_hello():
     expected_log = [
         "koji buildinfo hello-2.10-2.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
+        "koji buildinfo hello-2.10-2.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 hello"
     ]
     assert_mockbin_log(expected_log)
 
@@ -169,6 +171,9 @@ def test_obal_scratch_with_koji_upstream_hello():
         "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
     assert os.path.exists('/tmp/SRPMs/hello-2.10-2.src.rpm')
@@ -181,7 +186,8 @@ def test_obal_scratch_with_koji_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch"
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch"
     ]
     assert_mockbin_log(expected_log)
     assert os.path.exists('/tmp/SRPMs/hello-2.10-2.src.rpm')
@@ -197,6 +203,12 @@ def test_obal_release_with_koji_upstream_hello():
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
         "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm",
         "koji watch-task 1234",
+        "koji taskinfo -v 1234",
+        "koji buildinfo hello-2.10-2.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 hello",
+        "koji latest-build --quiet obaltest-nightly-el8 hello",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm",
+        "koji watch-task 1234",
         "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
@@ -209,7 +221,13 @@ def test_obal_release_with_koji_upstream_existing_build():
     expected_log = [
         "koji buildinfo package-with-existing-build-1.0-1.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build",
-        "koji tag-build obaltest-nightly-rhel7 package-with-existing-build-1.0-1.el7"
+        "koji tag-build obaltest-nightly-rhel7 package-with-existing-build-1.0-1.el7",
+        "koji buildinfo package-with-existing-build-1.0-1.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-existing-build-1.0-1.src.rpm",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -221,7 +239,14 @@ def test_obal_release_with_koji_upstream_whitelist_check():
     expected_log = [
         "koji buildinfo package-with-existing-build-1.0-1.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build",
-        "koji tag-build obaltest-nightly-rhel7 package-with-existing-build-1.0-1.el7"
+        "koji tag-build obaltest-nightly-rhel7 package-with-existing-build-1.0-1.el7",
+        "koji buildinfo package-with-existing-build-1.0-1.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
+        "koji list-pkgs --tag obaltest-nightly-el8 --package package-with-existing-build --quiet",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-existing-build-1.0-1.src.rpm",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -235,6 +260,8 @@ def test_obal_release_upstream_hello():
     expected_log = [
         "koji buildinfo hello-2.10-2.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
+        "koji buildinfo hello-2.10-2.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 hello",
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
@@ -267,7 +294,9 @@ def test_obal_release_upstream_hello_nowait():
     expected_log = [
         "koji buildinfo hello-2.10-2.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
-        "tito release --yes dist-git"
+        "koji buildinfo hello-2.10-2.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 hello",
+        "tito release --yes dist-git",
     ]
     assert_mockbin_log(expected_log)
 
@@ -281,6 +310,8 @@ def test_obal_release_upstream_hello_waitrepo():
     expected_log = [
         "koji buildinfo hello-2.10-2.el7",
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
+        "koji buildinfo hello-2.10-2.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 hello",
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
@@ -732,5 +763,24 @@ def test_obal_mock():
 
     expected_log = [
         "mock --recurse --chain -r mock/el7.cfg --localrepo {pwd}/mock_builds SRPMs/foo-1.0-1.src.rpm SRPMs/hello-2.10-2.src.rpm"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_verify_tag():
+    assert_obal_success(['verify-koji-tag', 'obaltest-nightly-rhel7'])
+
+    expected_log = ['koji list-pkgs --quiet --tag obaltest-nightly-rhel7']
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_verify_tag_all():
+    assert_obal_success(['verify-koji-tag', 'all'])
+
+    expected_log = [
+        'koji list-pkgs --quiet --tag obaltest-nightly-el8',
+        'koji list-pkgs --quiet --tag obaltest-nightly-rhel7'
     ]
     assert_mockbin_log(expected_log)
