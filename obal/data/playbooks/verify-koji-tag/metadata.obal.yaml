@@ -1,0 +1,5 @@
+help: Verify packages against a Koji tag
+variables:
+  tag:
+    parameter: tag
+    help: Koji tag to verify against

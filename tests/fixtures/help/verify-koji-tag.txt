@@ -1,0 +1,15 @@
+usage: obal verify-koji-tag [-h] [-v] [-e EXTRA_VARS] tag
+
+Verify packages against a Koji tag
+
+positional arguments:
+  tag                   Koji tag to verify against
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         verbose output
+
+advanced arguments:
+  -e EXTRA_VARS, --extra-vars EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @

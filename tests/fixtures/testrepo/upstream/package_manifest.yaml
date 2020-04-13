@@ -10,6 +10,8 @@ packages:
     koji_tags:
       - name: obaltest-nightly-rhel7
         dist: '.el7'
+      - name: obaltest-nightly-el8
+        dist: '.el8'
   hosts:
     hello:
       nightly_package_tito_releaser_args:
