@@ -31,7 +31,7 @@ def main():
 
         module.exit_json(changed=False, tagged_version=build, exists=(nevr == build))
     except KojiCommandError as error:
-        module.fail_json(changed=False, msg=error, command=command)
+        module.fail_json(changed=False, msg=error.message, command=error.command)
 
 
 if __name__ == '__main__':
