@@ -32,7 +32,6 @@
             --config {{ temp_directory.path }}/{{ config_filename }}
             --refresh
             --newest
-            --best
             --check {{ repoclosure_target_repos_all | join(' --check ') }}
             {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/'+dist if repoclosure_use_downloaded_rpms else '' }}
             {{ additional_repos | join(' ') }}
