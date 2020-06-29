@@ -13,8 +13,6 @@ install:
   - chmod +x /home/travis/.local/bin/spectool
   - chmod +x /home/travis/.local/bin/rpmdev-bumpspec
   - chmod +x /home/travis/.local/bin/rpmdev-packager
-  - git config --global user.email "travis@example.com"
-  - git config --global user.name "Travis"
 script:
   - tox
   - docker build --build-arg VERSION=master -t quay.io/foreman/obal:latest .

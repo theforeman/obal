@@ -23,6 +23,8 @@ if os.environ.get('TRAVIS', None):
 
 def git_init(path):
     subprocess.check_call(['git', 'init'], cwd=path)
+    subprocess.check_call(['git', 'config', 'user.email', 'test@example.test'])
+    subprocess.check_call(['git', 'config', 'user.name', 'Test CI'])
     subprocess.check_call(['git', 'annex', 'init'], cwd=path)
     subprocess.check_call(['git', '-c', 'annex.largefiles=nothing', 'add', '.'], cwd=path)
     subprocess.check_call(['git', 'commit', '-a', '-m', 'init'], cwd=path)
