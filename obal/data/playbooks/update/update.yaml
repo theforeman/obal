@@ -55,7 +55,7 @@
     - packages
   gather_facts: no
   tasks:
-    - when: commit is true
+    - when: commit is defined and commit
       block:
         - name: 'Get updated version from spec'
           command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
