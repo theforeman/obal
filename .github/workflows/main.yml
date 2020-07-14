@@ -33,6 +33,11 @@ jobs:
           sudo apt-get install -y git-annex rpm
       - name: Run tests
         run: tox
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
       - name: Run container tests
         run: docker build --build-arg VERSION=master -t quay.io/foreman/obal:latest .
 
