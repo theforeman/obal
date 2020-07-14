@@ -24,12 +24,10 @@ jobs:
         run: pip install -r requirements-test.txt
       - name: Install RPM tools
         run : |
-          curl --create-dirs -o ~/.local/bin/spectool https://pagure.io/rpmdevtools/raw/26a8abc746fba9c0b32eb899b96c92841a37855a/f/spectool.in
-          curl --create-dirs -o ~/.local/bin/rpmdev-bumpspec https://pagure.io/rpmdevtools/raw/6f387c1deaa5cbed770310e288abde04b17421dc/f/rpmdev-bumpspec
-          curl --create-dirs -o ~/.local/bin/rpmdev-packager https://pagure.io/rpmdevtools/raw/master/f/rpmdev-packager
-          chmod +x ~/.local/bin/spectool
-          chmod +x ~/.local/bin/rpmdev-bumpspec
-          chmod +x ~/.local/bin/rpmdev-packager
+          sudo curl --create-dirs -o /usr/local/bin/spectool https://pagure.io/rpmdevtools/raw/26a8abc746fba9c0b32eb899b96c92841a37855a/f/spectool.in
+          sudo curl --create-dirs -o /usr/local/bin/rpmdev-bumpspec https://pagure.io/rpmdevtools/raw/6f387c1deaa5cbed770310e288abde04b17421dc/f/rpmdev-bumpspec
+          sudo curl --create-dirs -o /usr/local/bin/rpmdev-packager https://pagure.io/rpmdevtools/raw/master/f/rpmdev-packager
+          sudo chmod +x /usr/local/bin/*
           sudo apt-get update && sudo apt-get install -y git-annex rpm
       - name: Run tests
         run: tox
