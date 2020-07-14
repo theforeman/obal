@@ -15,9 +15,9 @@ jobs:
       matrix:
         python: ["2.7", "3.6", "3.7"]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -37,16 +37,16 @@ jobs:
   container:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Run container tests
         run: docker build --build-arg VERSION=master -t quay.io/foreman/obal:latest .
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: '3.7'
       - name: Install dependencies
