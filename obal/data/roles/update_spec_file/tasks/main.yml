@@ -6,6 +6,7 @@
     replace: '\g<prefix>{{ source_server }}\g<filename>'
   when:
     - source_server is defined
+    - source_server|length > 0
     - version is defined
 
 - name: 'Bump version in specfile'
