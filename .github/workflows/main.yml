@@ -30,7 +30,7 @@ jobs:
           chmod +x ~/.local/bin/spectool
           chmod +x ~/.local/bin/rpmdev-bumpspec
           chmod +x ~/.local/bin/rpmdev-packager
-          sudo apt-get install -y git-annex rpm
+          sudo apt-get update && sudo apt-get install -y git-annex rpm
       - name: Run tests
         run: tox
 
