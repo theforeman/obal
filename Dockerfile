@@ -10,9 +10,11 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV PYTHONUNBUFFERED=0
 
-ARG VERSION=VERSION
+ARG VERSION=master
+ARG REPO=theforeman/obal.git
 
-RUN pip install git+https://github.com/theforeman/obal.git@${VERSION}
+RUN pip install -U pip
+RUN pip install git+https://github.com/${REPO}@${VERSION}
 RUN obal setup
 
 RUN mkdir -p /opt/packaging

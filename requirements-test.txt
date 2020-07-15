@@ -1,2 +1,3 @@
-tox-travis
+tox
+tox-gh-actions
 ansible-lint
