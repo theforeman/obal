@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run container tests
-        run: docker build --build-arg REPO=${GITHUB_REPOSITORY} --build-arg VERSION=${GITHUB_REF} -t quay.io/foreman/obal:latest .
+        run: docker build --build-arg REPO=${GITHUB_REPOSITORY} --build-arg VERSION=${GITHUB_REF} -t quay.io/foreman/obal:$(echo ${GITHUB_REF} | tr '/' '_') .
 
   lint:
     runs-on: ubuntu-latest
