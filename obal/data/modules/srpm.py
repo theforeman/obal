@@ -5,10 +5,25 @@ Build SRPM
 import shutil
 import os
 import subprocess
+from contextlib import contextmanager
 from tempfile import mkdtemp
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.obal import chdir # pylint:disable=import-error,no-name-in-module
+
+
+@contextmanager
+def chdir(directory):
+    """
+    Change the directory in a context manager. Automatically switches back even if an exception
+    occurs.
+    """
+    old = os.getcwd()
+    os.chdir(directory)
+    try:
+        yield
+    finally:
+        os.chdir(old)
+
 
 def run_command(command):
     """
