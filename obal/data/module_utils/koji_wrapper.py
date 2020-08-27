@@ -1,7 +1,7 @@
 """
 A koji wrapper
 """
-from subprocess import STDOUT, check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError
 
 class KojiCommandError(Exception):
     """Raised when Koji command fails"""
@@ -18,6 +18,6 @@ def koji(command, executable=None):
         executable = 'koji'
 
     try:
-        return check_output([executable] + command, stderr=STDOUT, universal_newlines=True)
+        return check_output([executable] + command, universal_newlines=True)
     except CalledProcessError as error:
         raise KojiCommandError(error.output, error.cmd)
