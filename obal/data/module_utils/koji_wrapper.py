@@ -8,7 +8,7 @@ class KojiCommandError(Exception):
     def __init__(self, message, command):
         self.message = message
         self.command = command
-        super(KojiCommandError, self).__init__(message)
+        super(KojiCommandError, self).__init__(message) #pylint: disable-all
 
 def koji(command, executable=None):
     """

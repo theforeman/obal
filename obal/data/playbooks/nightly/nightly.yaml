@@ -34,6 +34,7 @@
           copy:
             src: "{{ item }}"
             dest: "{{ package_dir }}"
+            mode: preserve
           with_items: "{{ nightly_sourcefiles }}"
 
         - name: 'get nightly_specfile'
@@ -62,6 +63,7 @@
           copy:
             src: "{{ original_specfile.backup }}"
             dest: "{{ nightly_specfile_path }}"
+            mode: preserve
           when: original_specfile is defined
 
         - name: 'delete copied source files'
