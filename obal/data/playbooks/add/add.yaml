@@ -16,6 +16,7 @@
       file:
         state: 'directory'
         path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        mode: 0755
       register: package_directory_result
 
     - block:
