@@ -60,8 +60,13 @@ def get_specfile_name(specfile, scl=None):
 
 
 def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
-    """get the name from the specfile"""
+    """get the name, epoch, version and release from the specfile"""
     return specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
+
+
+def get_specfile_nvr(specfile, scl=None, dist=None, macros=None):
+    """get the name, version and release from the specfile"""
+    return specfile_macro_lookup(specfile, '%{nvr}', scl=scl, dist=dist, macros=macros)
 
 
 def get_whitelist_status(build_command, tag, package):

@@ -1,17 +1,17 @@
 ---
 - name: Find local NEVR for package
-  rpm_nevr:
+  rpm_nvr:
     spec_file: "{{ spec_file_path }}"
     scl: "{{ tag.scl | default(omit) }}"
     dist: "{{ tag.dist | default(omit) }}"
     macros: "{{ tag.macros | default(omit) }}"
-  register: package_nevr
+  register: package_nvr
 
 - name: Verify package build exists for tag
   check_koji_build:
     tag: "{{ tag.name }}"
-    nevr: "{{ package_nevr.nevr }}"
-    package: "{{ package_nevr.name }}"
+    nvr: "{{ package_nvr.nvr }}"
+    package: "{{ package_nvr.name }}"
     koji_executable: "{{ koji_executable|default('koji') }}"
   register: build_exists
 
@@ -22,6 +22,6 @@
 - debug:
     msg:
       - "Tag: {{ tag.name }}"
-      - "Git version: {{ package_nevr.nevr }}"
+      - "Git version: {{ package_nvr.nvr }}"
       - "Tagged version: {{ build_exists.tagged_version }}"
       - "Build Exists: {{ build_exists.exists }}"

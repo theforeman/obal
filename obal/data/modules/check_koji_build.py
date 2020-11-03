@@ -12,13 +12,13 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             tag=dict(type='str', required=False),
-            nevr=dict(type='str', required=True),
+            nvr=dict(type='str', required=True),
             package=dict(type='str', required=True),
             koji_executable=dict(type='str', required=False)
         )
     )
 
-    nevr = module.params['nevr']
+    nvr = module.params['nvr']
     tag = module.params['tag']
     package = module.params['package']
     koji_executable = module.params['koji_executable']
@@ -29,9 +29,9 @@ def main():
             build = koji(command, koji_executable)
             build = build.split(' ')[0]
 
-            module.exit_json(changed=False, tagged_version=build, exists=(nevr == build))
+            module.exit_json(changed=False, tagged_version=build, exists=(nvr == build))
         else:
-            command = ['buildinfo', nevr]
+            command = ['buildinfo', nvr]
             output = koji(command, koji_executable)
             exists = 'No such build' not in output
 
