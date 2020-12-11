@@ -20,6 +20,13 @@
     - '%global mainver'
   when: version is defined
 
+- name: 'Allow prerelease in specfile'
+  replace:
+    path: "{{ spec_file_path }}"
+    regexp: '^#(global prerelease.*)$'
+    replace: '%\1'
+  when: prerelease is defined
+
 - name: 'Bump prerelease in specfile'
   replace:
     path: "{{ spec_file_path }}"
