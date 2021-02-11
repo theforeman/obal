@@ -2,7 +2,7 @@
 - hosts:
     - packages
   serial: 1
-  gather_facts: no
+  gather_facts: false
   vars:
     changelog: rebuilt
   roles:
@@ -12,3 +12,4 @@
       command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"{{ changelog }}\""
       args:
         chdir: "{{ spec_file_path | dirname }}"
+      changed_when: false

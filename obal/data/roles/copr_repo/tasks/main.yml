@@ -8,6 +8,7 @@
       --description '{{ copr_repo_description }}'
       --unlisted-on-hp on
       --repo '{{ copr_repo_external_repos | join(' ') }}'
+  changed_when: false
 
 - name: 'Add build packages to chroot'
   command: >
@@ -15,3 +16,4 @@
       edit-chroot
       {{ copr_repo_name }}/{{ copr_repo_chroot }}
       --packages '{{ copr_repo_packages | join(' ') }}'
+  changed_when: false

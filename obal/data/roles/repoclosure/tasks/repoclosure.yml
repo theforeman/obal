@@ -9,7 +9,7 @@
         suffix: repoclosure
       register: temp_directory
 
-    - name:
+    - name: Set config filename for repoclosure
       set_fact:
         config_filename: "{{ repoclosure_config | basename }}"
 
@@ -18,6 +18,7 @@
         src: "{{ inventory_dir }}/{{ repoclosure_config }}"
         dest: "{{ temp_directory.path }}/{{ config_filename }}"
         remote_src: true
+        mode: 0640
 
     - name: Replace cachedir with temp directory
       replace:

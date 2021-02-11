@@ -1,7 +1,7 @@
 - hosts:
     - repoclosures
     - packages
-  gather_facts: no
+  gather_facts: false
   roles:
     - repoclosure
   # Repoclosure can't run in parallel because it reuses caches

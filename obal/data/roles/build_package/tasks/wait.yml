@@ -2,9 +2,9 @@
 - block:
     - name: "Watch {{ build_package_koji_command }} task(s)"
       command: "{{ build_package_koji_command }} watch-task {{ build_package_tito_release.tasks | join(' ') }}"
-      ignore_errors: yes
+      ignore_errors: true
       register: build_package_koji_status
-      changed_when: False
+      changed_when: false
 
     - name: 'Download task logs'
       include_tasks: download_logs.yml
@@ -18,7 +18,7 @@
     - name: "Get {{ build_package_koji_command }} build detals"
       command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
       with_items: "{{ build_package_tito_release.tasks }}"
-      changed_when: False
+      changed_when: false
       register: build_package_koji_task_info
 
     - name: "Filter {{ build_package_build_system }} output"
@@ -37,9 +37,9 @@
 - block:
     - name: "Watch copr task(s)"
       command: "copr-cli watch-build {{ build_package_tito_release.builds | join(' ') }}"
-      ignore_errors: yes
+      ignore_errors: true
       register: build_package_copr_status
-      changed_when: False
+      changed_when: false
 
     - name: 'Failed build'
       fail:

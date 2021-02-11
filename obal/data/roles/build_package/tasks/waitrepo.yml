@@ -5,6 +5,6 @@
     --build={{ item['Build'] | regex_replace(' .*', '') }}
     --target
     {{ item['Request Parameters']['Build Target'] }}
-  changed_when: False
+  changed_when: false
   with_items: "{{ build_package_koji_task_data }}"
   when: build_package_build_system == 'koji' and build_package_waitrepo|bool

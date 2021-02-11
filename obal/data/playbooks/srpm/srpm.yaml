@@ -2,6 +2,6 @@
 - hosts:
     - packages
   serial: 1
-  gather_facts: no
+  gather_facts: false
   roles:
     - build_srpm

@@ -17,9 +17,9 @@
   shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q "web:"'
   args:
     chdir: "{{ package_dir }}"
-  changed_when: False
+  changed_when: false
   register: setup_sources_search_annex
-  ignore_errors: yes
+  ignore_errors: true
   when: "( not setup_sources_source_exists.stat.exists ) or
     ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined
     and setup_sources_source_exists.stat.islnk )"
@@ -40,12 +40,12 @@
     '{{ setup_sources_source }}'
   args:
     chdir: "{{ package_dir }}"
-  ignore_errors: yes
+  ignore_errors: true
   when: setup_sources_search_annex is failed
 
 - name: 'Ensure no actual change happened'
   command: "git diff --exit-code {{ setup_sources_sourcebase }}"
-  changed_when: False
+  changed_when: false
   args:
     chdir: "{{ package_dir }}"
   when: setup_sources_remove_source is changed

@@ -4,3 +4,4 @@
   args:
     chdir: "{{ inventory_dir }}"
   run_once: true
+  changed_when: false
