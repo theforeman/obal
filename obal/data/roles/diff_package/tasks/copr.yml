@@ -10,21 +10,25 @@
       --with-latest-build
   register: copr_package_info
   ignore_errors: true
-  changed_when: False
+  changed_when: false
 
-- set_fact:
+- name: Set copr package info
+  set_fact:
     copr_package_info: "{{ copr_package_info.stdout | from_json }}"
   when: copr_package_info is successful
 
-- set_fact:
+- name: Set copr package version on success
+  set_fact:
     copr_package_version: "{{ copr_package_info['name'] + '-' + copr_package_info['latest_build']['pkg_version'] }}"
   when: copr_package_info is successful and 'latest_build' in copr_package_info
 
-- set_fact:
+- name: Set copr package version on failure
+  set_fact:
     copr_package_version: ""
   when: copr_package_info is failed or 'latest_build' not in copr_package_info
 
-- set_fact:
+- name: Set diff package changed state
+  set_fact:
     diff_package_changed: "{{ not copr_package_version.startswith(git_package_version) }}"
 
 - debug:

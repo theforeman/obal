@@ -5,5 +5,5 @@
 
 - name: 'Set diff_package_changed to True when skipping package diffs'
   set_fact:
-    diff_package_changed: True
+    diff_package_changed: true
   when: diff_package_skip

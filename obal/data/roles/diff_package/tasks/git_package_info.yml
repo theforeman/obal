@@ -8,7 +8,8 @@
       --srpm
       {{ spec_file_path }}
   register: git_package_info
-  changed_when: False
+  changed_when: false
 
-- set_fact:
+- name: Set git package version
+  set_fact:
     git_package_version: "{{ git_package_info.stdout }}"

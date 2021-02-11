@@ -1,10 +1,6 @@
 use_default_rules: true
-rulesdir:
-  - ./rules/
-skip_list:
-  - ANSIBLE0006
-  - ANSIBLE0012
-  - '701'
-  - '405'
-  - '306'
 parseable: true
+skip_list:
+  - meta-no-info
+  - risky-shell-pipe
+  - command-instead-of-module

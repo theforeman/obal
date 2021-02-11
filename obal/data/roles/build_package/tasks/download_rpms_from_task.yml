@@ -1,11 +1,13 @@
 - block:
-    - set_fact:
+    - name: Define download directory
+      set_fact:
         download_dir: "{{ inventory_dir }}/downloaded_rpms/{{ item['Request Parameters']['Build Target'].split('-')[-1] }}"
 
     - name: 'Create RPM downloads directory'
       file:
         state: directory
         path: "{{ download_dir }}"
+        mode: 0775
 
     - name: "Download {{ build_package_koji_command }} RPM(s)"
       command: "{{ build_package_koji_command }} download-task --arch=noarch --arch=x86_64 {{ item['Task'] }}"

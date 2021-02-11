@@ -15,7 +15,8 @@
     koji_executable: "{{ koji_executable|default('koji') }}"
   register: build_exists
 
-- set_fact:
+- name: Set diff_package_changed
+  set_fact:
     diff_package_changed: "{{ diff_package_changed|default(false) or not build_exists.exists }}"
 
 - debug:

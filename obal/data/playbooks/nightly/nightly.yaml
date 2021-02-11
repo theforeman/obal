@@ -2,7 +2,7 @@
 - hosts:
     - packages
   serial: 1
-  gather_facts: no
+  gather_facts: false
   vars:
     build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
   roles:
@@ -52,7 +52,7 @@
             path: "{{ nightly_specfile_path }}"
             line: "{{ global_nightly_macro }}"
             insertbefore: BOF
-            backup: yes
+            backup: true
           register: original_specfile
 
         - import_role:

@@ -14,7 +14,7 @@
 - name: Find all downloaded repositories
   find:
     paths: "{{ inventory_dir }}/downloaded_rpms"
-    recurse: no
+    recurse: false
     file_type: directory
   register: downloaded_rpms_folders
 
@@ -25,7 +25,7 @@
 - name: Run repoclosure for all dists
   include_tasks: repoclosure.yml
   vars:
-    repoclosure_use_downloaded_rpms: True
+    repoclosure_use_downloaded_rpms: true
   loop: "{{ downloaded_rpms_dists }}"
   loop_control:
     loop_var: dist
@@ -36,7 +36,7 @@
 - name: Run repoclosure for main repo
   include_tasks: repoclosure.yml
   vars:
-    repoclosure_use_downloaded_rpms: False
+    repoclosure_use_downloaded_rpms: false
   loop:
     - "{{ repoclosure_target_dist }}"
   loop_control:

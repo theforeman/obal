@@ -2,7 +2,7 @@
 - hosts:
     - packages
   serial: 1
-  gather_facts: no
+  gather_facts: false
   roles:
     - git_annex_setup
     - spec_file
@@ -13,7 +13,7 @@
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: old_source_urls
       when: old_source_urls is not defined
-      changed_when: False
+      changed_when: false
 
     - name: "Remove old sources"
       command: "git rm --ignore-unmatch {{ item | basename }}"
@@ -33,7 +33,7 @@
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       register: new_source_urls
       when: new_source_urls is not defined
-      changed_when: False
+      changed_when: false
 
     - name: 'Git annex add new sources'
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
@@ -53,7 +53,7 @@
 
 - hosts:
     - packages
-  gather_facts: no
+  gather_facts: false
   tasks:
     - when: commit is defined and commit
       block:
@@ -61,14 +61,14 @@
           command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
           args:
             chdir: "{{ inventory_dir }}"
-          changed_when: False
+          changed_when: false
           register: updated_version
 
         - name: 'Get current git branch'
           command: "git rev-parse --abbrev-ref HEAD"
           args:
             chdir: "{{ inventory_dir }}"
-          changed_when: False
+          changed_when: false
           register: git_branch
           run_once: true
 
