@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=0
 ARG VERSION=master
 ARG REPO=theforeman/obal.git
 
-RUN pip install -U pip
+RUN pip install -U 'pip<21'
 RUN pip install git+https://github.com/${REPO}@${VERSION}
 RUN obal setup
 
