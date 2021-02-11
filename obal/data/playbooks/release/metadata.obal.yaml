@@ -1,3 +1,4 @@
+---
 help: |
   This action releases a package to Koji/Brew/Copr
 
