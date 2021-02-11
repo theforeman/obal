@@ -1,3 +1,4 @@
+---
 help: |
   This action builds SRPMs for each package specified and then uses mock to attempt to build RPMs locally for each.
 variables:

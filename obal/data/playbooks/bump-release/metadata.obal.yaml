@@ -1,3 +1,4 @@
+---
 help: |
   This action updates a spec file's release field and adds a pre-formatted changelog entry.
 variables:
