@@ -1,0 +1,29 @@
+---
+- name: 'Get updated version from spec'
+  command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
+  args:
+    chdir: "{{ inventory_dir }}"
+  changed_when: false
+  register: updated_version
+
+- name: 'Get current git branch'
+  command: "git rev-parse --abbrev-ref HEAD"
+  args:
+    chdir: "{{ inventory_dir }}"
+  changed_when: false
+  register: git_branch
+  run_once: true
+
+- name: 'Create git branch'
+  command: "git checkout -b {{ git_branch.stdout }}-update-{{ inventory_hostname }}-{{ updated_version.stdout }}"
+  args:
+    chdir: "{{ inventory_dir }}"
+  run_once: true
+  changed_when: true
+
+- name: 'Create git commit'
+  command: "git commit -a -m 'Update {{ inventory_hostname }} to {{ updated_version.stdout }}'"
+  args:
+    chdir: "{{ inventory_dir }}"
+  run_once: true
+  changed_when: true
