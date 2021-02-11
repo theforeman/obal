@@ -12,4 +12,4 @@
       command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"{{ changelog }}\""
       args:
         chdir: "{{ spec_file_path | dirname }}"
-      changed_when: false
+      changed_when: true
