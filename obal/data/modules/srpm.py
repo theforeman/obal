@@ -47,6 +47,9 @@ def copy_sources(spec_file, package_dir, sources_dir):
         if not source:
             continue
 
+        if not source.startswith('Source') and not source.startswith('Patch'):
+            continue
+
         source_link = source.split(' ')[1]
 
         if not source_link.startswith('http'):
