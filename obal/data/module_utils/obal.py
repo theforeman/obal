@@ -75,3 +75,25 @@ def get_whitelist_status(build_command, tag, package):
     ]
     retcode = subprocess.call(cmd)
     return retcode == 0
+
+
+def get_specfile_sources(specfile):
+    """
+    Get a list of sources and patches from a specfile
+
+    Returns the filenames or URLs as an array
+    """
+    sources = run_command(["spectool", "--list-files", specfile])
+    return [source.split(' ')[1] for source in sources.split("\n")
+            if source and (source.startswith('Source') or source.startswith('Patch'))]
+
+
+def run_command(command):
+    """
+    Run a system command
+    """
+    return subprocess.check_output(
+        command,
+        universal_newlines=True,
+        stderr=subprocess.STDOUT
+    )
