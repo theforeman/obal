@@ -5,11 +5,16 @@ Build SRPM
 import shutil
 import os
 import subprocess
+from zipfile import ZipFile
 from contextlib import contextmanager
-from tempfile import mkdtemp
+from tempfile import mkdtemp, TemporaryFile
+
+from ansible.module_utils.six.moves.urllib.request import urlopen # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.six.moves.urllib.error import HTTPError # pylint:disable=import-error,no-name-in-module
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.obal import run_command, get_specfile_sources # pylint:disable=import-error,no-name-in-module
+
 
 @contextmanager
 def chdir(directory):
@@ -54,6 +59,32 @@ def copy_sources(spec_file, package_dir, sources_dir):
             run_command(["git-annex", "lock", "--force"])
 
 
+def fetch_remote_sources(source_location, source_system, sources_dir):
+    """
+    Copy RPM sources from a remote source like Jenkins to rpmbuild environment
+    """
+    source_system_urls = {
+        'jenkins': '{}/lastSuccessfulBuild/artifact/*zip*/archive.zip',
+    }
+
+    url = source_system_urls[source_system].format(source_location)
+    request = urlopen(url)
+
+    try:
+        archive = TemporaryFile()
+        archive.write(request.read())
+
+        with ZipFile(archive) as zip_file:
+            for zip_info in zip_file.infolist():
+                if zip_info.filename[-1] == '/':
+                    continue
+
+                zip_info.filename = os.path.basename(zip_info.filename)
+                zip_file.extract(zip_info, sources_dir)
+    finally:
+        archive.close()
+
+
 def main():
     """
     Build a package using tito
@@ -63,12 +94,16 @@ def main():
             package=dict(type='str', required=False),
             scl=dict(type='str', required=False),
             output=dict(type='path', required=False),
+            source_location=dict(type='str', required=False),
+            source_system=dict(type='str', required=False),
         )
     )
 
     package = module.params['package']
     output = module.params['output']
     scl = module.params['scl']
+    source_location = module.params['source_location']
+    source_system = module.params['source_system']
 
     spec_file = os.path.join(package, '%s.spec' % os.path.basename(package))
 
@@ -79,6 +114,14 @@ def main():
 
         os.mkdir(sources_dir)
         os.mkdir(build_dir)
+
+        if source_location:
+            try:
+                fetch_remote_sources(source_location, source_system, sources_dir)
+            except HTTPError as error:
+                module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
+            except KeyError as error:
+                module.fail_json(msg="Unknown source_system specified.", output=error)
 
         copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
