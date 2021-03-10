@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from tempfile import mkdtemp
 
 from ansible.module_utils.basic import AnsibleModule
-
+from ansible.module_utils.obal import run_command, get_specfile_sources # pylint:disable=import-error,no-name-in-module
 
 @contextmanager
 def chdir(directory):
@@ -25,35 +25,15 @@ def chdir(directory):
         os.chdir(old)
 
 
-def run_command(command):
-    """
-    Run a system command
-    """
-    return subprocess.check_output(
-        command,
-        universal_newlines=True,
-        stderr=subprocess.STDOUT
-    )
-
-
 def copy_sources(spec_file, package_dir, sources_dir):
     """
     Copy RPM sources to rpmbuild environment
     """
-    command = ["spectool", "--list-files", spec_file]
-    sources = run_command(command)
+    sources = get_specfile_sources(spec_file)
 
-    for source in sources.split("\n"):
-        if not source:
-            continue
-
-        if not source.startswith('Source') and not source.startswith('Patch'):
-            continue
-
-        source_link = source.split(' ')[1]
-
-        if not source_link.startswith('http'):
-            shutil.copy(os.path.join(package_dir, source_link), sources_dir)
+    for source in sources:
+        if not source.startswith('http'):
+            shutil.copy(os.path.join(package_dir, source), sources_dir)
 
     with chdir(package_dir):
         run_command(["git-annex", "lock"])
