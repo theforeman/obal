@@ -4,3 +4,5 @@ skip_list:
   - meta-no-info
   - risky-shell-pipe
   - command-instead-of-module
+  - no-handler
+  - unnamed-task
