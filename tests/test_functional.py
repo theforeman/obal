@@ -169,7 +169,6 @@ def test_obal_release_upstream_hello():
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
-        "koji wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -204,8 +203,8 @@ def test_obal_release_upstream_hello_nowait():
 
 
 @obal_cli_test(repotype='upstream')
-def test_obal_release_upstream_hello_nowaitrepo():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=False'])
+def test_obal_release_upstream_hello_waitrepo():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -214,6 +213,7 @@ def test_obal_release_upstream_hello_nowaitrepo():
         "tito release --yes dist-git",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
+        "koji wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -226,7 +226,6 @@ def test_obal_nightly_upstream_hello():
         "tito release --yes dist-git --arg jenkins_job=hello-master-release",
         "koji watch-task 1234",
         "koji taskinfo -v 1234",
-        "koji wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -328,9 +327,6 @@ def test_obal_release_downstream_hello():
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
         "brew taskinfo -v 1234",
-        # the build and target in the next command are "wrong" because the
-        # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -347,9 +343,6 @@ def test_obal_release_downstream_hello_wait_download_logs():
         "brew watch-task 1234",
         "brew download-logs -r 1234",
         "brew taskinfo -v 1234",
-        # the build and target in the next command are "wrong" because the
-        # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
@@ -365,17 +358,14 @@ def test_obal_release_downstream_hello_wait_download_rpms():
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
         "brew taskinfo -v 1234",
-        # the build and target in the next command are "wrong" because the
-        # output from our mocked brew is not dynamic
-        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7",
         "brew download-task --arch=noarch --arch=x86_64 1234",
         "createrepo {pwd}/downloaded_rpms/rhel7",
     ]
     assert_mockbin_log(expected_log)
 
 @obal_cli_test(repotype='downstream')
-def test_obal_release_downstream_hello_nowaitrepo():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=False'])
+def test_obal_release_downstream_hello_waitrepo():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -384,6 +374,9 @@ def test_obal_release_downstream_hello_nowaitrepo():
         "tito release --yes obaltest-dist-git-rhel-7",
         "brew watch-task 1234",
         "brew taskinfo -v 1234",
+        # the build and target in the next command are "wrong" because the
+        # output from our mocked brew is not dynamic
+        "brew wait-repo --build=hello-2.10-1.el7 --target obaltest-nightly-rhel7"
     ]
     assert_mockbin_log(expected_log)
 
