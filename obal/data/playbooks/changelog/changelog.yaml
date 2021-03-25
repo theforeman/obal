@@ -9,4 +9,4 @@
     - name: 'ensure changelog'
       changelog:
         spec: "{{ spec_file_path }}"
-        changelog: "{{ changelog | default('- rebuilt') }}"
+        entry: "{{ changelog | default('- rebuilt') }}"

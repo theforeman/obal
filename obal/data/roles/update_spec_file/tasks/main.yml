@@ -61,5 +61,5 @@
 - name: 'add changelog entry'
   changelog:
     spec: "{{ spec_file_path }}"
-    changelog: "{{ changelog }}"
+    entry: "{{ changelog }}"
   when: changelog is defined
