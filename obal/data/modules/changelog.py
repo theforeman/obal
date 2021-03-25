@@ -35,12 +35,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             spec=dict(required=True),
-            changelog=dict(default='- rebuilt')
+            entry=dict(required=False)
         )
     )
 
     spec = module.params['spec']
-    changelog = module.params['changelog']
+    entry = module.params['entry']
 
     user = subprocess.check_output(['rpmdev-packager'], universal_newlines=True).strip()
     evr = get_specfile_evr(spec)
@@ -50,22 +50,27 @@ def main():
 
     changed = False
 
-    if not changelog.startswith('-'):
-        changelog = '- ' + changelog
+    if entry and not entry.startswith('-'):
+        entry = '- ' + entry
 
     for i, line in enumerate(lines):
         if line.startswith("%changelog"):
-            with en_locale():
-                date = time.strftime("%a %b %d %Y", time.gmtime())
-            entry = "* %s %s - %s\n%s\n\n" % (date, user, evr, changelog)
-            lines[i] += entry
-            changed = True
+            if entry:
+                with en_locale():
+                    date = time.strftime("%a %b %d %Y", time.gmtime())
+                entry = "* %s %s - %s\n%s\n\n" % (date, user, evr, entry)
+                lines[i] += entry
+                changed = True
+            changelog = lines[i+1:]
             break
 
-    with open(spec, "w") as spec_file:
-        spec_file.writelines(lines)
+    if changed:
+        with open(spec, "w") as spec_file:
+            spec_file.writelines(lines)
 
-    module.exit_json(changed=changed)
+    changelog = ''.join(changelog).rstrip()
+
+    module.exit_json(changed=changed, changelog=changelog)
 
 
 if __name__ == '__main__':
