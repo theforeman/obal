@@ -84,7 +84,7 @@
 
     - name: 'Set default changelog'
       set_fact:
-        changelog: '- Release {{ inventory_hostname }} {{ version }}'
+        changelog: '- Release {{ inventory_hostname }} {{ version }}{{ prerelease | default("") }}'
       when:
         - changelog is not defined
         - version is defined
