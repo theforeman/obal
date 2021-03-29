@@ -6,7 +6,7 @@
   vars:
     changelog: rebuilt
   roles:
-    - spec_file
+    - spec_file_path
   tasks:
     - name: 'Bump release'
       command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"{{ changelog }}\""

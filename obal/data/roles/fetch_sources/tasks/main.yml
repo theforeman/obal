@@ -69,7 +69,7 @@
 
 - block:
     - include_role:
-        name: spec_file
+        name: spec_file_path
 
     - name: 'Set setup flag'
       set_fact:
