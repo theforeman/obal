@@ -1,6 +1,6 @@
 usage: obal update [-h] [-v] [-e EXTRA_VARS] [--changelog CHANGELOG]
                    [--commit] [--prerelease PRERELEASE] [--release RELEASE]
-                   [--version VERSION]
+                   [--template TEMPLATE] [--version VERSION]
                    target [target ...]
 
 Update a package to a newer version
@@ -35,6 +35,7 @@ optional arguments:
                         the prerelease macro will be removed
   --release RELEASE     Optionally set the release. When unspecified, the
                         release will be set to 1
+  --template TEMPLATE   The template to use
   --version VERSION     Optionally update to an explicit version. When
                         unspecified, the latest version from the upstream will
                         be used

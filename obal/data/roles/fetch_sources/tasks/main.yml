@@ -1,5 +1,10 @@
 ---
-- block:
+- when:
+    - upstream is defined
+    - upstream.endswith('.git')
+    - upstream_files is defined
+    - version is not defined
+  block:
     - name: 'Extract upstream directory'
       set_fact:
         upstream_directory: "{{ upstream.split('/')[-1] }}"
@@ -17,18 +22,18 @@
         src: "{{ obal_tmp_dir }}/{{ upstream_directory }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when:
-    - upstream is defined
-    - upstream.endswith('.git')
-    - upstream_files is defined
-    - version is not defined
   rescue:
     - name: 'Remove package directory'
       file:
         state: 'absent'
         path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- block:
+- when:
+    - upstream is defined
+    - upstream.endswith('src.rpm')
+    - upstream_files is defined
+    - version is not defined
+  block:
     - name: 'Make package download directory'
       file:
         state: 'directory'
@@ -56,43 +61,8 @@
         src: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when:
-    - upstream is defined
-    - upstream.endswith('src.rpm')
-    - upstream_files is defined
-    - version is not defined
   rescue:
     - name: 'Remove package directory'
       file:
         state: 'absent'
         path: "./{{ package_base_dir }}/{{ inventory_hostname }}"
-
-- block:
-    - include_role:
-        name: spec_file
-
-    - name: 'Set setup flag'
-      set_fact:
-        setup_sources_flags: '-f'
-
-    - name: 'Set release'
-      set_fact:
-        release: '1'
-      when:
-        - release is not defined
-        - version is defined
-
-    - name: 'Set default changelog'
-      set_fact:
-        changelog: '- Release {{ inventory_hostname }} {{ version }}{{ prerelease | default("") }}'
-      when:
-        - changelog is not defined
-        - version is defined
-
-    - name: 'update spec file'
-      include_role:
-        name: update_spec_file
-
-    - name: 'update source files'
-      include_role:
-        name: setup_sources

@@ -27,3 +27,5 @@ variables:
   commit:
     help: When true, creates a git branch and commits the update changes to it.
     action: store_true
+  template:
+    help: The template to use

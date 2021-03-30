@@ -23,9 +23,37 @@
       when:
         - "'://' in item"
 
-    - name: 'Fetch sources'
+    - name: 'fetch sources'
       include_role:
         name: fetch_sources
+
+    - name: 'update spec file'
+      include_role:
+        name: update_spec_file
+
+    - name: 'update source files'
+      include_role:
+        name: setup_sources
+
+    - when:
+        - template is defined
+        - "'rubygem' in inventory_hostname"
+      block:
+        - name: Read changelog
+          changelog:
+            spec: "{{ spec_file_path }}"
+          register: changelog
+
+        - name: Run spec update template
+          shell: "gem2rpm -o {{ spec_file_path }} -t {{ template }} {{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/*.gem"
+          args:
+            chdir: "{{ inventory_dir }}"
+
+        - name: Add back changelog
+          lineinfile:
+            path: "{{ spec_file_path }}"
+            insertafter: "%changelog"
+            line: "{{ changelog.changelog }}"
 
     - name: Determine new source file from spec
       shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
@@ -50,6 +78,41 @@
       with_items: "{{ new_source_urls.stdout_lines | list }}"
       when:
         - "'://' not in item"
+
+    - name: Check for updates
+      command: "git status --porcelain {{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      register: git_status
+      args:
+        chdir: "{{ inventory_dir }}"
+      changed_when: false
+
+    - when: git_status.stdout
+      block:
+        - name: 'Bump release'
+          command: "rpmdev-bumpspec {{ spec_file_path | basename }} -c \"Update spec file\""
+          args:
+            chdir: "{{ spec_file_path | dirname }}"
+          changed_when: true
+          when: version is not defined
+
+        - name: 'Reset release in specfile'
+          replace:
+            path: "{{ spec_file_path }}"
+            regexp: '^(?P<prefix>{{ item }}\s+)[0-9.]+(?P<suffix>.*)$'
+            replace: '\g<prefix>1\g<suffix>'
+          with_items:
+            - 'Release:'
+            - '%global _release'
+            - '%global release'
+          when:
+            - version is defined
+            - release is not defined
+
+        - name: 'Add changelog entry'
+          changelog:
+            spec: "{{ spec_file_path }}"
+            entry: "Release {{ version }}"
+          when: version is defined
 
 - hosts:
     - packages

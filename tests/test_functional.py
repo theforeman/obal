@@ -393,7 +393,7 @@ def test_obal_update_upstream_hello():
 
     assert 'Version:        2.8' in specfilecontent
     assert 'Release:        1' in specfilecontent
-    assert '- Release hello 2.8' in specfilecontent
+    assert '- Release 2.8' in specfilecontent
     assert '%global prerelease' not in specfilecontent
 
 
@@ -410,7 +410,7 @@ def test_obal_update_upstream_hello_prerelease():
 
     assert 'Version:        2.8' in specfilecontent
     assert 'Release:        1' in specfilecontent
-    assert '- Release hello 2.8' in specfilecontent
+    assert '- Release 2.8' in specfilecontent
     assert '%global prereleasesource rc1' in specfilecontent
 
 
@@ -427,7 +427,7 @@ def test_obal_update_upstream_hello_keeprelease():
 
     assert 'Version:        2.8' in specfilecontent
     assert 'Release:        2' in specfilecontent
-    assert '- Release hello 2.8' in specfilecontent
+    assert '- Release 2.8' in specfilecontent
 
 
 @obal_cli_test(repotype='downstream')
@@ -471,7 +471,7 @@ def test_obal_update_downstream_with_version_hello():
     assert 'Version:        2.10' in specfilecontent
     assert 'Source0:        http://ftp.gnu.org/gnu' in specfilecontent
     assert 'Version:        2.9' not in specfilecontent
-    assert '- Release hello' in specfilecontent
+    assert '- Release 2.10' in specfilecontent
 
 
 @obal_cli_test(repotype='empty')
