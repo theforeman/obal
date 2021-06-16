@@ -70,8 +70,7 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
     url = source_system_urls[source_system].format(source_location)
     request = urlopen(url)
 
-    try:
-        archive = TemporaryFile()
+    with TemporaryFile() as archive:
         archive.write(request.read())
 
         with ZipFile(archive) as zip_file:
@@ -81,8 +80,6 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
 
                 zip_info.filename = os.path.basename(zip_info.filename)
                 zip_file.extract(zip_info, sources_dir)
-    finally:
-        archive.close()
 
 
 def main():
