@@ -6,3 +6,5 @@ skip_list:
   - command-instead-of-module
   - no-handler
   - unnamed-task
+warn_list:
+  - ignore-errors
