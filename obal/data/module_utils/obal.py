@@ -58,12 +58,15 @@ def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
     return specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
 
 
-def get_whitelist_status(build_command, tag, package):
+def package_exists(build_command, tag, package):
     """
-    Get whitelist status of a given package within a tag.
+    Check if package exists within a tag.
 
-    Return `True` if the package is whitelisted, `False` otherwise.
+    Return `True` if the package added to the tag, `False` otherwise.
     """
+    if not build_command:
+        build_command = 'koji'
+
     cmd = [
         build_command,
         'list-pkgs',

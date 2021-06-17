@@ -174,16 +174,16 @@ def test_obal_release_upstream_hello():
 
 
 @obal_cli_test(repotype='upstream')
-def test_obal_release_upstream_hello_whitelist_check():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_whitelist_check=true'])
+def test_obal_release_upstream_hello_tag_check():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_tag_check=true'])
 
     expected_log_entry = "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet"
     assert_in_mockbin_log(expected_log_entry)
 
 
 @obal_cli_test(repotype='upstream')
-def test_obal_release_upstream_hello_no_whitelist_check():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_whitelist_check=false'])
+def test_obal_release_upstream_hello_no_tag_check():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_tag_check=false'])
 
     unexpected_log_entry = "koji list-pkgs --tag obaltest-nightly-rhel7 --package hello --quiet"
     assert_not_in_mockbin_log(unexpected_log_entry)
@@ -231,16 +231,16 @@ def test_obal_nightly_upstream_hello():
 
 
 @obal_cli_test(repotype='downstream')
-def test_obal_release_downstream_hello_whitelist_check():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_whitelist_check=true'])
+def test_obal_release_downstream_hello_tag_check():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_tag_check=true'])
 
     expected_log_entry = "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet"
     assert_in_mockbin_log(expected_log_entry)
 
 
 @obal_cli_test(repotype='downstream')
-def test_obal_release_downstream_hello_no_whitelist_check():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_whitelist_check=false'])
+def test_obal_release_downstream_hello_no_tag_check():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_koji_tag_check=false'])
 
     unexpected_log_entry = "brew list-pkgs --tag obaltest-dist-git-rhel-7 --package hello --quiet"
     assert_not_in_mockbin_log(unexpected_log_entry)

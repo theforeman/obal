@@ -8,13 +8,7 @@ except ImportError:
 import os
 
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=C0413
-from ansible.module_utils.obal import get_specfile_name, get_whitelist_status  # pylint:disable=import-error,no-name-in-module
-
-ANSIBLE_METADATA = {
-    'metadata_version': '1.2',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
+from ansible.module_utils.obal import get_specfile_name, package_exists  # pylint:disable=import-error,no-name-in-module
 
 
 def run_module():
@@ -31,7 +25,7 @@ def run_module():
         changed=False,
         branches=[],
         autobuild_tags=[],
-        whitelist_status=dict(),
+        status=dict(),
     )
 
     releasers_config = module.params['releasers_conf']
@@ -56,13 +50,12 @@ def run_module():
     if not result['branches'] and not result['autobuild_tags']:
         module.fail_json(msg="No branches or autobuild_tags were found mapped to {}.".format(module.params['releasers']), **result)
 
-    # check whitelist status
     for tag in result['branches'] + result['autobuild_tags']:
-        status = get_whitelist_status(module.params['build_command'], tag, package_name)
-        result['whitelist_status'][tag] = status
+        status = package_exists(module.params['build_command'], tag, package_name)
+        result['status'][tag] = status
 
-    if not all(result['whitelist_status'].values()):
-        module.fail_json(msg="Package has not been whitelisted for given branches and autobuild_tags", **result)
+    if not all(result['status'].values()):
+        module.fail_json(msg="Package has not been added to given branches and autobuild_tags", **result)
 
     module.exit_json(**result)
 
