@@ -14,7 +14,7 @@ variables:
     parameter: --scratch
     action: store_true
     help: Set --scratch for scratch builds.
-  build_package_koji_whitelist_check:
+  build_package_koji_tag_check:
     action: store_false
-    parameter: --skip-koji-whitelist-check
-    help: ignore koji whitelist check and release the package anyway
+    parameter: --skip-koji-tag-check
+    help: Ignore koji tag check and release the package anyway

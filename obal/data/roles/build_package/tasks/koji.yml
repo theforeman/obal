@@ -1,11 +1,11 @@
 ---
-- name: "Confirm package is whitelisted"
-  package_whitelist_check:
+- name: "Confirm package is add to the tag"
+  package_tag_check:
     releasers_conf: "{{ inventory_dir }}/rel-eng/releasers.conf"
     spec_file_path: "{{ spec_file_path }}"
     releasers: "{{ releasers }}"
     build_command: "{{ build_package_koji_command }}"
-  when: build_package_koji_whitelist_check | bool
+  when: build_package_koji_tag_check | bool
 
 - name: 'Set tito_releasers for brew scratch'
   set_fact:
