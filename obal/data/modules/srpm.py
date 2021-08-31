@@ -123,7 +123,11 @@ def main():
                 module.fail_json(msg="Unknown source_system specified.",
                     source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
 
-        copy_sources(spec_file, package, sources_dir)
+        try:
+            copy_sources(spec_file, package, sources_dir)
+        except subprocess.CalledProcessError as error:
+            module.fail_json(msg='Failed to build srpm', output=error.output)
+
         shutil.copy(spec_file, base_dir)
 
         command = ['rpmbuild', '-bs']
@@ -153,8 +157,6 @@ def main():
         path = os.path.join(output, os.path.basename(result))
 
         module.exit_json(changed=True, path=path)
-    except subprocess.CalledProcessError as error:
-        module.fail_json(msg='Failed to build srpm', output=error.output)
     finally:
         shutil.rmtree(base_dir)
 
