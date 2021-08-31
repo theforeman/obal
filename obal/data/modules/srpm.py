@@ -15,6 +15,11 @@ from ansible.module_utils.six.moves.urllib.error import HTTPError # pylint:disab
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.obal import run_command, get_specfile_sources # pylint:disable=import-error,no-name-in-module
 
+SOURCE_SYSTEM_URLS = {
+    'jenkins': '{}/lastSuccessfulBuild/artifact/*zip*/archive.zip',
+}
+VALID_SOURCE_SYSTEMS = list(SOURCE_SYSTEM_URLS.keys())
+
 
 @contextmanager
 def chdir(directory):
@@ -63,11 +68,8 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
     """
     Copy RPM sources from a remote source like Jenkins to rpmbuild environment
     """
-    source_system_urls = {
-        'jenkins': '{}/lastSuccessfulBuild/artifact/*zip*/archive.zip',
-    }
 
-    url = source_system_urls[source_system].format(source_location)
+    url = SOURCE_SYSTEM_URLS[source_system].format(source_location)
     request = urlopen(url)
 
     with TemporaryFile() as archive:
@@ -118,7 +120,8 @@ def main():
             except HTTPError as error:
                 module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
             except KeyError as error:
-                module.fail_json(msg="Unknown source_system specified.", output=error)
+                module.fail_json(msg="Unknown source_system specified.",
+                    source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
 
         copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
