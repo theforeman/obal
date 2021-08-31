@@ -64,6 +64,22 @@ def copy_sources(spec_file, package_dir, sources_dir):
             run_command(["git-annex", "lock", "--force"])
 
 
+def fetch_local_sources(source_location, source_system, sources_dir):
+    if source_system == 'local-bundle-rake':
+        command = ['bundle', 'exec', 'rake', 'pkg:generate_source']
+    elif source_system == 'local-rake':
+        command = ['rake', 'pkg:generate_source']
+    else:
+        raise ValueError("Unknown source system %s" % source_system)
+
+    with chdir(source_location):
+        output = run_command(command)
+
+        for line in output.splitlines():
+            if os.path.isfile(line):
+                shutil.copy(line, sources_dir)
+
+
 def fetch_remote_sources(source_location, source_system, sources_dir):
     """
     Copy RPM sources from a remote source like Jenkins to rpmbuild environment
@@ -115,18 +131,27 @@ def main():
         os.mkdir(build_dir)
 
         if source_location:
+            if source_system.startswith('local-'):
+                try:
+                    fetch_local_sources(source_location, source_system, sources_dir)
+                except ValueError:
+                    module.fail_json(msg="Unknown source_system specified.",
+                        source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
+                except subprocess.CalledProcessError as error:
+                    module.fail_json(msg='Failed fetch local sources', output=error.output)
+            else:
+                try:
+                    fetch_remote_sources(source_location, source_system, sources_dir)
+                except HTTPError as error:
+                    module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
+                except KeyError as error:
+                    module.fail_json(msg="Unknown source_system specified.",
+                        source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
+        else:
             try:
-                fetch_remote_sources(source_location, source_system, sources_dir)
-            except HTTPError as error:
-                module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
-            except KeyError as error:
-                module.fail_json(msg="Unknown source_system specified.",
-                    source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
-
-        try:
-            copy_sources(spec_file, package, sources_dir)
-        except subprocess.CalledProcessError as error:
-            module.fail_json(msg='Failed to build srpm', output=error.output)
+                copy_sources(spec_file, package, sources_dir)
+            except subprocess.CalledProcessError as error:
+                module.fail_json(msg='Failed to build srpm', output=error.output)
 
         shutil.copy(spec_file, base_dir)
 
