@@ -1,7 +1,7 @@
 ---
 - block:
     - name: "Watch {{ build_package_koji_command }} task(s)"
-      command: "{{ build_package_koji_command }} watch-task {{ build_package_tito_release.tasks | join(' ') }}"
+      command: "{{ build_package_koji_command }} watch-task {{ koji_tasks | join(' ') }}"
       ignore_errors: true
       register: build_package_koji_status
       changed_when: false
@@ -17,7 +17,7 @@
 
     - name: "Get {{ build_package_koji_command }} build detals"
       command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
-      with_items: "{{ build_package_tito_release.tasks }}"
+      with_items: "{{ koji_tasks }}"
       changed_when: false
       register: build_package_koji_task_info
 

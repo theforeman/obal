@@ -16,7 +16,7 @@ TESTREPO_DIR = os.path.join(FIXTURE_DIR, 'testrepo')
 MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin')
 MOCK_SOURCES_DIR = os.path.join(FIXTURE_DIR, 'mock_sources')
 
-DEFAULT_ARGS = []
+DEFAULT_ARGS = ['-e', 'srpm_directory="/tmp/SRPMs"']
 if os.environ.get('TRAVIS', None):
     DEFAULT_ARGS.extend(['-e', 'ansible_remote_tmp=/tmp/ansible-remote'])
 
@@ -133,7 +133,7 @@ def test_obal_check_upstream_hello():
 
 
 @obal_cli_test(repotype='upstream')
-def test_obal_scratch_upstream_hello():
+def test_obal_scratch_with_tito_upstream_hello():
     assert_obal_success(['scratch', 'hello'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
@@ -147,13 +147,78 @@ def test_obal_scratch_upstream_hello():
 
 
 @obal_cli_test(repotype='upstream')
-def test_obal_scratch_upstream_hello_nowait():
+def test_obal_scratch_with_tito_upstream_hello_nowait():
     assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
         "tito release --yes --scratch dist-git"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_with_koji_upstream_hello():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_use_koji_build=true'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
+    ]
+    assert_mockbin_log(expected_log)
+    assert os.path.exists('/tmp/SRPMs/hello-2.10-2.src.rpm')
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_with_koji_upstream_hello_nowait():
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False', '-e', 'build_package_use_koji_build=true'])
+
+    assert os.path.exists('packages/hello/hello-2.10.tar.gz')
+
+    expected_log = [
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch"
+    ]
+    assert_mockbin_log(expected_log)
+    assert os.path.exists('/tmp/SRPMs/hello-2.10-2.src.rpm')
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_release_with_koji_upstream_hello():
+    assert_obal_success(['release', 'hello', '-e', 'build_package_use_koji_build=true'])
+
+    expected_log = [
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
+        "koji latest-build --quiet obaltest-nightly-rhel7 hello",
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_with_koji_upstream_build_failure():
+    assert_obal_success(['release', 'package-with-existing-build', '-e', 'build_package_use_koji_build=true'])
+
+    expected_log = [
+        "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build",
+        "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_with_koji_upstream_whitelist_check():
+    assert_obal_success(['release', 'package-with-existing-build', '-e', 'build_package_use_koji_build=true', '-e', 'build_package_koji_whitelist_check=true'])
+
+    expected_log = [
+        "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build",
+        "koji list-pkgs --tag obaltest-nightly-rhel7 --package package-with-existing-build --quiet",
+        "koji latest-build --quiet obaltest-nightly-rhel7 package-with-existing-build"
     ]
     assert_mockbin_log(expected_log)
 

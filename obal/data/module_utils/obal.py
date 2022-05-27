@@ -78,6 +78,7 @@ def get_whitelist_status(build_command, tag, package):
         package,
         '--quiet'
     ]
+
     try:
         koji(cmd, build_command)
         return True

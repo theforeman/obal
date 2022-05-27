@@ -1,0 +1,42 @@
+---
+- name: "Confirm package is whitelisted"
+  package_whitelist_check:
+    releasers_conf: "{{ inventory_dir }}/rel-eng/releasers.conf"
+    spec_file_path: "{{ spec_file_path }}"
+    releasers: "{{ releasers }}"
+    build_command: "{{ build_package_koji_command }}"
+  when: build_package_koji_whitelist_check | bool
+
+- name: 'Set tito_releasers for brew scratch'
+  set_fact:
+    build_package_tito_releasers: "{{ releasers | map('replace', 'dist-git', 'scratch') | list }}"
+  when: build_package_koji_command == 'brew' and build_package_scratch
+
+- name: 'Set tito_releasers'
+  set_fact:
+    build_package_tito_releasers: "{{ releasers }}"
+  when: build_package_koji_command != 'brew' or not build_package_scratch
+
+- name: 'Release to {{ build_package_koji_command }}'
+  tito_release:
+    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    arguments: "{{ build_package_tito_args }}"
+    scratch: "{{ build_package_scratch and build_package_koji_command != 'brew'}}"
+    test: "{{ build_package_test }}"
+    releasers: "{{ build_package_tito_releasers }}"
+    releaser_arguments: "{{ build_package_tito_releaser_args }}"
+  register: build_package_tito_release
+
+- name: 'Created tasks'
+  debug:
+    var: build_package_tito_release.task_urls
+
+- name: 'Wait for tasks to finish'
+  include_tasks: wait.yml
+  when: build_package_wait|bool
+  vars:
+    koji_tasks: "{{ build_package_tito_release.tasks }}"
+
+- name: 'Download task results'
+  include_tasks: download_rpms.yml
+  when: build_package_download_rpms|bool
