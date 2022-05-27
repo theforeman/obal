@@ -11,3 +11,4 @@ build_package_download_rpms: false
 build_package_waitrepo: false
 build_package_koji_whitelist_check: false
 build_package_tito_builder:
+build_package_use_koji_build: false

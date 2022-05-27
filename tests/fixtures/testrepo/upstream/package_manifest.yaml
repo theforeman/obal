@@ -15,6 +15,7 @@ packages:
       nightly_package_tito_releaser_args:
         - "jenkins_job=hello-master-release"
     foo: {}
+    package-with-existing-build: {}
 
 repoclosures:
   vars:

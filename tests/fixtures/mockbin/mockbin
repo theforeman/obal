@@ -113,10 +113,22 @@ elif prog in ['koji', 'brew']:
     parser_latest_build.add_argument('pkg')
     parser_latest_build.add_argument('--quiet', action='store_true')
 
+    parser_build = subparsers.add_parser('build')
+    parser_build.add_argument('tag')
+    parser_build.add_argument('pkg')
+    parser_build.add_argument('--scratch', action='store_true')
+
     parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
+
     if 'output' in args and args.output:
         print(args.output)
+
+    if 'build' in sys.argv:
+        print('Created task: 1234')
+
+    if 'package-with-existing-build' in sys.argv:
+        print('package-with-existing-build-1.0-1.el7')
 
 elif prog in ['copr-cli']:
     print({})
