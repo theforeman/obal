@@ -6,3 +6,4 @@ skip_list:
   - command-instead-of-module
   - no-handler
   - unnamed-task
+  - no-changed-when

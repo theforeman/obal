@@ -40,7 +40,7 @@
     '{{ setup_sources_source }}'
   args:
     chdir: "{{ package_dir }}"
-  ignore_errors: true
+  failed_when: false
   when: setup_sources_search_annex is failed
 
 - name: 'Ensure no actual change happened'
