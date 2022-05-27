@@ -31,7 +31,7 @@ def run_module():
         changed=False,
         branches=[],
         autobuild_tags=[],
-        whitelist_status=dict(),
+        whitelist_status={},
     )
 
     releasers_config = module.params['releasers_conf']
