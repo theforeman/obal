@@ -40,7 +40,7 @@ def get_changelog_evr(specfile):
         specfile
     ]
     evr = subprocess.check_output(cmd, universal_newlines=True)
-    return evr.split('\n', maxsplit=1)[0].split(" ")[-1]
+    return evr.splitlines()[0].split(" ")[-1]
 
 
 def get_specfile_evr(specfile):
