@@ -1,50 +1,75 @@
 ---
 - name: "Package name"
-  rpm_nevr:
+  rpm_nvr:
     spec_file: "{{ spec_file_path }}"
     scl: "{{ tag.scl | default(omit) }}"
     dist: "{{ tag.dist | default(omit) }}"
     macros: "{{ tag.macros | default(omit) }}"
-  register: package_nevr
+  register: package_nvr
 
-- name: create temporary build directory
-  tempfile:
-    state: directory
-    suffix: srpms
-  register: srpm_directory
-  when: srpm_directory is not defined
-
-- name: 'Build SRPM'
-  srpm:
-    package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-    output: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
-    scl: "{{ scl | default(omit) }}"
-    source_location: "{{ source_location | default(omit) }}"
-    source_system: "{{ source_system | default(omit) }}"
-  register: srpm_build
-
-- name: "Build package in Koji"
-  koji_build:
-    scratch: "{{ build_package_scratch }}"
+- name: Check build status
+  check_koji_build:
     tag: "{{ tag.name }}"
-    srpm: "{{ srpm_build.path }}"
-    package: "{{ package_nevr.name }}"
-    nevr: "{{ package_nevr.nevr }}"
+    nvr: "{{ package_nvr.nvr }}"
+    package: "{{ package_nvr.name }}"
     koji_executable: "{{ build_package_koji_command }}"
-    tag_check: "{{ build_package_koji_whitelist_check }}"
-  register: koji_build_tasks
+  register: build_exists
+  when: not build_package_scratch
 
-- name: 'Created tasks'
-  debug:
-    var: koji_build_tasks.task_urls
-  when: koji_build_tasks.changed
+- debug:
+    msg: "{{ build_exists }}"
 
-- name: 'Wait for tasks to finish'
-  include_tasks: wait.yml
-  when: build_package_wait|bool and koji_build_tasks.changed
-  vars:
-    koji_tasks: "{{ koji_build_tasks.tasks }}"
+- name: Tag package build into Koji tag
+  koji_tag_package:
+    tag: "{{ tag.name }}"
+    nvr: "{{ package_nvr.nvr }}"
+    koji_executable: "{{ koji_executable|default('koji') }}"
+  when:
+    - build_exists is not skipped
+    - not build_exists.exists_for_tag
+    - build_exists.exists
+    - not build_package_scratch
 
-- name: 'Download task results'
-  include_tasks: download_rpms.yml
-  when: build_package_download_rpms|bool
+- when: build_exists is skipped or not build_exists.exists
+  block:
+    - name: create temporary build directory
+      tempfile:
+        state: directory
+        suffix: srpms
+      register: srpm_directory
+      when: srpm_directory is not defined
+
+    - name: 'Build SRPM'
+      srpm:
+        package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        output: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
+        scl: "{{ scl | default(omit) }}"
+        source_location: "{{ source_location | default(omit) }}"
+        source_system: "{{ source_system | default(omit) }}"
+      register: srpm_build
+
+    - name: "Build package in Koji"
+      koji_build:
+        scratch: "{{ build_package_scratch }}"
+        tag: "{{ tag.name }}"
+        srpm: "{{ srpm_build.path }}"
+        package: "{{ package_nvr.name }}"
+        nevr: "{{ package_nvr.nvr }}"
+        koji_executable: "{{ build_package_koji_command }}"
+        tag_check: "{{ build_package_koji_whitelist_check }}"
+      register: koji_build_tasks
+
+    - name: 'Created tasks'
+      debug:
+        var: koji_build_tasks.task_urls
+      when: koji_build_tasks.changed
+
+    - name: 'Wait for tasks to finish'
+      include_tasks: wait.yml
+      when: build_package_wait|bool and koji_build_tasks.changed
+      vars:
+        koji_tasks: "{{ koji_build_tasks.tasks }}"
+
+    - name: 'Download task results'
+      include_tasks: download_rpms.yml
+      when: build_package_download_rpms|bool
