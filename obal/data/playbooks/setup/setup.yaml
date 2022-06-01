@@ -10,7 +10,7 @@
         name:
           - rpm-build
           - koji
-          - git-annex
+          - "{{ 'git-annex' if ansible_distribution_major_version == '7' else 'git-annex-standalone' }}"
           - tito
           - scl-utils
           - scl-utils-build
