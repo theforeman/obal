@@ -17,11 +17,12 @@
 
 - name: Set diff_package_changed
   set_fact:
-    diff_package_changed: "{{ diff_package_changed|default(false) or not build_exists.exists }}"
+    diff_package_changed: "{{ diff_package_changed|default(false) or not build_exists.exists_for_tag }}"
 
 - debug:
     msg:
       - "Tag: {{ tag.name }}"
       - "Git version: {{ package_nvr.nvr }}"
       - "Tagged version: {{ build_exists.tagged_version }}"
-      - "Build Exists: {{ build_exists.exists }}"
+      - "Build exists for tag: {{ build_exists.exists_for_tag }}"
+      - "Build exists: {{ build_exists.exists }}"
