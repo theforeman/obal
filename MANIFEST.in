@@ -5,5 +5,3 @@ include .coveragerc
 include .pylintrc
 recursive-include rules *.py
 exclude Dockerfile
-exclude .travis
-recursive-exclude .travis *
