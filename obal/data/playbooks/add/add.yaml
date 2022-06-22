@@ -32,7 +32,7 @@
             chdir: "{{ inventory_dir }}"
 
         - name: 'Git add new package'
-          command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/*"
+          command: "git -c annex.largefiles=nothing add ./{{ package_base_dir }}/{{ inventory_hostname }}/*"
           args:
             chdir: "{{ inventory_dir }}"
 
@@ -49,7 +49,7 @@
             chdir: "{{ inventory_dir }}"
 
         - name: 'Git add new package'
-          command: "git add ./{{ package_base_dir }}/{{ inventory_hostname }}/*"
+          command: "git -c annex.largefiles=nothing add ./{{ package_base_dir }}/{{ inventory_hostname }}/*"
           when: git_status.stdout | length > 0
           args:
             chdir: "{{ inventory_dir }}"
