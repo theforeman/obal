@@ -44,7 +44,7 @@
   when: setup_sources_search_annex is failed
 
 - name: 'Ensure no actual change happened'
-  command: "git diff --exit-code {{ setup_sources_sourcebase }}"
+  command: "git diff --exit-code -- {{ setup_sources_sourcebase }}"
   changed_when: false
   args:
     chdir: "{{ package_dir }}"
