@@ -3,6 +3,12 @@ Ansible module helper functions for obal modules
 """
 import subprocess
 
+try:
+    from ansible.module_utils.koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
+except ImportError:
+    # when trying to import this file outside the ansible context, we cannot rely on the magic ansible import path
+    from .koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
+
 
 def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None):
     """expand a given macro from a specfile"""
@@ -65,7 +71,6 @@ def get_whitelist_status(build_command, tag, package):
     Return `True` if the package is whitelisted, `False` otherwise.
     """
     cmd = [
-        build_command,
         'list-pkgs',
         '--tag',
         tag,
@@ -73,8 +78,11 @@ def get_whitelist_status(build_command, tag, package):
         package,
         '--quiet'
     ]
-    retcode = subprocess.call(cmd)
-    return retcode == 0
+    try:
+        koji(cmd, build_command)
+        return True
+    except KojiCommandError:
+        return False
 
 
 def get_specfile_sources(specfile):
