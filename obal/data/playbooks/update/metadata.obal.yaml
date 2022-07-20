@@ -27,3 +27,7 @@ variables:
   commit:
     help: When true, creates a git branch and commits the update changes to it.
     action: store_true
+  template:
+    help: The template to use for spec file updates
+  type:
+    help: The type of package being updated

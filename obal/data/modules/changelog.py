@@ -50,7 +50,7 @@ def main():
 
     changed = False
 
-    if entry and not entry.startswith('-'):
+    if entry is not None and not entry.startswith('-'):
         entry = '- ' + entry
 
     for i, line in enumerate(lines):

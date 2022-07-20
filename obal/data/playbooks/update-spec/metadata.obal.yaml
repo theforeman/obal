@@ -1,0 +1,11 @@
+help: |
+  Update a package's specfile based on a template
+
+    obal update-spec mypackage --type gem --template gem2rpm/scl.spec.erb
+variables:
+  template:
+    help: The template to use for updates
+  type:
+    help: The type of package being updated (e.g. gem)
+  strategy:
+    help: The strategy to use for an NPM package

@@ -58,8 +58,103 @@
     - release is defined
     - release != 'keep'
 
+- name: Set type
+  set_fact:
+    type: 'npm'
+  when: type is not defined and 'nodejs' in inventory_hostname
+
+- name: Set type
+  set_fact:
+    type: 'gem'
+  when: type is not defined and 'rubygem' in inventory_hostname
+
 - name: 'add changelog entry'
   changelog:
     spec: "{{ spec_file_path }}"
     entry: "{{ changelog }}"
   when: changelog is defined
+
+- name: Read changelog
+  changelog:
+    spec: "{{ spec_file_path }}"
+  register: changelog
+
+- when: type == 'tar'
+  block:
+    - import_role:
+        name: setup_sources
+
+- when: type == 'gem'
+  block:
+    - import_role:
+        name: setup_sources
+
+    - name: Run spec update template
+      shell: "gem2rpm -o {{ spec_file_path }} -t {{ template }} {{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/*-{{ version }}.gem"
+      args:
+        chdir: "{{ inventory_dir }}"
+
+    - name: Add back changelog
+      lineinfile:
+        path: "{{ spec_file_path }}"
+        insertafter: "%changelog"
+        line: "{{ changelog.changelog }}"
+
+- when: type == 'npm'
+  block:
+    - name: Find version
+      shell: "rpmspec --srpm -q --queryformat=%{version} {{ spec_file_path }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+      register: version_output
+      when: version is not defined
+
+    - name: Find release
+      shell: "rpmspec --srpm -q --queryformat=%{release} {{ spec_file_path }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+      register: release_output
+      when: release is not defined
+
+    - name: Set version
+      set_fact:
+        version: "{{ version_output.stdout }}"
+      when: version is not defined
+
+    - name: Set release
+      set_fact:
+        release: "{{ release_output.stdout }}"
+      when: release is not defined
+
+    - name: Find all sources to remove
+      find:
+        paths: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+        patterns: "*.tgz"
+        file_type: any
+      register: files_to_remove
+
+    - name: Remove old sources
+      file:
+        state: absent
+        path: "{{ item.path }}"
+      with_items: "{{ files_to_remove.files }}"
+
+    - name: Run spec update template
+      command: "npm2rpm -s {{ strategy | default('single') }} -n {{ name | default(inventory_hostname.replace('nodejs-', '')) }} -v {{ version }} -o . -c"
+      args:
+        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+
+    - name: Add release back
+      replace:
+        path: "{{ spec_file_path }}"
+        regexp: "Release: 1"
+        replace: "Release: {{ release }}"
+
+    - import_role:
+        name: setup_sources
+
+    - name: Add back changelog
+      lineinfile:
+        path: "{{ spec_file_path }}"
+        insertafter: "%changelog"
+        line: "{{ changelog.changelog }}"

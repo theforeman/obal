@@ -51,6 +51,14 @@
       when:
         - "'://' not in item"
 
+    - name: "Remove old sources"
+      command: "git rm --ignore-unmatch {{ item | basename }}"
+      args:
+        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      with_items: "{{ old_source_urls.stdout_lines | list }}"
+      when:
+        - "'://' in item"
+
 - hosts:
     - packages
   gather_facts: false
