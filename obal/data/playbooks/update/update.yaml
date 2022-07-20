@@ -5,7 +5,7 @@
   gather_facts: false
   roles:
     - git_annex_setup
-    - spec_file
+    - spec_file_path
   tasks:
     - name: Determine source file from spec
       shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"

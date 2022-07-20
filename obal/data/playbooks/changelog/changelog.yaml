@@ -4,7 +4,7 @@
   serial: 1
   gather_facts: false
   roles:
-    - spec_file
+    - spec_file_path
   tasks:
     - name: 'ensure changelog'
       changelog:
