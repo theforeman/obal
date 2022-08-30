@@ -90,6 +90,7 @@ def main():
         argument_spec=dict(
             package=dict(type='str', required=False),
             scl=dict(type='str', required=False),
+            macros=dict(type='dict', required=False, default={}),
             output=dict(type='path', required=False),
             source_location=dict(type='str', required=False),
             source_system=dict(type='str', required=False),
@@ -99,6 +100,7 @@ def main():
     package = module.params['package']
     output = module.params['output']
     scl = module.params['scl']
+    macros = module.params['macros']
     source_location = module.params['source_location']
     source_system = module.params['source_system']
 
@@ -133,6 +135,10 @@ def main():
 
         if scl:
             command += ['--define', 'scl %s' %  scl]
+
+        if macros is not None:
+            for (macro, value) in macros.items():
+                command += ['--define', '%s %s' % (macro, value)]
 
         command += [os.path.join(base_dir, '%s.spec' % os.path.basename(package))]
 
