@@ -83,7 +83,7 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
                 zip_file.extract(zip_info, sources_dir)
 
 
-def build_srpm(module, package, base_dir, sources_dir, scl=None):
+def build_srpm(module, package, base_dir, sources_dir, scl=None, macros=None):
     """
     Build the SRPM and return the path to the result
     """
@@ -100,6 +100,10 @@ def build_srpm(module, package, base_dir, sources_dir, scl=None):
 
     if scl:
         command += ['--define', 'scl %s' %  scl]
+
+    if macros is not None:
+        for (macro, value) in macros.items():
+            command += ['--define', '%s %s' % (macro, value)]
 
     command += [os.path.join(base_dir, '%s.spec' % os.path.basename(package))]
 
@@ -128,6 +132,7 @@ def main():
         argument_spec=dict(
             package=dict(type='str', required=False),
             scl=dict(type='str', required=False),
+            macros=dict(type='dict', required=False),
             output=dict(type='path', required=False),
             source_location=dict(type='str', required=False),
             source_system=dict(type='str', required=False),
@@ -137,6 +142,7 @@ def main():
     package = module.params['package']
     output = module.params['output']
     scl = module.params['scl']
+    macros = module.params['macros']
     source_location = module.params['source_location']
     source_system = module.params['source_system']
 
@@ -158,7 +164,7 @@ def main():
         copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
 
-        result = build_srpm(module, package, base_dir, sources_dir, scl)
+        result = build_srpm(module, package, base_dir, sources_dir, scl, macros)
 
         if not os.path.exists(output):
             os.mkdir(output)

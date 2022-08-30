@@ -44,6 +44,7 @@
         package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
         output: "{{ build_package_srpm_directory | default(srpm_directory.path) }}"
         scl: "{{ scl | default(omit) }}"
+        macros: "{{ tag.macros | default(omit) }}"
         source_location: "{{ source_location | default(omit) }}"
         source_system: "{{ source_system | default(omit) }}"
       register: srpm_build

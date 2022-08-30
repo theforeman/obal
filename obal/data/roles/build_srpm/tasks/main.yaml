@@ -4,6 +4,7 @@
     package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
     output: "{{ build_srpm_output_dir }}"
     scl: "{{ build_srpm_scl | default(omit) }}"
+    macros: "{{ macros | default(omit) }}"
     source_location: "{{ source_location | default(omit) }}"
     source_system: "{{ source_system | default(omit) }}"
   register: srpm_build
