@@ -1,4 +1,8 @@
 ---
+- name: 'Before SRPM'
+  debug:
+    msg: "Before"
+
 - name: 'Build SRPM'
   srpm:
     package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"

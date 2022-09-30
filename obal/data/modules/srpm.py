@@ -82,6 +82,34 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
                 zip_file.extract(zip_info, sources_dir)
 
 
+def fetch_local_sources(source_location, sources_dir):
+    """
+    Copy RPM sources from a local source on disk
+    """
+    if os.path.isdir(source_location):
+        source_files = os.listdir(source_location)
+
+        for source in source_files:
+            shutil.copy(os.path.join(source_location, source), sources_dir)
+    else:
+        shutil.copy(source_location, sources_dir)
+
+
+def rpmbuild_command(base_dir, build_dir, sources_dir):
+    """
+    Generate the base rpmbuild command
+    """
+    command = ['rpmbuild', '-bs']
+    command += ['--define', '_topdir %s' % base_dir]
+    command += ['--define', '_sourcedir %s' % sources_dir]
+    command += ['--define', '_builddir %s' % build_dir]
+    command += ['--define', '_srcrpmdir %s' % base_dir]
+    command += ['--define', '_rpmdir %s' % base_dir]
+    command += ['--undefine', 'dist']
+
+    return command
+
+
 def main():
     """
     Build a package using tito
@@ -113,23 +141,20 @@ def main():
         os.mkdir(build_dir)
 
         if source_location:
-            try:
-                fetch_remote_sources(source_location, source_system, sources_dir)
-            except HTTPError as error:
-                module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
-            except KeyError as error:
-                module.fail_json(msg="Unknown source_system specified.", output=error)
+            if os.path.exists(source_location):
+                fetch_local_sources(source_location, sources_dir)
+            else:
+                try:
+                    fetch_remote_sources(source_location, source_system, sources_dir)
+                except HTTPError as error:
+                    module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
+                except KeyError as error:
+                    module.fail_json(msg="Unknown source_system specified.", output=error)
 
         copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
 
-        command = ['rpmbuild', '-bs']
-        command += ['--define', '_topdir %s' % base_dir]
-        command += ['--define', '_sourcedir %s' % sources_dir]
-        command += ['--define', '_builddir %s' % build_dir]
-        command += ['--define', '_srcrpmdir %s' % base_dir]
-        command += ['--define', '_rpmdir %s' % base_dir]
-        command += ['--undefine', 'dist']
+        command = rpmbuild_command(base_dir, build_dir, sources_dir)
 
         if scl:
             command += ['--define', 'scl %s' %  scl]

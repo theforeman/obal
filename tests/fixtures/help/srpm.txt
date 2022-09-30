@@ -1,5 +1,7 @@
 usage: obal srpm [-h] [-v] [-e EXTRA_VARS] [--dist BUILD_SRPM_DIST]
                  [--dir BUILD_SRPM_OUTPUT_DIR] [--scl BUILD_SRPM_SCL]
+                 [--source-location SOURCE_LOCATION]
+                 [--source-system SOURCE_SYSTEM]
                  target [target ...]
 
 Build a SRPM for packages
@@ -18,6 +20,11 @@ optional arguments:
                         Absolute path to output dir for SRPM. Defaults to
                         <inventory_dir>/SRPMs
   --scl BUILD_SRPM_SCL  SCL to set when building a SRPM
+  --source-location SOURCE_LOCATION
+                        Pass a path or URL to a location for the SRPM source.
+  --source-system SOURCE_SYSTEM
+                        If passing a URL to source-location, set this to the
+                        system being used (e.g. jenkins).
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS
