@@ -8,9 +8,13 @@ help: |
 
     obal update mypackage --version 3.4.5
 
-  To update a package to a new version and create a git branch for the change from the command line:
+  To update a package to a new version and create a commit for the change from the command line:
 
     obal update mypackage --version 3.4.5 --commit
+
+  To update a package to a new version and create a git branch for the change from the command line:
+
+    obal update mypackage --version 3.4.5 --branch
 
   Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
 
@@ -25,5 +29,8 @@ variables:
   changelog:
     help: Optionally set the changelog. When unspecified, an entry will be generated
   commit:
+    help: When true, commits the update changes to it into the current branch
+    action: store_true
+  branch:
     help: When true, creates a git branch and commits the update changes to it.
     action: store_true

@@ -51,9 +51,25 @@
       when:
         - "'://' not in item"
 
+    - name: 'Get updated version from spec'
+      command: "rpmspec --query --queryformat=%{version} --srpm {{ spec_file_path }}"
+      args:
+        chdir: "{{ inventory_dir }}"
+      changed_when: false
+      register: updated_version
+      when: commit is defined and commit
+
+    - name: 'Create git commit'
+      command: "git commit -a -m 'Update {{ inventory_hostname }} to {{ updated_version.stdout }}'"
+      args:
+        chdir: "{{ inventory_dir }}"
+      run_once: true
+      changed_when: true
+      when: commit is defined and commit
+
 - hosts:
     - packages
   gather_facts: false
   roles:
-    - when: commit is defined and commit
+    - when: branch is defined and branch
       role: git_branch_and_commit
