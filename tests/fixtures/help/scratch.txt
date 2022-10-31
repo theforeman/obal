@@ -1,4 +1,6 @@
 usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
+                    [--source-location SOURCE_LOCATION]
+                    [--source-system SOURCE_SYSTEM]
                     target [target ...]
 
 Create a scratch build of a package
@@ -14,6 +16,11 @@ optional arguments:
   --skip-koji-whitelist-check
                         ignore koji whitelist check and scratch build the
                         package anyway
+  --source-location SOURCE_LOCATION
+                        Pass a path or URL to a location for the SRPM source.
+  --source-system SOURCE_SYSTEM
+                        If passing a URL to source-location, set this to the
+                        system being used (e.g. jenkins).
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS

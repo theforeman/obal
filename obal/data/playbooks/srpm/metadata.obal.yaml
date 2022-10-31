@@ -13,3 +13,9 @@ variables:
   build_srpm_output_dir:
     parameter: --dir
     help: Absolute path to output dir for SRPM. Defaults to <inventory_dir>/SRPMs
+  source_location:
+    paramter: --source-location
+    help: Pass a path or URL to a location for the SRPM source.
+  source_system:
+    paramter: --source-system
+    help: If passing a URL to source-location, set this to the system being used (e.g. jenkins).
