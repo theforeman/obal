@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 
@@ -44,7 +45,10 @@ def test_help(playbook, capsys, help_dir):
     help_file = help_dir / '{}.txt'.format(playbook.name)
 
     if help_file.check(exists=1):
-        assert help_file.read() == captured.out
+        expected = help_file.read()
+        if sys.version_info >= (3, 10, 0):
+            expected = expected.replace('optional arguments:', 'options:')
+        assert expected == captured.out
     else:
         help_file.write(captured.out)
         raise pytest.skip('Written help text')
