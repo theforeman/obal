@@ -38,7 +38,6 @@
             {{ additional_repos | join(' ') }}
             {{ '--repo ' if repoclosure_lookaside_repos else '' }}
             {{ repoclosure_lookaside_repos[dist] | join(' --repo ') }}
-        warn: false
       register: output
       args:
         chdir: "{{ inventory_dir }}"
