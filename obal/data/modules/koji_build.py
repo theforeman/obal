@@ -55,7 +55,7 @@ def main():
     try:
         output = koji(command, koji_executable)
     except KojiCommandError as error:
-        module.fail_json(msg='Failed to koji build', command=error.cmd, output=error.output,
+        module.fail_json(msg='Failed to koji build', command=error.command, output=error.message,
                          tag=tag, scratch=scratch, srpm=srpm, code=error.returncode)
 
     tasks = re.findall(r'^Created task:\s(\d+)', output, re.MULTILINE)
