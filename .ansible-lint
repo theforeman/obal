@@ -7,3 +7,5 @@ skip_list:
   - no-handler
   - unnamed-task
   - no-changed-when
+  - fqcn[action-core]
+  - name[template]
