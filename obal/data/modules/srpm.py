@@ -137,11 +137,18 @@ def main():
         command += [os.path.join(base_dir, '%s.spec' % os.path.basename(package))]
 
         try:
-            result = run_command(command)
+            command_output = run_command(command)
         except subprocess.CalledProcessError as error:
             module.fail_json(msg='Failed to srpm build', command=' '.join(command), output=error.output)
 
-        result = result.split("Wrote: ")[-1].rstrip()
+        result = None
+        for line in command_output.splitlines():
+            if line.startswith("Wrote: "):
+                result = line.split("Wrote: ")[-1].rstrip()
+                break
+
+        if not result:
+            module.fail_json(msg='Failed to find built SRPM', command=' '.join(command))
 
         if not os.path.exists(output):
             os.mkdir(output)
