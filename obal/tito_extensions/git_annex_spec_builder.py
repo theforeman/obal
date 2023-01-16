@@ -6,7 +6,7 @@ A tito plugin to build using git-annex
 
 import os
 import shutil
-from distutils.version import LooseVersion as loose_version  # pylint: disable=E0611
+from distutils.version import LooseVersion as loose_version  # pylint: disable=E0611,deprecated-module
 from pkg_resources import require
 
 from tito.compat import getstatusoutput
