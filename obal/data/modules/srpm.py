@@ -82,6 +82,43 @@ def fetch_remote_sources(source_location, source_system, sources_dir):
                 zip_file.extract(zip_info, sources_dir)
 
 
+def build_srpm(module, package, base_dir, sources_dir, scl=None):
+    """
+    Build the SRPM and return the path to the result
+    """
+    build_dir = os.path.join(base_dir, 'BUILD')
+    os.mkdir(build_dir)
+
+    command = ['rpmbuild', '-bs']
+    command += ['--define', '_topdir %s' % base_dir]
+    command += ['--define', '_sourcedir %s' % sources_dir]
+    command += ['--define', '_builddir %s' % build_dir]
+    command += ['--define', '_srcrpmdir %s' % base_dir]
+    command += ['--define', '_rpmdir %s' % base_dir]
+    command += ['--undefine', 'dist']
+
+    if scl:
+        command += ['--define', 'scl %s' %  scl]
+
+    command += [os.path.join(base_dir, '%s.spec' % os.path.basename(package))]
+
+    try:
+        command_output = run_command(command)
+    except subprocess.CalledProcessError as error:
+        module.fail_json(msg='Failed to srpm build', command=' '.join(command), output=error.output)
+
+    result = None
+    for line in command_output.splitlines():
+        if line.startswith("Wrote: "):
+            result = line.split("Wrote: ")[-1].rstrip()
+            break
+
+    if not result:
+        module.fail_json(msg='Failed to find built SRPM', command=' '.join(command))
+
+    return result
+
+
 def main():
     """
     Build a package using tito
@@ -107,10 +144,7 @@ def main():
     try:
         base_dir = mkdtemp()
         sources_dir = os.path.join(base_dir, 'SOURCES')
-        build_dir = os.path.join(base_dir, 'BUILD')
-
         os.mkdir(sources_dir)
-        os.mkdir(build_dir)
 
         if source_location:
             try:
@@ -123,32 +157,7 @@ def main():
         copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
 
-        command = ['rpmbuild', '-bs']
-        command += ['--define', '_topdir %s' % base_dir]
-        command += ['--define', '_sourcedir %s' % sources_dir]
-        command += ['--define', '_builddir %s' % build_dir]
-        command += ['--define', '_srcrpmdir %s' % base_dir]
-        command += ['--define', '_rpmdir %s' % base_dir]
-        command += ['--undefine', 'dist']
-
-        if scl:
-            command += ['--define', 'scl %s' %  scl]
-
-        command += [os.path.join(base_dir, '%s.spec' % os.path.basename(package))]
-
-        try:
-            command_output = run_command(command)
-        except subprocess.CalledProcessError as error:
-            module.fail_json(msg='Failed to srpm build', command=' '.join(command), output=error.output)
-
-        result = None
-        for line in command_output.splitlines():
-            if line.startswith("Wrote: "):
-                result = line.split("Wrote: ")[-1].rstrip()
-                break
-
-        if not result:
-            module.fail_json(msg='Failed to find built SRPM', command=' '.join(command))
+        result = build_srpm(module, package, base_dir, sources_dir, scl)
 
         if not os.path.exists(output):
             os.mkdir(output)
