@@ -138,7 +138,7 @@ elif prog in ['koji', 'brew']:
         print('package-with-existing-build-1.0-1.el7')
 
     if 'package-with-existing-build-1.0-1.el7' in sys.argv and 'buildinfo' in sys.argv:
-        print('BUILD: package-with-existing-build-1.0-1.el7')
+        print('BUILD: package-with-existing-build-1.0-1.el7\nState: COMPLETE')
 
 elif prog in ['copr-cli']:
     print({})
