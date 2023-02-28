@@ -26,7 +26,7 @@ def main():
     command = ['buildinfo', nvr]
     try:
         output = koji(command, koji_executable)
-        exists = "BUILD: %s" % (nvr) in output
+        exists = "BUILD: %s" % (nvr) in output and "State: COMPLETE" in output
     except KojiCommandError:
         output = None
         exists = False
