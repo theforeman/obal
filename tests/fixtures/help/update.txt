@@ -1,5 +1,6 @@
 usage: obal update [-h] [-v] [-e EXTRA_VARS] [--changelog CHANGELOG]
-                   [--commit] [--prerelease PRERELEASE] [--release RELEASE]
+                   [--branch] [--commit]
+                   [--prerelease PRERELEASE] [--release RELEASE]
                    [--version VERSION]
                    target [target ...]
 
@@ -15,6 +16,10 @@ To update a package to a new version and create a git branch for the change from
 
   obal update mypackage --version 3.4.5 --commit
 
+To update a package to a new version and create a git branch for the change from the command line:
+
+  obal update mypackage --version 3.4.5 --branch
+
 Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
 
   obal update mypackage
@@ -22,9 +27,10 @@ Updating a package that is taken from an upstream repository assumes that the pa
 positional arguments:
   target                the target to execute the action against
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --branch              When true, creates a git branch and commits the update changes to it.
   --changelog CHANGELOG
                         Optionally set the changelog. When unspecified, an
                         entry will be generated
