@@ -1,7 +1,7 @@
 FROM quay.io/centos/centos:stream8
 
 RUN echo "tsflags=nodocs" >> /etc/yum.conf && \
-    yum -y install git glibc-langpack-en epel-release python3-pip && \
+    yum -y install git glibc-langpack-en epel-release python3-pip 'dnf-command(config-manager)' && \
     yum clean all
 
 ENV LANG=en_US.UTF-8 \
