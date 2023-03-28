@@ -18,6 +18,12 @@ packages:
         - "jenkins_job=hello-master-release"
     foo: {}
     package-with-existing-build: {}
+    package-with-two-targets:
+      koji_tags:
+        - name: obaltest-nightly-el8
+          dist: '.el8'
+        - name: obalclient-nightly-el8
+          dist: '.el8'
 
 repoclosures:
   vars:
