@@ -17,8 +17,6 @@ MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin')
 MOCK_SOURCES_DIR = os.path.join(FIXTURE_DIR, 'mock_sources')
 
 DEFAULT_ARGS = ['-e', 'srpm_directory="/tmp/SRPMs"']
-if os.environ.get('TRAVIS', None):
-    DEFAULT_ARGS.extend(['-e', 'ansible_remote_tmp=/tmp/ansible-remote'])
 
 
 def git_init(path):

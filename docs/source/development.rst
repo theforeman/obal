@@ -249,7 +249,7 @@ To decide on the next version, the git log is a good indicator. We can either do
 
     $ bumpversion patch
 
-This will modify all the files containing the version number, create a git commit and a GPG signed git tag. Once this is pushed, Travis will release it to PyPI:
+This will modify all the files containing the version number, create a git commit and a GPG signed git tag. Once this is pushed, GitHub Actions will release it to PyPI:
 
     $ git push
 
