@@ -28,7 +28,7 @@ def en_locale():
         try:
             yield
         finally:
-            locale.resetlocale(locale.LC_TIME)
+            locale.setlocale(locale.LC_TIME, "")
 
 
 def main():
