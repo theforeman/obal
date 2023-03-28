@@ -231,6 +231,24 @@ def test_obal_release_with_koji_upstream_existing_build():
 
 
 @obal_cli_test(repotype='upstream')
+def test_obal_release_with_koji_upstream_two_target_tags():
+    assert_obal_success(['release', 'package-with-two-targets', '-e', 'build_package_use_koji_build=true'])
+
+    expected_log = [
+        "koji buildinfo package-with-two-targets-1.0-1.el8",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-two-targets",
+        "koji latest-build --quiet obaltest-nightly-el8 package-with-two-targets",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-two-targets-1.0-1.src.rpm",
+        "koji watch-task 1234",
+        "koji taskinfo -v 1234",
+        "koji buildinfo package-with-two-targets-1.0-1.el8",
+        "koji latest-build --quiet obalclient-nightly-el8 package-with-two-targets",
+        "koji tag-build obalclient-nightly-el8 package-with-two-targets-1.0-1.el8"
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
 def test_obal_release_with_koji_upstream_whitelist_check():
     assert_obal_success(['release', 'package-with-existing-build', '-e', 'build_package_use_koji_build=true', '-e', 'build_package_koji_whitelist_check=true'])
 
@@ -778,6 +796,7 @@ def test_obal_verify_tag_all():
     assert_obal_success(['verify-koji-tag', 'all'])
 
     expected_log = [
+        'koji list-pkgs --quiet --tag obalclient-nightly-el8',
         'koji list-pkgs --quiet --tag obaltest-nightly-el8',
         'koji list-pkgs --quiet --tag obaltest-nightly-rhel7'
     ]

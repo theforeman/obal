@@ -33,11 +33,14 @@ prog = os.path.basename(sys.argv[0])
 sys.argv[0] = prog
 
 mockbin_log = os.environ.get('MOCKBIN_LOG', None)
+mockbin_log_contents = []
 
 if mockbin_log:
     with open(mockbin_log, 'a') as logfile:
         logline = ' '.join([quote(entry) for entry in sys.argv])
         logfile.write("%s\n" % (logline))
+    with open(mockbin_log, 'r') as logfile:
+        mockbin_log_contents = [line.strip() for line in logfile.readlines()]
 
 if prog == 'tito':
     parser = argparse.ArgumentParser()
@@ -76,7 +79,7 @@ if prog == 'tito':
 
 elif prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='subcommand')
 
     parser_listpkgs = subparsers.add_parser('list-pkgs')
     parser_listpkgs.add_argument('--tag')
@@ -118,12 +121,12 @@ elif prog in ['koji', 'brew']:
     parser_build.add_argument('pkg')
     parser_build.add_argument('--scratch', action='store_true')
 
-    parser_build = subparsers.add_parser('tag-build')
-    parser_build.add_argument('tag')
-    parser_build.add_argument('pkg')
+    parser_tag_build = subparsers.add_parser('tag-build')
+    parser_tag_build.add_argument('tag')
+    parser_tag_build.add_argument('pkg')
 
-    parser_build = subparsers.add_parser('buildinfo')
-    parser_build.add_argument('pkg')
+    parser_buildinfo = subparsers.add_parser('buildinfo')
+    parser_buildinfo.add_argument('pkg')
 
     parser_taskinfo.add_argument('-v', action='store_const', dest='output', const=_FAKE_TASKINFO)
     args = parser.parse_args()
@@ -131,7 +134,7 @@ elif prog in ['koji', 'brew']:
     if 'output' in args and args.output:
         print(args.output)
 
-    if 'build' in sys.argv:
+    if args.subcommand in ['build', 'tag-build']:
         print('Created task: 1234')
 
     if 'package-with-existing-build' in sys.argv and 'latest-build' in sys.argv:
@@ -139,6 +142,14 @@ elif prog in ['koji', 'brew']:
 
     if 'package-with-existing-build-1.0-1.el7' in sys.argv and 'buildinfo' in sys.argv:
         print('BUILD: package-with-existing-build-1.0-1.el7\nState: COMPLETE')
+
+    if args.subcommand == 'latest-build' and args.pkg == 'package-with-two-targets-1.0-1.el8':
+        if args.tag != 'obalclient-nightly-el8':
+            print(args.pkg)
+
+    if args.subcommand == 'buildinfo' and args.pkg == 'package-with-two-targets-1.0-1.el8':
+        if 'koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-two-targets-1.0-1.src.rpm' in mockbin_log_contents:
+            print('BUILD: {}\nState: COMPLETE'.format(args.pkg))
 
 elif prog in ['copr-cli']:
     print({})
