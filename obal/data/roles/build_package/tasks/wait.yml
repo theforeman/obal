@@ -1,5 +1,6 @@
 ---
-- block:
+- when: build_package_build_system == 'koji'
+  block:
     - name: "Watch {{ build_package_koji_command }} task(s)"
       command: "{{ build_package_koji_command }} watch-task {{ koji_tasks | join(' ') }}"
       ignore_errors: true
@@ -32,9 +33,9 @@
         - build_package_waitrepo|bool
         - not build_package_scratch
         - build_package_koji_status is succeeded
-  when: build_package_build_system == 'koji'
 
-- block:
+- when: build_package_build_system == 'copr'
+  block:
     - name: "Watch copr task(s)"
       command: "copr-cli watch-build {{ build_package_tito_release.builds | join(' ') }}"
       ignore_errors: true
@@ -45,4 +46,3 @@
       fail:
         msg: "The build in Copr  has failed"
       when: (build_package_copr_status is failed)
-  when: build_package_build_system == 'copr'

@@ -1,5 +1,5 @@
 ---
-- name: check for package dir
+- name: Check for package dir
   stat:
     path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
   register: package_dir

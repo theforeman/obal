@@ -1,12 +1,13 @@
 ---
-- hosts:
+- name: Add a changelog entry
+  hosts:
     - packages
   serial: 1
   gather_facts: false
   roles:
     - spec_file
   tasks:
-    - name: 'ensure changelog'
+    - name: 'Ensure changelog entry'
       changelog:
         spec: "{{ spec_file_path }}"
         entry: "{{ changelog | default('- rebuilt') }}"

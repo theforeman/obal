@@ -1,9 +1,10 @@
 ---
-- hosts:
+- name: Setup system for use of obal
+  hosts:
     - localhost
   connection: local
   tasks:
-    - name: install required packages
+    - name: Install required packages
       become: true
       package:
         state: present
@@ -20,8 +21,8 @@
           - dnf
           - dnf-plugins-core
 
-    - when: ansible_os_family == 'Fedora'
-      name: install required packages
+    - name: Install required Fedora packages
+      when: ansible_os_family == 'Fedora'
       become: true
       package:
         state: present

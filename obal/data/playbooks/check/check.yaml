@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Verify that the packages defined in git are also built
+  hosts:
     - packages
   gather_facts: false
   roles:

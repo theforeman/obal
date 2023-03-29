@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Build a nightly version of a package
+  hosts:
     - packages
   serial: 1
   gather_facts: false
@@ -8,46 +9,47 @@
   roles:
     - package_variables
   tasks:
-    - name: 'legacy nightly building'
+    - name: 'Legacy nightly building'
+      when: nightly_sourcefiles is not defined and nightly_githash is not defined
       block:
-        - name: 'set nightly_releaser'
+        - name: 'Set nightly_releaser'
           set_fact:
             releasers:
               - "{{ nightly_releaser }}"
 
         - import_role:
             name: build_package
-      when: nightly_sourcefiles is not defined and nightly_githash is not defined
 
-    - name: 'nightly building'
+    - name: 'Nightly building'
+      when: nightly_sourcefiles is defined and nightly_githash is defined
       block:
-        - name: 'set package_dir'
+        - name: 'Set package_dir'
           set_fact:
             package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-        - name: 'set global_nightly_macro'
+        - name: 'Set global_nightly_macro'
           set_fact:
             global_nightly_macro:
               "%global nightly .{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}git{{ nightly_githash[:7] }}"
 
-        - name: 'copy source files'
+        - name: 'Copy source files'
           copy:
             src: "{{ item }}"
             dest: "{{ package_dir }}"
             mode: preserve
           with_items: "{{ nightly_sourcefiles }}"
 
-        - name: 'get nightly_specfile'
+        - name: 'Get nightly_specfile'
           find:
             pattern: "*.spec"
             path: "{{ package_dir }}"
           register: nightly_specfile
 
-        - name: 'set nightly_specfile_path'
+        - name: 'Set nightly_specfile_path'
           set_fact:
             nightly_specfile_path: "{{ nightly_specfile.files[0].path }}"
 
-        - name: 'add nightly macro to specfile'
+        - name: 'Add nightly macro to specfile'
           lineinfile:
             path: "{{ nightly_specfile_path }}"
             line: "{{ global_nightly_macro }}"
@@ -57,16 +59,15 @@
 
         - import_role:
             name: build_package
-      when: nightly_sourcefiles is defined and nightly_githash is defined
       always:
-        - name: 'restore spec file'
+        - name: 'Restore spec file'
           copy:
             src: "{{ original_specfile.backup }}"
             dest: "{{ nightly_specfile_path }}"
             mode: preserve
           when: original_specfile is defined
 
-        - name: 'delete copied source files'
+        - name: 'Delete copied source files'
           file:
             state: absent
             path: "{{ package_dir }}/{{ item | basename }}"

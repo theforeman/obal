@@ -1,5 +1,6 @@
 ---
-- block:
+- when: not build_package_scratch
+  block:
     - name: 'Release to copr'
       tito_release:
         directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
@@ -13,9 +14,9 @@
     - name: 'Wait for tasks to finish'
       include_tasks: wait.yml
       when: build_package_wait|bool
-  when: not build_package_scratch
 
-- block:
+- when: build_package_scratch
+  block:
     - name: Define copr repo name
       set_fact:
         copr_repo_name: "{{ copr_user }}/{{ build_package_scratch_repo }}-{{ 999999999 | random | to_uuid }}"
@@ -26,7 +27,7 @@
       copy:
         content: "{{ 'copr_repo: ' + copr_repo_name | to_yaml }}"
         dest: "{{ obal_tmp_dir }}/copr_repo"
-        mode: 0640
+        mode: '0640'
       run_once: true
 
     - include_role:
@@ -50,4 +51,3 @@
 
     - debug:
         msg: "{{ build_status.stdout_lines | join('\n') }}"
-  when: build_package_scratch

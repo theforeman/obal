@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Add a new package from an upstream repo to a downstream one
+  hosts:
     - packages
   serial: 1
   gather_facts: false
@@ -16,10 +17,11 @@
       file:
         state: 'directory'
         path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-        mode: 0755
+        mode: '0755'
       register: package_directory_result
 
-    - block:
+    - when: package_directory_result is changed
+      block:
         - name: 'Fetch sources'
           include_role:
             name: fetch_sources
@@ -53,4 +55,3 @@
           when: git_status.stdout | length > 0
           args:
             chdir: "{{ inventory_dir }}"
-      when: package_directory_result is changed

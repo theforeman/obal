@@ -1,5 +1,5 @@
 ---
-- name: get spec file
+- name: Get spec file
   find:
     pattern: "*.spec"
     path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"

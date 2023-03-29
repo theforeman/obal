@@ -6,7 +6,7 @@
 
 - name: 'Set source path'
   set_fact:
-    setup_sources_sourcepath: "{{ package_dir  }}/{{ setup_sources_sourcebase }}"
+    setup_sources_sourcepath: "{{ package_dir }}/{{ setup_sources_sourcebase }}"
 
 - name: 'Source exists'
   stat:

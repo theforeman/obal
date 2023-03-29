@@ -6,4 +6,4 @@
   file:
     state: 'directory'
     path: "{{ obal_tmp_dir }}"
-    mode: 0755
+    mode: '0755'

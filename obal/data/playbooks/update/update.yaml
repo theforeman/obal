@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Update packages
+  hosts:
     - packages
   serial: 1
   gather_facts: false
@@ -51,7 +52,8 @@
       when:
         - "'://' not in item"
 
-- hosts:
+- name: Commit changes after update
+  hosts:
     - packages
   gather_facts: false
   roles:
