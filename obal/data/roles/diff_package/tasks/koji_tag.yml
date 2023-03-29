@@ -12,12 +12,12 @@
     tag: "{{ tag.name }}"
     nvr: "{{ package_nvr.nvr }}"
     package: "{{ package_nvr.name }}"
-    koji_executable: "{{ koji_executable|default('koji') }}"
+    koji_executable: "{{ koji_executable | default('koji') }}"
   register: build_exists
 
 - name: Set diff_package_changed
   set_fact:
-    diff_package_changed: "{{ diff_package_changed|default(false) or not build_exists.exists_for_tag }}"
+    diff_package_changed: "{{ diff_package_changed | default(false) or not build_exists.exists_for_tag }}"
 
 - debug:
     msg:

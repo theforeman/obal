@@ -1,7 +1,7 @@
 - block:
-    - name: generate list of repositories
+    - name: Generate list of repositories
       set_fact:
-        repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist]|default([]) + ['downloaded_rpms'] }}"
+        repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist] | default([]) + ['downloaded_rpms'] }}"
 
     - name: Create temp directory
       tempfile:
@@ -18,7 +18,7 @@
         src: "{{ inventory_dir }}/{{ repoclosure_config }}"
         dest: "{{ temp_directory.path }}/{{ config_filename }}"
         remote_src: true
-        mode: 0640
+        mode: '0640'
 
     - name: Replace cachedir with temp directory
       replace:
@@ -34,7 +34,7 @@
             --refresh
             --newest
             --check {{ repoclosure_target_repos_all | join(' --check ') }}
-            {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/'+dist if repoclosure_use_downloaded_rpms else '' }}
+            {{ '--repofrompath=downloaded_rpms,./downloaded_rpms/' + dist if repoclosure_use_downloaded_rpms else '' }}
             {{ additional_repos | join(' ') }}
             {{ '--repo ' if repoclosure_lookaside_repos else '' }}
             {{ repoclosure_lookaside_repos[dist] | join(' --repo ') }}

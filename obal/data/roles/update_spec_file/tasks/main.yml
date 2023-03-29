@@ -58,7 +58,7 @@
     - release is defined
     - release != 'keep'
 
-- name: 'add changelog entry'
+- name: 'Add changelog entry'
   changelog:
     spec: "{{ spec_file_path }}"
     entry: "{{ changelog }}"

@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Scratch build a package
+  hosts:
     - packages
   serial: 1
   any_errors_fatal: false  # don't bomb out the entire playbook if one host (i.e. package) fails

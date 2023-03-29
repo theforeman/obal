@@ -23,7 +23,7 @@
   koji_tag_package:
     tag: "{{ tag.name }}"
     nvr: "{{ package_nvr.nvr }}"
-    koji_executable: "{{ koji_executable|default('koji') }}"
+    koji_executable: "{{ koji_executable | default('koji') }}"
   when:
     - build_exists is not skipped
     - not build_exists.exists_for_tag
@@ -32,7 +32,7 @@
 
 - when: build_exists is skipped or not build_exists.exists
   block:
-    - name: create temporary build directory
+    - name: Create temporary build directory
       tempfile:
         state: directory
         suffix: srpms

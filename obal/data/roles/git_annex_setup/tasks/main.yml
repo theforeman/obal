@@ -1,5 +1,5 @@
 ---
-- name: call git annex init
+- name: Call git annex init
   command: git annex init
   args:
     creates: .git/annex/index

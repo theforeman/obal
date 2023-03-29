@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Build SRPM
+  hosts:
     - packages
   serial: 1
   gather_facts: false

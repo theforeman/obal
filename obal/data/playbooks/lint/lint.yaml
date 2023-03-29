@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Run rpmlint
+  hosts:
     - packages
   serial: 1
   gather_facts: false

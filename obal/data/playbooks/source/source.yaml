@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Setup sources
+  hosts:
     - packages
   serial: 1
   gather_facts: false

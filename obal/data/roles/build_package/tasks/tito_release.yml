@@ -21,7 +21,7 @@
   tito_release:
     directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
     arguments: "{{ build_package_tito_args }}"
-    scratch: "{{ build_package_scratch and build_package_koji_command != 'brew'}}"
+    scratch: "{{ build_package_scratch and build_package_koji_command != 'brew' }}"
     test: "{{ build_package_test }}"
     releasers: "{{ build_package_tito_releasers }}"
     releaser_arguments: "{{ build_package_tito_releaser_args }}"

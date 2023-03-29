@@ -1,4 +1,5 @@
-- hosts:
+- name: Run reposclosure for packages
+  hosts:
     - repoclosures
     - packages
   gather_facts: false

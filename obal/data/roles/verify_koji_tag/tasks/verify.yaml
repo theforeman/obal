@@ -4,7 +4,7 @@
     tag: "{{ tag_name }}"
     packages: "{{ hostvars }}"
     directory: "{{ lookup('env', 'PWD') }}"
-    koji_executable: "{{ koji_executable|default('koji') }}"
+    koji_executable: "{{ koji_executable | default('koji') }}"
   register: missing
 
 - name: "Packages in Koji but not in git for {{ tag_name }}"

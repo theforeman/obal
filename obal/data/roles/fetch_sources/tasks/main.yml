@@ -1,5 +1,10 @@
 ---
-- block:
+- when:
+    - upstream is defined
+    - upstream.endswith('.git')
+    - upstream_files is defined
+    - version is not defined
+  block:
     - name: 'Extract upstream directory'
       set_fact:
         upstream_directory: "{{ upstream.split('/')[-1] }}"
@@ -13,32 +18,33 @@
         depth: 1
 
     - name: 'Copy upstream files'
-      synchronize:
+      ansible.posix.synchronize:
         src: "{{ obal_tmp_dir }}/{{ upstream_directory }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when:
-    - upstream is defined
-    - upstream.endswith('.git')
-    - upstream_files is defined
-    - version is not defined
   rescue:
     - name: 'Remove package directory'
       file:
         state: 'absent'
         path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- block:
+- when:
+    - upstream is defined
+    - upstream.endswith('src.rpm')
+    - upstream_files is defined
+    - version is not defined
+  block:
     - name: 'Make package download directory'
       file:
         state: 'directory'
         path: "{{ obal_tmp_dir }}/{{ inventory_hostname }}"
-        mode: 0755
+        mode: '0755'
 
     - name: 'Fetch srpm'
       get_url:
         url: "{{ upstream }}"
         dest: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/"
+        mode: '0640'
 
     - name: 'Find SRPM'
       find:
@@ -52,15 +58,10 @@
         chdir: "{{ obal_tmp_dir }}/{{ inventory_hostname }}"
 
     - name: 'Copy upstream files'
-      synchronize:
+      ansible.posix.synchronize:
         src: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
       with_items: "{{ upstream_files }}"
-  when:
-    - upstream is defined
-    - upstream.endswith('src.rpm')
-    - upstream_files is defined
-    - version is not defined
   rescue:
     - name: 'Remove package directory'
       file:
@@ -89,10 +90,10 @@
         - changelog is not defined
         - version is defined
 
-    - name: 'update spec file'
+    - name: 'Update spec file'
       include_role:
         name: update_spec_file
 
-    - name: 'update source files'
+    - name: 'Update source files'
       include_role:
         name: setup_sources
