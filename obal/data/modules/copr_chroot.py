@@ -18,6 +18,7 @@ def main():
             external_repos=dict(type='list', required=False),
             buildroot_packages=dict(type='list', required=False),
             modules=dict(type='list', required=False),
+            config_file=dict(type='str', required=False),
         )
     )
 
@@ -27,6 +28,7 @@ def main():
     external_repos = module.params['external_repos']
     buildroot_packages = module.params['buildroot_packages']
     modules = module.params['modules']
+    config_file = module.params['config_file']
 
     command = [
         'edit-chroot',
@@ -43,7 +45,7 @@ def main():
         command.extend(['--modules', ','.join(modules)])
 
     try:
-        output = copr_cli(command)
+        output = copr_cli(command, config_file=config_file)
     except CoprCliCommandError as error:
         module.fail_json(msg='Copr chroot edit failed', command=' '.join(error.command), output=error.message)
 

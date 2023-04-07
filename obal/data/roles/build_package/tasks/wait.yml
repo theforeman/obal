@@ -36,13 +36,14 @@
 
 - when: build_package_build_system == 'copr'
   block:
-    - name: "Watch copr task(s)"
-      command: "copr-cli watch-build {{ build_package_tito_release.builds | join(' ') }}"
+    - name: "Watch copr build(s)"
+      command:
+        "copr-cli {{ '--config ' + build_package_copr_config if build_package_copr_config is defined else '' }} watch-build {{ copr_build_ids | join(' ') }}"
       ignore_errors: true
       register: build_package_copr_status
       changed_when: false
 
     - name: 'Failed build'
       fail:
-        msg: "The build in Copr  has failed"
+        msg: "The build in Copr has failed"
       when: (build_package_copr_status is failed)

@@ -1,0 +1,20 @@
+- when: build_package_build_system == 'copr' and build_package_download_rpms
+  block:
+    - name: Define download directory
+      set_fact:
+        download_dir: "{{ inventory_dir }}/downloaded_rpms"
+
+    - name: 'Create RPM downloads directory'
+      file:
+        state: directory
+        path: "{{ download_dir }}"
+        mode: '0775'
+
+    - name: "Download Copr RPM(s)"
+      command: "copr-cli {{ ' --config ' + build_package_copr_config if build_package_copr_config is defined else '' }} download-build {{ item }}"
+      args:
+        chdir: "{{ download_dir }}"
+
+    - name: 'Create repo from downloaded RPMs'
+      command: "createrepo {{ download_dir }}/{{ item }}"
+      loop: "{{ chroots }}"

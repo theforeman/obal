@@ -1,21 +1,12 @@
 ---
 packages:
   vars:
-    releasers:
-      - copr
-    scl: copr-scl
-    copr_user: "@fake-user"
-    copr_repo_name: copr-repo-scratch
-    diff_package_copr_repo: copr-repo-staging
-    diff_package_type: copr
+    copr_project_user: example
+    copr_project_name: foreman
+    copr_scratch_project: foreman-1234
     build_package_build_system: copr
-    build_package_scratch_repo: copr-repo-scratch
-    copr_repo_chroot: epel-7-x86_64
-    copr_repo_external_repos:
-      - http://mirror.centos.org/centos/7/sclo/x86_64/rh/
-    copr_repo_packages:
-      - scl-utils-build
-      - rh-ruby24-build
+    copr_projects:
+      - "{{ hostvars['foreman'] }}"
   hosts:
     hello: {}
 

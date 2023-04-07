@@ -1,4 +1,8 @@
-usage: obal release [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
+usage: obal release [-h] [-v] [-e EXTRA_VARS]
+                    [--copr-chroot BUILD_PACKAGE_COPR_CHROOTS]
+                    [--copr-config BUILD_PACKAGE_COPR_CONFIG] [--copr-rebuild]
+                    [--skip-koji-whitelist-check] [--skip-failed-build]
+                    [--nowait]
                     target [target ...]
 
 This action releases a package to Koji/Brew/Copr
@@ -11,9 +15,17 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --copr-chroot BUILD_PACKAGE_COPR_CHROOTS
+                        Specify a Copr chroot to release for, can be specified
+                        multiple times
+  --copr-config BUILD_PACKAGE_COPR_CONFIG
+                        Path to a Copr config file
+  --copr-rebuild        Forces a rebuild of a package in Copr
   --skip-koji-whitelist-check
                         ignore koji whitelist check and release the package
                         anyway
+  --skip-failed-build   Skips failing builds and continues execution
+  --nowait              Do not wait on builds to complete
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS

@@ -1,19 +1,20 @@
 ---
-- name: 'Create copr scratch build repo'
-  command: >
-    copr-cli
-      create
-      {{ copr_repo_name }}
-      --chroot {{ copr_repo_chroot }}
-      --description '{{ copr_repo_description }}'
-      --unlisted-on-hp on
-      --repo '{{ copr_repo_external_repos | join(' ') }}'
-  changed_when: false
+- name: 'Create Copr repo'
+  copr_repo:
+    repo_name: "{{ copr_repo_name }}"
+    chroots: "{{ copr_repo_chroots | map(attribute='name') }}"
+    description: "{{ copr_repo_description | default(omit) }}"
+    delete_after_days: "{{ copr_repo_delete_after_days | default(omit) }}"
+    unlisted_on_homepage: "{{ copr_repo_unlisted_on_homepage | default(omit) }}"
+  register: create_output
 
-- name: 'Add build packages to chroot'
-  command: >
-    copr-cli
-      edit-chroot
-      {{ copr_repo_name }}/{{ copr_repo_chroot }}
-      --packages '{{ copr_repo_packages | join(' ') }}'
-  changed_when: false
+- name: Configure chroots
+  copr_chroot:
+    repo_name: "{{ copr_repo_name }}"
+    chroot: "{{ chroot.name }}"
+    external_repos: "{{ chroot.external_repos | default(omit) }}"
+    buildroot_packages: "{{ chroot.buildroot_packages | default(omit) }}"
+    modules: "{{ chroot.modules | default(omit) }}"
+  loop: "{{ copr_repo_chroots }}"
+  loop_control:
+    loop_var: chroot

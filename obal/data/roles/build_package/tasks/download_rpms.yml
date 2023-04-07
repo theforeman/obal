@@ -1,3 +1,7 @@
 - include_tasks: download_rpms_from_task.yml
   with_items: "{{ build_package_koji_task_data }}"
   when: build_package_build_system == 'koji' and build_package_download_rpms
+
+- include_tasks: download_rpms_copr.yml
+  with_items: "{{ copr_builds['results'] | map(attribute='builds') | list | flatten }}"
+  when: build_package_build_system == 'copr' and build_package_download_rpms

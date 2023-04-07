@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import argparse
+import json
 try:
     from shlex import quote
 except ImportError:
@@ -152,4 +153,57 @@ elif prog in ['koji', 'brew']:
             print('BUILD: {}\nState: COMPLETE'.format(args.pkg))
 
 elif prog in ['copr-cli']:
-    print({})
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='subcommand')
+
+    parser_build = subparsers.add_parser('get-package')
+    parser_build.add_argument('project')
+    parser_build.add_argument('--name')
+    parser_build.add_argument('--with-all-builds', action='store_true')
+
+    parser_build = subparsers.add_parser('build')
+    parser_build.add_argument('project')
+    parser_build.add_argument('pkg')
+    parser_build.add_argument('--nowait', action='store_true')
+    parser_build.add_argument('--chroot')
+
+    parser_build = subparsers.add_parser('list')
+    parser_build.add_argument('project')
+
+    parser_build = subparsers.add_parser('fork')
+    parser_build.add_argument('src')
+    parser_build.add_argument('dest')
+
+    parser_build = subparsers.add_parser('create')
+    parser_build.add_argument('project')
+    parser_build.add_argument('--description')
+    parser_build.add_argument('--chroot')
+    parser_build.add_argument('--appstream')
+    parser_build.add_argument('--delete-after-days')
+    parser_build.add_argument('--unlisted-on-hp')
+
+    parser_build = subparsers.add_parser('modify')
+    parser_build.add_argument('project')
+    parser_build.add_argument('--delete-after-days')
+
+    parser_build = subparsers.add_parser('edit-chroot')
+    parser_build.add_argument('project-chroot')
+    parser_build.add_argument('--repos')
+    parser_build.add_argument('--packages')
+    parser_build.add_argument('--modules')
+
+    parser_build = subparsers.add_parser('watch-build')
+    parser_build.add_argument('build')
+
+    args = parser.parse_args()
+
+    if args.subcommand == 'get-package':
+        #json_data = json.loads('{"builds": [{"state": "succeeded", "source_package": {"version": "0.0.1"}}]}')
+        json_data = {"builds": [{"state": "succeeded", "source_package": {"version": "0.0.1"}}]}
+        print(json.dumps(json_data, indent=2))
+    elif args.subcommand == 'build':
+        print("Build was added to foreman-1234:")
+        print("https://copr.fedorainfracloud.org/coprs/build/5678")
+        print("Created builds: 5678")
+    else:
+        print({})
