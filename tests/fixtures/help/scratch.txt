@@ -1,4 +1,6 @@
-usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--skip-koji-whitelist-check]
+usage: obal scratch [-h] [-v] [-e EXTRA_VARS]
+                    [--copr-config BUILD_PACKAGE_COPR_CONFIG]
+                    [--skip-koji-whitelist-check]
                     target [target ...]
 
 Create a scratch build of a package
@@ -11,6 +13,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --copr-config BUILD_PACKAGE_COPR_CONFIG
+                        Path to a Copr config file
   --skip-koji-whitelist-check
                         ignore koji whitelist check and scratch build the
                         package anyway

@@ -10,12 +10,15 @@ class CoprCliCommandError(Exception):
         self.command = command
         super(CoprCliCommandError, self).__init__(message) #pylint: disable-all
 
-def copr_cli(command, executable=None):
+def copr_cli(command, executable=None, config_file=None):
     """
     Run a copr-cli command
     """
     if executable is None:
         executable = 'copr-cli'
+
+    if config_file:
+        command = ['--config', config_file] + command
 
     try:
         return check_output([executable] + command, universal_newlines=True, stderr=STDOUT)

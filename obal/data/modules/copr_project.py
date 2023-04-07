@@ -7,7 +7,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.copr import copr_cli, CoprCliCommandError, full_name # pylint:disable=import-error,no-name-in-module
 
 
-def project_exists(user, project, module):
+def project_exists(user, project, module, config_file=None):
     """
     Return true if a project already exists for a user
     """
@@ -17,7 +17,7 @@ def project_exists(user, project, module):
     ]
 
     try:
-        project_list = copr_cli(command)
+        project_list = copr_cli(command, config_file=config_file)
     except CoprCliCommandError as error:
         module.fail_json(msg='Copr project listing failed', command=' '.join(error.command), output=error.message)
 
@@ -35,6 +35,8 @@ def main():
             description=dict(type='str', required=False),
             unlisted_on_homepage=dict(type='bool', required=False, default=False),
             delete_after_days=dict(type='str', required=False),
+            appstream=dict(type='str', required=False, default='off'),
+            config_file=dict(type='str', required=False),
         )
     )
 
@@ -44,11 +46,13 @@ def main():
     description = module.params['description']
     unlisted_on_homepage = module.params['unlisted_on_homepage']
     delete_after_days = module.params['delete_after_days']
+    appstream = module.params['appstream']
+    config_file = module.params['config_file']
 
     if not description:
         description = project
 
-    if project_exists(user, project, module):
+    if project_exists(user, project, module, config_file=config_file):
         command = ['modify']
     else:
         command = ['create']
@@ -58,6 +62,8 @@ def main():
         '--description',
         description
     ])
+
+    command.extend(['--appstream', appstream])
 
     for chroot in chroots:
         command.extend(['--chroot', chroot])
@@ -69,7 +75,7 @@ def main():
         command.extend(['--delete-after-days', delete_after_days])
 
     try:
-        output = copr_cli(command)
+        output = copr_cli(command, config_file=config_file)
     except CoprCliCommandError as error:
         module.fail_json(msg='Copr project creation failed', command=' '.join(error.command), output=error.message)
 

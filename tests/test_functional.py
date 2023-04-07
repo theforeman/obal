@@ -662,10 +662,10 @@ def test_obal_scratch_copr_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
-        "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
-        "tito build --srpm --scl copr-scl",
-        "copr-cli build --nowait copr-repo-scratch hello-2.10-1.src.rpm"
+        "copr-cli list example",
+        "copr-cli create example/foreman-1234 --description foreman-1234 --appstream off --chroot epel-7-x86_64 --unlisted-on-hp on --delete-after-days 4",  # noqa: E501
+        "copr-cli edit-chroot example/foreman-1234/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
+        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64"
     ]
     assert_mockbin_log(expected_log)
 
@@ -677,11 +677,11 @@ def test_obal_scratch_copr_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "copr-cli create copr-repo-scratch --chroot epel-7-x86_64 --description 'Scratch Builds' --unlisted-on-hp on --repo http://mirror.centos.org/centos/7/sclo/x86_64/rh/",  # noqa: E501
-        "copr-cli edit-chroot copr-repo-scratch/epel-7-x86_64 --packages 'scl-utils-build rh-ruby24-build'",  # noqa: E501
-        "tito build --srpm --scl copr-scl",
-        "copr-cli build copr-repo-scratch hello-2.10-1.src.rpm",
-        # copr-cli build waits by default, so there is no "watch-build" step here
+        "copr-cli list example",
+        "copr-cli create example/foreman-1234 --description foreman-1234 --appstream off --chroot epel-7-x86_64 --unlisted-on-hp on --delete-after-days 4",  # noqa: E501
+        "copr-cli edit-chroot example/foreman-1234/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
+        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64",
+        "copr-cli watch-build 5678"
     ]
     assert_mockbin_log(expected_log)
 
@@ -693,8 +693,8 @@ def test_obal_release_copr_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "copr-cli get-package @fake-user/copr-repo-staging --name hello --with-latest-build",
-        "tito release --yes copr",
+        "copr-cli get-package example/foreman --name hello --with-all-builds",
+        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64"
     ]
     assert_mockbin_log(expected_log)
 
@@ -706,9 +706,9 @@ def test_obal_release_copr_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "copr-cli get-package @fake-user/copr-repo-staging --name hello --with-latest-build",
-        "tito release --yes copr",
-        "copr-cli watch-build"
+        "copr-cli get-package example/foreman --name hello --with-all-builds",
+        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64",
+        "copr-cli watch-build 5678"
     ]
     assert_mockbin_log(expected_log)
 
@@ -808,7 +808,7 @@ def test_copr_project_one_chroot():
 
     expected_log = [
         "copr-cli list example",
-        "copr-cli create example/foreman --description foreman --chroot epel-7-x86_64",  # noqa: E501
+        "copr-cli create example/foreman --description foreman --appstream off --chroot epel-7-x86_64",  # noqa: E501
         "copr-cli edit-chroot example/foreman/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
 
     ]
@@ -821,7 +821,7 @@ def test_copr_project_many_chroots():
 
     expected_log = [
         "copr-cli list example",
-        "copr-cli create example/foreman-client --description foreman-client --chroot rhel-9-x86_64 --chroot rhel-8-x86_64 --chroot rhel-7-x86_64",  # noqa: E501
+        "copr-cli create example/foreman-client --description foreman-client --appstream off --chroot rhel-9-x86_64 --chroot rhel-8-x86_64 --chroot rhel-7-x86_64",  # noqa: E501
         "copr-cli edit-chroot example/foreman-client/rhel-9-x86_64",
         "copr-cli edit-chroot example/foreman-client/rhel-8-x86_64",
         "copr-cli edit-chroot example/foreman-client/rhel-7-x86_64"

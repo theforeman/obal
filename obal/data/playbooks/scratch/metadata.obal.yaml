@@ -8,3 +8,6 @@ variables:
     action: store_false
     parameter: --skip-koji-whitelist-check
     help: ignore koji whitelist check and scratch build the package anyway
+  build_package_copr_config:
+    parameter: --copr-config
+    help: Path to a Copr config file
