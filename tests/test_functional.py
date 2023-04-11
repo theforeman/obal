@@ -801,3 +801,30 @@ def test_obal_verify_tag_all():
         'koji list-pkgs --quiet --tag obaltest-nightly-rhel7'
     ]
     assert_mockbin_log(expected_log)
+
+@obal_cli_test(repotype='copr')
+def test_copr_project_one_chroot():
+    assert_obal_success(['copr-project', 'foreman'])
+
+    expected_log = [
+        "copr-cli list example",
+        "copr-cli create example/foreman --description foreman --chroot epel-7-x86_64",  # noqa: E501
+        "copr-cli edit-chroot example/foreman/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
+
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='copr')
+def test_copr_project_many_chroots():
+    assert_obal_success(['copr-project', 'client'])
+
+    expected_log = [
+        "copr-cli list example",
+        "copr-cli create example/foreman-client --description foreman-client --chroot rhel-9-x86_64 --chroot rhel-8-x86_64 --chroot rhel-7-x86_64",  # noqa: E501
+        "copr-cli edit-chroot example/foreman-client/rhel-9-x86_64",
+        "copr-cli edit-chroot example/foreman-client/rhel-8-x86_64",
+        "copr-cli edit-chroot example/foreman-client/rhel-7-x86_64"
+
+    ]
+    assert_mockbin_log(expected_log)

@@ -1,0 +1,18 @@
+usage: obal copr-project [-h] [-v] [-e EXTRA_VARS] [--user COPR_PROJECT_USER]
+                         target [target ...]
+
+This action configures Copr projects
+
+positional arguments:
+  target                the target to execute the action against
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         verbose output
+  --user COPR_PROJECT_USER
+                        Copr user to use instead of the default value
+
+advanced arguments:
+  -e EXTRA_VARS, --extra-vars EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @

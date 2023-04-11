@@ -22,3 +22,23 @@ packages:
 repoclosures:
   hosts:
     core-repoclosure: {}
+
+copr_projects:
+  vars:
+    copr_project_user: 'example'
+  hosts:
+    foreman:
+      copr_project_name: "foreman"
+      copr_project_chroots:
+        - name: epel-7-x86_64
+          external_repos:
+            - http://mirror.centos.org/centos/7/sclo/x86_64/rh/
+          buildroot_packages:
+            - rh-ruby24-build
+            - scl-utils-build
+    client:
+      copr_project_name: "foreman-client"
+      copr_project_chroots:
+        - name: rhel-9-x86_64
+        - name: rhel-8-x86_64
+        - name: rhel-7-x86_64
