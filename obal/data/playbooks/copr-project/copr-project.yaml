@@ -1,0 +1,8 @@
+---
+- name: Configure Copr projects
+  hosts:
+    - copr_projects
+  serial: 1
+  gather_facts: false
+  roles:
+    - role: copr_project

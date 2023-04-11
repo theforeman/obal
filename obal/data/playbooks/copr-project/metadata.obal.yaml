@@ -1,0 +1,7 @@
+---
+help: |
+  This action configures Copr projects
+variables:
+  copr_project_user:
+    parameter: --user
+    help: Copr user to use instead of the default value

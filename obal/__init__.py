@@ -26,11 +26,11 @@ class ApplicationConfig(obsah.ApplicationConfig):
         return 'obal'
 
     @staticmethod
-    def target_name():
+    def target_names():
         """
         Return the name of the target in the playbook if the playbook takes a parameter.
         """
-        return 'packages'
+        return ['packages', 'copr_projects']
 
     @staticmethod
     def metadata_name():
