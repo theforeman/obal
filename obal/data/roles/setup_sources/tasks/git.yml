@@ -7,7 +7,7 @@
   git:
     repo: "{{ setup_sources_git }}"
     dest: "{{ setup_sources_git_checkout_dir }}"
-    version: "{{ git_branch | default('master') }}"
+    version: "{{ git_branch | default(omit) }}"
     force: true
     depth: 1
 

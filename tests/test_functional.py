@@ -20,7 +20,7 @@ DEFAULT_ARGS = ['-e', 'srpm_directory="/tmp/SRPMs"']
 
 
 def git_init(path):
-    subprocess.check_call(['git', 'init'], cwd=path)
+    subprocess.check_call(['git', 'init', '--initial-branch', 'develop'], cwd=path)
     subprocess.check_call(['git', 'config', 'user.email', 'test@example.test'])
     subprocess.check_call(['git', 'config', 'user.name', 'Test CI'])
     subprocess.check_call(['git', 'annex', 'init'], cwd=path)
