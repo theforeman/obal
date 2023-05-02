@@ -9,6 +9,6 @@ packages:
   hosts:
     hello:
       upstream: "file://{{ inventory_dir }}/../upstream/.git"
-      branch: "master"
+      branch: "develop"
       upstream_files:
         - "packages/hello/"
