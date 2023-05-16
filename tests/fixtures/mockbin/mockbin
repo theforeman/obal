@@ -6,9 +6,9 @@ import os
 import sys
 import argparse
 try:
-    from pipes import quote
-except ImportError:
     from shlex import quote
+except ImportError:
+    from pipes import quote
 
 
 _FAKE_TASKINFO = """Task: 1234
