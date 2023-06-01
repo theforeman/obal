@@ -2,9 +2,9 @@
 - name: Find all tags
   koji_find_tags:
     packages: "{{ hostvars }}"
-  register: tags
+  register: all_tags
 
 - include_tasks: "verify.yaml"
-  loop: "{{ tags.tags }}"
+  loop: "{{ all_tags.tags }}"
   loop_control:
     loop_var: tag_name
