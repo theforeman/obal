@@ -10,23 +10,35 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         python:
-          - "2.7"
           - "3.6"
           - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
+        include:
+          - python: "2.7"
+            container: "python:2.7"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+        if: matrix.container == null
+      - name: Install sudo
+        run: apt-get update && apt-get install -y sudo debian-archive-keyring
+        if: matrix.container != null
+      - name: Install git and git-annex from backports
+        run: |
+          echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+          apt-get update && apt-get install -y git/buster-backports git-annex/buster-backports
+        if: matrix.container != null
       - name: Install dependencies
         run: pip install -r requirements-test.txt
       - name: Install RPM tools
