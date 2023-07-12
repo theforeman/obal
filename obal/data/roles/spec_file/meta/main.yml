@@ -1,3 +1,4 @@
 ---
 dependencies:
   - role: ensure_package
+allow_duplicates: true
