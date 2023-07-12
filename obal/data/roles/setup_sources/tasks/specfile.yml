@@ -1,4 +1,7 @@
 ---
+- include_role:
+    name: spec_file
+
 - name: 'Extract Sources from spec'
   shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
   register: setup_sources_sources
