@@ -199,7 +199,9 @@ elif prog in ['copr-cli']:
 
     if args.subcommand == 'get-package':
         #json_data = json.loads('{"builds": [{"state": "succeeded", "source_package": {"version": "0.0.1"}}]}')
-        json_data = {"builds": [{"state": "succeeded", "source_package": {"version": "0.0.1"}}]}
+        json_data = {"builds": [
+            {"chroots": ["rhel-7-x86_64"], "state": "succeeded", "source_package": {"version": "0.0.1"}}
+        ]}
         print(json.dumps(json_data, indent=2))
     elif args.subcommand == 'build':
         print("Build was added to foreman-1234:")
