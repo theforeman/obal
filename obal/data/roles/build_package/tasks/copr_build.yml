@@ -1,111 +1,69 @@
 ---
-- when:
-    - not build_package_scratch
-    - not build_package_copr_rebuild
-  block:
-    - name: "Package name"
-      rpm_nevr:
-        spec_file: "{{ spec_file_path }}"
-        scl: "{{ tag.scl | default(omit) }}"
-        dist: "{{ tag.dist | default(omit) }}"
-        macros: "{{ tag.macros | default(omit) }}"
-      register: package_nevr
+- block:
+    - name: Create temporary build directory
+      tempfile:
+        state: directory
+        suffix: srpms
+      register: srpm_directory
+      when: srpm_directory is not defined
 
-    - name: Get information about Copr build
-      copr_build_info:
-        user: "{{ copr_project_user }}"
-        project: "{{ copr_project['copr_project_name'] }}"
-        nevr: "{{ package_nevr.nevr }}"
-        package: "{{ package_nevr.name }}"
-        config_file: "{{ build_package_copr_config | default(omit) }}"
-      register: build_info
-
-- name: Create temporary build directory
-  tempfile:
-    state: directory
-    suffix: srpms
-  register: srpm_directory
-  when: srpm_directory is not defined or ('exists' in build_info and not build_info.exists) or build_package_copr_rebuild
-
-- name: 'Build SRPM'
-  srpm:
-    package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-    output: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
-    source_location: "{{ source_location | default(omit) }}"
-    source_system: "{{ source_system | default(omit) }}"
-  register: srpm_build
-  when: (srpm_directory is defined and (build_info.exists is defined and not build_info.exists)) or build_package_copr_rebuild or build_package_scratch
-
-- when: (not build_package_scratch and (build_info.exists is defined and not build_info.exists)) or build_package_copr_rebuild
-  block:
-    - name: 'Run build'
-      copr_build:
-        user: "{{ copr_project_user }}"
-        project: "{{ copr_project['copr_project_name'] }}"
-        srpm: "{{ srpm_build.path }}"
-        chroots: "{{ chroot }}"
-        config_file: "{{ build_package_copr_config | default(omit) }}"
-      register: copr_builds
-      ignore_errors: "{{ build_package_skip_failed_build | default(false) }}"
-      loop: "{{ copr_project['copr_project_chroots'] | map(attribute='name') | list }}"
-      loop_control:
-        loop_var: chroot
-
-    - name: 'Created tasks'
-      debug:
-        msg: "{{ copr_builds['results'] | map(attribute='build_urls') | list | flatten }}"
-
-    - name: 'Wait for tasks to finish'
-      include_tasks: wait.yml
-      when: build_package_wait|bool
+    - include_role:
+        name: build_srpm
       vars:
-        copr_build_ids: "{{ copr_builds['results'] | map(attribute='builds') | list | flatten }}"
+        build_srpm_output_dir: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
+
+- name: Define Copr project user
+  set_fact:
+    build_package_project_user: "{{ copr_scratch_user | default(copr_project_user) }}"
 
 - when: build_package_scratch
   block:
     - name: Define Copr scratch project name
       set_fact:
-        copr_scratch_project: "{{ copr_project['copr_project_name'] }}-scratch-{{ 999999999 | random | to_uuid }}"
-      when: copr_scratch_project is not defined
-
-    - name: Define Copr scatch user name
-      set_fact:
-        copr_scratch_user: "{{ copr_project_user }}"
-      when: copr_scratch_user is not defined
+        build_package_project_name: "{{ copr_scratch_project | default(copr_project['copr_project_name'] + '-scratch-' + (999999999 | random | to_uuid)) }}"
 
     - include_role:
         name: copr_project
       vars:
-        copr_project_user: "{{ copr_scratch_user }}"
-        copr_project_name: "{{ copr_scratch_project }}"
+        copr_project_user: "{{ build_package_project_user }}"
+        copr_project_name: "{{ build_package_project_name }}"
         copr_project_chroots: "{{ copr_project['copr_project_chroots'] }}"
         copr_project_description: "{{ copr_project['copr_project_description'] | default('') }}"
         copr_project_delete_after_days: "4"
         copr_project_unlisted_on_homepage: "{{ copr_project['copr_project_unlisted_on_homepage'] | default(true) }}"
         copr_project_copr_config: "{{ build_package_copr_config | default('') }}"
 
-    - name: 'Run build'
-      copr_build:
-        user: "{{ copr_scratch_user }}"
-        project: "{{ copr_scratch_project }}"
-        srpm: "{{ srpm_build.path }}"
-        chroots: "{{ chroot }}"
-        config_file: "{{ build_package_copr_config | default(omit) }}"
-      register: copr_builds
-      loop: "{{ copr_project['copr_project_chroots'] | map(attribute='name') | list }}"
-      loop_control:
-        loop_var: chroot
+- name: 'Run build'
+  copr_build:
+    user: "{{ build_package_project_user }}"
+    project: "{{ build_package_project_name | default(copr_project['copr_project_name']) }}"
+    srpm: "{{ srpm_build.path }}"
+    chroot: "{{ chroot }}"
+    config_file: "{{ build_package_copr_config | default(omit) }}"
+    force: "{{ build_package_copr_rebuild }}"
+  register: copr_builds
+  ignore_errors: "{{ build_package_skip_failed_build | default(false) }}"
+  loop: "{{ copr_project['copr_project_chroots'] | map(attribute='name') | list }}"
+  loop_control:
+    loop_var: chroot
 
-    - name: 'Created tasks'
-      debug:
-        msg: "{{ copr_builds['results'] | map(attribute='build_urls') | list | flatten }}"
+- name: 'Created tasks'
+  when: copr_builds is changed
+  debug:
+    msg: "{{ copr_builds['results'] | selectattr('build_urls', 'defined') | map(attribute='build_urls') | list | flatten }}"
 
-    - name: 'Wait for tasks to finish'
-      include_tasks: wait.yml
-      when: build_package_wait|bool
-      vars:
-        copr_build_ids: "{{ copr_builds['results'] | map(attribute='builds') | list | flatten }}"
+- name: 'Wait for tasks to finish'
+  when:
+    - build_package_wait|bool
+    - copr_builds is changed
+  include_tasks: wait.yml
+  vars:
+    copr_build_ids: "{{ copr_builds['results'] | selectattr('builds', 'defined') | map(attribute='builds') | list | flatten }}"
 
+- when:
+    - build_package_archive_build_info
+    - copr_builds is changed
+  block:
     - name: Create build info directory
       file:
         path: "{{ inventory_dir }}/copr_build_info"
@@ -120,8 +78,8 @@
         content: "{{ copr_builds | to_yaml }}"
         mode: '0644'
 
-    - name: 'Download builds'
-      include_tasks: download_rpms.yml
-      when: build_package_download_rpms|bool
-      vars:
-        chroots: "{{ copr_project['copr_project_chroots'] | map(attribute='name') | list }}"
+- name: 'Download builds'
+  include_tasks: download_rpms.yml
+  when: build_package_download_rpms|bool
+  vars:
+    chroots: "{{ copr_project['copr_project_chroots'] | map(attribute='name') | list }}"

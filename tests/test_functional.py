@@ -665,7 +665,8 @@ def test_obal_scratch_copr_hello_nowait():
         "copr-cli list example",
         "copr-cli create example/foreman-1234 --description foreman-1234 --appstream off --chroot epel-7-x86_64 --unlisted-on-hp on --delete-after-days 4",  # noqa: E501
         "copr-cli edit-chroot example/foreman-1234/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
-        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64"
+        "copr-cli get-package example/foreman-1234 --name hello --with-all-builds",
+        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --chroot epel-7-x86_64 --nowait"
     ]
     assert_mockbin_log(expected_log)
 
@@ -680,7 +681,8 @@ def test_obal_scratch_copr_hello():
         "copr-cli list example",
         "copr-cli create example/foreman-1234 --description foreman-1234 --appstream off --chroot epel-7-x86_64 --unlisted-on-hp on --delete-after-days 4",  # noqa: E501
         "copr-cli edit-chroot example/foreman-1234/epel-7-x86_64 --repos http://mirror.centos.org/centos/7/sclo/x86_64/rh/ --packages 'rh-ruby24-build scl-utils-build'",  # noqa: E501
-        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64",
+        "copr-cli get-package example/foreman-1234 --name hello --with-all-builds",
+        "copr-cli build example/foreman-1234 /tmp/SRPMs/hello-2.10-1.src.rpm --chroot epel-7-x86_64 --nowait",
         "copr-cli watch-build 5678"
     ]
     assert_mockbin_log(expected_log)
@@ -694,7 +696,7 @@ def test_obal_release_copr_hello_nowait():
 
     expected_log = [
         "copr-cli get-package example/foreman --name hello --with-all-builds",
-        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64"
+        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --chroot epel-7-x86_64 --nowait"
     ]
     assert_mockbin_log(expected_log)
 
@@ -707,7 +709,7 @@ def test_obal_release_copr_hello():
 
     expected_log = [
         "copr-cli get-package example/foreman --name hello --with-all-builds",
-        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --nowait --chroot epel-7-x86_64",
+        "copr-cli build example/foreman /tmp/SRPMs/hello-2.10-1.src.rpm --chroot epel-7-x86_64 --nowait",
         "copr-cli watch-build 5678"
     ]
     assert_mockbin_log(expected_log)

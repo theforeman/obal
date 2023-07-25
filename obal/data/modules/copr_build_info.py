@@ -48,7 +48,7 @@ def main():
     successful_nevrs = ("{}-{}".format(package, build['source_package']['version']) for build in successful_builds)
     exists = nevr in successful_nevrs
 
-    module.exit_json(exists=exists)
+    module.exit_json(info=package_info, exists=exists)
 
 
 if __name__ == '__main__':

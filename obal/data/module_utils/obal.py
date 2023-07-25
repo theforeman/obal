@@ -10,6 +10,23 @@ except ImportError:
     from .koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
 
 
+def macro_lookup(command, scl=None, dist=None, macros=None):
+    """run a macro lookup command"""
+    if dist:
+        command += ['--define', 'dist %s' % dist]
+    else:
+        command += ['--undefine', 'dist']
+
+    if scl:
+        command += ['--define', 'scl %s' % scl]
+
+    if macros is not None:
+        for (macro, value) in macros.items():
+            command += ['--define', '%s %s' % (macro, value)]
+
+    return subprocess.check_output(command, universal_newlines=True)
+
+
 def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None):
     """expand a given macro from a specfile"""
     command = [
@@ -21,19 +38,20 @@ def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None)
         specfile
     ]
 
-    if dist:
-        command += ['--define', '"dist %s"' % dist]
-    else:
-        command += ['--undefine', 'dist']
+    return macro_lookup(command, scl=scl, dist=dist, macros=macros)
 
-    if scl:
-        command += ['--define', '"scl %s"' % scl]
 
-    if macros is not None:
-        for (macro, value) in macros.items():
-            command += ['--define', '"%s %s"' % (macro, value)]
+def srpm_macro_lookup(srpm, macro_str, scl=None, dist=None, macros=None):
+    """expand a given macro from an srpm"""
+    command = [
+        'rpmquery',
+        '--queryformat',
+        macro_str,
+        '--package',
+        srpm
+    ]
 
-    return subprocess.check_output(' '.join(command), universal_newlines=True, shell=True)
+    return macro_lookup(command, scl=scl, dist=dist, macros=macros)
 
 
 def get_changelog_evr(specfile):
@@ -54,9 +72,19 @@ def get_specfile_evr(specfile):
     return specfile_macro_lookup(specfile, '%{evr}')
 
 
+def get_srpm_evr(srpm):
+    """get the EVR from the source header of the srpm"""
+    return srpm_macro_lookup(srpm, '%{evr}')
+
+
 def get_specfile_name(specfile, scl=None):
     """get the name from the specfile"""
     return specfile_macro_lookup(specfile, '%{name}', scl=scl)
+
+
+def get_srpm_name(srpm, scl=None):
+    """get the name from the srpm"""
+    return srpm_macro_lookup(srpm, '%{name}', scl=scl)
 
 
 def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
@@ -64,9 +92,19 @@ def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
     return specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
 
 
+def get_srpm_nevr(srpm, scl=None, dist=None, macros=None):
+    """get the name, epoch, version and release from the srpm"""
+    return srpm_macro_lookup(srpm, '%{nevr}', scl=scl, dist=dist, macros=macros)
+
+
 def get_specfile_nvr(specfile, scl=None, dist=None, macros=None):
     """get the name, version and release from the specfile"""
     return specfile_macro_lookup(specfile, '%{nvr}', scl=scl, dist=dist, macros=macros)
+
+
+def get_srpm_nvr(srpm, scl=None, dist=None, macros=None):
+    """get the name, version and release from the srpm"""
+    return srpm_macro_lookup(srpm, '%{nvr}', scl=scl, dist=dist, macros=macros)
 
 
 def get_whitelist_status(build_command, tag, package):
