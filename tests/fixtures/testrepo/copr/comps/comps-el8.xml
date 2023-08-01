@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>obal</id>
+    <name>Obal</name>
+    <description>Packages for Obal test repo</description>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="default">hello</packagereq>
+    </packagelist>
+  </group>
+</comps>
