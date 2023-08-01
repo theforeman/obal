@@ -27,6 +27,7 @@ copr_projects:
           buildroot_packages:
             - rh-ruby24-build
             - scl-utils-build
+          comps_file: "{{ inventory_dir }}/comps/comps-el8.xml"
     client:
       copr_project_name: "foreman-client"
       copr_project_chroots:

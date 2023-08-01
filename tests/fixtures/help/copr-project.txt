@@ -1,4 +1,6 @@
-usage: obal copr-project [-h] [-v] [-e EXTRA_VARS] [--user COPR_PROJECT_USER]
+usage: obal copr-project [-h] [-v] [-e EXTRA_VARS]
+                         [--copr-config COPR_PROJECT_COPR_CONFIG]
+                         [--user COPR_PROJECT_USER]
                          target [target ...]
 
 This action configures Copr projects
@@ -9,6 +11,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --copr-config COPR_PROJECT_COPR_CONFIG
+                        Path to a Copr config file
   --user COPR_PROJECT_USER
                         Copr user to use instead of the default value
 

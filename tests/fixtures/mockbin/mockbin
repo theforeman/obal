@@ -191,6 +191,7 @@ elif prog in ['copr-cli']:
     parser_build.add_argument('--repos')
     parser_build.add_argument('--packages')
     parser_build.add_argument('--modules')
+    parser_build.add_argument('--upload-comps')
 
     parser_build = subparsers.add_parser('watch-build')
     parser_build.add_argument('build')

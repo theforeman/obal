@@ -5,3 +5,6 @@ variables:
   copr_project_user:
     parameter: --user
     help: Copr user to use instead of the default value
+  copr_project_copr_config:
+    parameter: --copr-config
+    help: Path to a Copr config file
