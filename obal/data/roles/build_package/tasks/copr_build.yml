@@ -5,12 +5,12 @@
         state: directory
         suffix: srpms
       register: srpm_directory
-      when: srpm_directory is not defined
+      when: build_package_srpm_directory is not defined
 
     - include_role:
         name: build_srpm
       vars:
-        build_srpm_output_dir: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
+        build_srpm_output_dir: "{{ build_package_srpm_directory | default(srpm_directory.path) }}"
 
 - name: Define Copr project user
   set_fact:
