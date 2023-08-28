@@ -11,4 +11,3 @@
 - name: 'Built srpm path'
   debug:
     msg: "Built {{ srpm_build.path }}"
-  when: srpm_build is successful

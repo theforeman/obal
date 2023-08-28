@@ -37,12 +37,12 @@
         state: directory
         suffix: srpms
       register: srpm_directory
-      when: srpm_directory is not defined
+      when: build_package_srpm_directory is not defined
 
     - name: 'Build SRPM'
       srpm:
         package: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-        output: "{{ srpm_directory.path if 'path' in srpm_directory else srpm_directory }}"
+        output: "{{ build_package_srpm_directory | default(srpm_directory.path) }}"
         scl: "{{ scl | default(omit) }}"
         source_location: "{{ source_location | default(omit) }}"
         source_system: "{{ source_system | default(omit) }}"

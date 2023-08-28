@@ -16,7 +16,7 @@ TESTREPO_DIR = os.path.join(FIXTURE_DIR, 'testrepo')
 MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin')
 MOCK_SOURCES_DIR = os.path.join(FIXTURE_DIR, 'mock_sources')
 
-DEFAULT_ARGS = ['-e', 'srpm_directory="/tmp/SRPMs"']
+DEFAULT_ARGS = ['-e', 'build_package_srpm_directory="/tmp/SRPMs"']
 
 
 def git_init(path):
