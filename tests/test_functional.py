@@ -607,10 +607,11 @@ def test_obal_repoclosure():
 
     expected_log = [
         "dnf repoclosure",
+        "--refresh",
+        "--newest",
         "--config",
         "repoclosure/yum.conf",
-        "--newest",
-        "--check downloaded_rpms",
+        "--check el7-katello",
         "--repo el7-base"
     ]
     assert_in_mockbin_log(expected_log)
@@ -625,11 +626,12 @@ def test_obal_repoclosure_with_downloaded_rpms():
 
     expected_log = [
         "dnf repoclosure",
+        "--newest",
+        "--refresh",
         "--config",
         "repoclosure/yum.conf",
-        "--newest",
+        "--repofrompath downloaded_rpms,{pwd}/downloaded_rpms/rhel7",
         "--check downloaded_rpms",
-        "--repofrompath=downloaded_rpms,./downloaded_rpms/rhel7",
         "--repo el7-base"
     ]
     assert_in_mockbin_log(expected_log)
@@ -644,12 +646,13 @@ def test_obal_repoclosure_katello_with_downloaded_rpms():
 
     expected_log = [
         "dnf repoclosure",
+        "--newest",
+        "--refresh",
         "--config",
         "repoclosure/yum.conf",
-        "--newest",
+        "--repofrompath downloaded_rpms,{pwd}/downloaded_rpms/rhel7",
         "--check el7-katello",
         "--check downloaded_rpms",
-        "--repofrompath=downloaded_rpms,./downloaded_rpms/rhel7",
         "--repo el7-base"
     ]
     assert_in_mockbin_log(expected_log)

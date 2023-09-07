@@ -33,6 +33,9 @@ repoclosures:
   hosts:
     core-repoclosure:
       repoclosure_target_dist: rhel7
+      repoclosure_target_repos:
+        rhel7:
+          - el7-katello
     dist-repoclosure: {}
     katello-repoclosure:
       repoclosure_target_repos:

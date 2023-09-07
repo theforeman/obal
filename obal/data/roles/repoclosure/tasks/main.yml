@@ -1,16 +1,4 @@
 ---
-- name: 'Initialize additional_repos'
-  set_fact:
-    additional_repos: []
-
-- name: 'Build additional repos'
-  set_fact:
-    additional_repos: "{{ additional_repos + ['--repofrompath=' + item.name + ',' + item.url] }}"
-  with_items: "{{ repoclosure_additional_repos }}"
-
-- debug:
-    msg: "{{ additional_repos }}"
-
 - name: Find all downloaded repositories
   find:
     paths: "{{ inventory_dir }}/downloaded_rpms"
