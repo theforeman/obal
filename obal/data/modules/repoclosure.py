@@ -37,7 +37,7 @@ def main():
         command.extend(['--check', name])
 
     for repo in additional_repos:
-        command.extend(['--repofrompath', f"{repo['name']},{repo['url']}"])
+        command.extend(['--repofrompath', '{},{}'.format(repo['name'], repo['url'])])
 
     for repo in lookaside:
         command.extend(['--repo', repo])
