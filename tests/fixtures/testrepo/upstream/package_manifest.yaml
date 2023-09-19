@@ -12,6 +12,9 @@ packages:
         dist: '.el7'
       - name: obaltest-nightly-el8
         dist: '.el8'
+    repoclosure_lookaside_repos:
+      rhel7:
+        - el7-base
   hosts:
     hello:
       nightly_package_tito_releaser_args:

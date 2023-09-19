@@ -3,3 +3,4 @@ repoclosure_additional_repos: []
 repoclosure_config: repoclosure/yum.conf
 repoclosure_target_repos: {}
 repoclosure_lookaside_repos: {}
+repoclosure_check_repos: []

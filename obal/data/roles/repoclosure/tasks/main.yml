@@ -1,33 +1,34 @@
 ---
-- name: Find all downloaded repositories
-  find:
-    paths: "{{ inventory_dir }}/downloaded_rpms"
-    recurse: false
-    file_type: directory
-  register: downloaded_rpms_folders
-
-- name: Map repositories to dists
-  set_fact:
-    downloaded_rpms_dists: "{{ downloaded_rpms_folders.files | map(attribute='path') | map('basename') | list }}"
-
 - name: Run repoclosure for all dists
-  include_tasks: repoclosure.yml
-  vars:
-    repoclosure_use_downloaded_rpms: true
-  loop: "{{ downloaded_rpms_dists }}"
-  loop_control:
-    loop_var: dist
+  include_tasks: downloaded_rpms_repoclosure.yml
   when:
-    - downloaded_rpms_dists
     - repoclosure_target_dist is not defined
+    - not repoclosure_check_repos
 
 - name: Run repoclosure for main repo
   include_tasks: repoclosure.yml
-  vars:
-    repoclosure_use_downloaded_rpms: false
   loop:
     - "{{ repoclosure_target_dist }}"
   loop_control:
     loop_var: dist
+  vars:
+    check_repos: "{{ repoclosure_target_repos[dist] }}"
+    lookaside_repos: "{{ repoclosure_lookaside_repos[dist] }}"
+    additional_repos: []
   when:
     - repoclosure_target_dist is defined
+    - not repoclosure_check_repos
+
+- name: Run repoclosure for a target repo
+  include_tasks: repoclosure.yml
+  loop:
+    - "{{ repoclosure_check_repos }}"
+  loop_control:
+    loop_var: repo_url
+    index_var: index
+  vars:
+    check_repos: "{{ 'repo' + index|string }}"
+    lookaside_repos: "{{ repoclosure_lookaside_repos[repoclosure_target_dist] }}"
+    additional_repos: "{{ [{'name': 'repo' + index|string, 'url': repo_url}] }}"
+  when:
+    - repoclosure_check_repos

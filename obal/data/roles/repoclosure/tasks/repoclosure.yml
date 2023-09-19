@@ -1,29 +1,4 @@
 - block:
-    - name: Generate downloaded_rpms dictionary for additional repositories
-      set_fact:
-        download_rpm_repos: "{{ dict([['name', 'downloaded_rpms'], ['url', inventory_dir + '/downloaded_rpms/' + dist]]) }}"
-      when: downloaded_rpms_dists
-
-    - name: Generate list of repositories
-      set_fact:
-        repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist] | default([]) + ['downloaded_rpms'] }}"
-      when: downloaded_rpms_dists
-
-    - name: Generate list of repositories
-      set_fact:
-        repoclosure_target_repos_all: "{{ repoclosure_target_repos[dist] }}"
-      when: not downloaded_rpms_dists
-
-    - name: Set additional_repos
-      set_fact:
-        additional_repos: "{{ repoclosure_additional_repos + [download_rpm_repos] }}"
-      when: download_rpm_repos is defined
-
-    - name: Set additional_repos
-      set_fact:
-        additional_repos: "{{ repoclosure_additional_repos }}"
-      when: download_rpm_repos is not defined
-
     - name: Set config filename for repoclosure
       set_fact:
         config_filename: "{{ repoclosure_config | basename }}"
@@ -47,12 +22,12 @@
         regexp: "^cachedir.*"
         replace: "cachedir={{ temp_directory.path }}"
 
-    - name: 'Run repoclosure for {{ dist }}'
+    - name: 'Run repoclosure'
       repoclosure:
         config: "{{ temp_directory.path }}/{{ config_filename }}"
-        check: "{{ repoclosure_target_repos_all }}"
-        additional_repos: "{{ additional_repos }}"
-        lookaside: "{{ repoclosure_lookaside_repos[dist] }}"
+        check: "{{ check_repos | default([]) }}"
+        additional_repos: "{{ additional_repos | default([]) }}"
+        lookaside: "{{ lookaside_repos | default([]) }}"
       register: output
 
     - debug:
