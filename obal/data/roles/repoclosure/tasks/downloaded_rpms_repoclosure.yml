@@ -1,0 +1,23 @@
+---
+- name: Find all downloaded repositories
+  find:
+    paths: "{{ inventory_dir }}/downloaded_rpms"
+    recurse: false
+    file_type: directory
+  register: downloaded_rpms_folders
+
+- name: Map repositories to dists
+  set_fact:
+    downloaded_rpms_dists: "{{ downloaded_rpms_folders.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Include repoclosure
+  ansible.builtin.include_tasks:
+    file: repoclosure.yml
+  vars:
+    download_rpm_repos: "{{ dict([['name', 'downloaded_rpms'], ['url', inventory_dir + '/downloaded_rpms/' + dist]]) }}"
+    check_repos: "{{ repoclosure_target_repos[dist] | default([]) + ['downloaded_rpms'] }}"
+    additional_repos: "{{ repoclosure_additional_repos + [download_rpm_repos] }}"
+    lookaside_repos: "{{ repoclosure_lookaside_repos[dist] }}"
+  loop: "{{ downloaded_rpms_dists }}"
+  loop_control:
+    loop_var: dist

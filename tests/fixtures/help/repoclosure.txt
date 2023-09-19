@@ -1,4 +1,7 @@
-usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS] target [target ...]
+usage: obal repoclosure [-h] [-v] [-e EXTRA_VARS]
+                        [--check REPOCLOSURE_CHECK_REPOS]
+                        [--dist REPOCLOSURE_TARGET_DIST]
+                        target [target ...]
 
 Run repoclosure for a repository
 
@@ -10,6 +13,10 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --check REPOCLOSURE_CHECK_REPOS
+                        Link to a repository to target for repoclosure
+  --dist REPOCLOSURE_TARGET_DIST
+                        Target dist to test against (e.g. el8)
 
 advanced arguments:
   -e EXTRA_VARS, --extra-vars EXTRA_VARS

@@ -657,6 +657,22 @@ def test_obal_repoclosure_katello_with_downloaded_rpms():
     ]
     assert_in_mockbin_log(expected_log)
 
+@obal_cli_test(repotype='upstream')
+def test_obal_repoclosure_with_check_repo():
+    assert_obal_success(['repoclosure', 'hello', '--check', 'https://test.example.com/myrepo', '--dist', 'rhel7'])
+
+    expected_log = [
+        "dnf repoclosure",
+        "--newest",
+        "--refresh",
+        "--config",
+        "repoclosure/yum.conf",
+        "--check repo0",
+        "--repofrompath repo0,https://test.example.com/myrepo",
+        "--repo el7-base"
+    ]
+
+    assert_in_mockbin_log(expected_log)
 
 @obal_cli_test(repotype='copr')
 def test_obal_scratch_copr_hello_nowait():
