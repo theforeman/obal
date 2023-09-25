@@ -86,7 +86,7 @@ def main():
         package_name = get_srpm_name(srpm)
         nevr = get_srpm_nevr(srpm)
     except CalledProcessError as error:
-        module.fail_json(msg="{}".format(error.output), command=error.cmd, output=error.output)
+        module.fail_json(msg=error.output, command=error.cmd, output=error.output)
 
     package_info = get_package_info(module, user, project, package_name, config_file)
 
