@@ -121,7 +121,7 @@ def build_srpm(module, package, base_dir, sources_dir, scl=None):
 
 def main():
     """
-    Build a package using tito
+    Build a package using rpmbuild
     """
     module = AnsibleModule(
         argument_spec=dict(
