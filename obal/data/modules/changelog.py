@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # pylint: disable=C0111
 import locale
 import subprocess

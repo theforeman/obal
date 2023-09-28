@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Check if build exists in Koji
 """

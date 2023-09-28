@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Find all defined Koji tags in inventory
 """

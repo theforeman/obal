@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Fork a Copr project
 """

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Retrieve a particular build for a package in Copr
 """

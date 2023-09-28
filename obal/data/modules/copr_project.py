@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Create a Project in Copr
 """

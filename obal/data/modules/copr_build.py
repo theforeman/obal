@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Release a package to Copr
 """
