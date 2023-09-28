@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Verify packages against a tag in Koji
 """

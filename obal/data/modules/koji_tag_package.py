@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Tag package build into Koji tag
 """

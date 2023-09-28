@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Calculate name-epoch:version-release for an RPM package
 """

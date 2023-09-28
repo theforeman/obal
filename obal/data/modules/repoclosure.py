@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Run repoclosure on a set of repositories
 """

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Manage a chroot in a Copr project
 """
