@@ -3,3 +3,4 @@
   loop: "{{ copr_projects }}"
   loop_control:
     loop_var: copr_project
+    label: "{{ copr_project['copr_project_name'] }}"
