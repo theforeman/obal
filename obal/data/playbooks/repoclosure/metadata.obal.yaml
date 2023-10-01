@@ -5,7 +5,7 @@ help: |
   Repoclosure ensures that all dependencies are met and all packages are installable.
 variables:
   repoclosure_check_repos:
-    store: append
+    action: append
     parameter: --check
     help: Link to a repository to target for repoclosure
   repoclosure_target_dist:
