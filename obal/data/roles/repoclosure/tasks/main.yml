@@ -21,8 +21,7 @@
 
 - name: Run repoclosure for a target repo
   include_tasks: repoclosure.yml
-  loop:
-    - "{{ repoclosure_check_repos }}"
+  loop: "{{ repoclosure_check_repos }}"
   loop_control:
     loop_var: repo_url
     index_var: index
