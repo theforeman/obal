@@ -1,25 +1,6 @@
 ---
-- name: 'Create Copr project'
-  copr_project:
-    user: "{{ copr_project_user }}"
-    project: "{{ copr_project_name }}"
-    chroots: "{{ copr_project_chroots | map(attribute='name') | list }}"
-    description: "{{ copr_project_description | default(omit) }}"
-    delete_after_days: "{{ copr_project_delete_after_days | default(omit) }}"
-    unlisted_on_homepage: "{{ copr_project_unlisted_on_homepage | default(omit) }}"
-    config_file: "{{ copr_project_copr_config | default(omit) }}"
-  register: create_output
+- when: copr_project_fork_from
+  include_tasks: fork.yml
 
-- name: Configure chroots
-  copr_chroot:
-    user: "{{ copr_project_user }}"
-    project: "{{ copr_project_name }}"
-    chroot: "{{ chroot.name }}"
-    external_repos: "{{ chroot.external_repos | default(omit) }}"
-    buildroot_packages: "{{ chroot.buildroot_packages | default(omit) }}"
-    modules: "{{ chroot.modules | default(omit) }}"
-    config_file: "{{ copr_project_copr_config | default(omit) }}"
-    comps_file: "{{ chroot.comps_file | default(omit) }}"
-  loop: "{{ copr_project_chroots }}"
-  loop_control:
-    loop_var: chroot
+- when: not copr_project_fork_from
+  include_tasks: create.yml

@@ -1,0 +1,8 @@
+---
+- name: Fork Copr project
+  copr_fork:
+    src_user: "{{ copr_project_user }}"
+    src_project: "{{ copr_project_fork_from }}"
+    dest_user: "{{ copr_project_user }}"
+    dest_project: "{{ copr_project_name }}"
+    config_file: "{{ copr_project_copr_config | default(omit) }}"

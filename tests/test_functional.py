@@ -849,3 +849,13 @@ def test_copr_project_many_chroots():
 
     ]
     assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='copr')
+def test_copr_project_fork():
+    assert_obal_success(['copr-project', 'client', '-e copr_project_fork_from=client-test'])
+
+    expected_log = [
+        "copr-cli fork example/client-test example/foreman-client"
+    ]
+    assert_mockbin_log(expected_log)
