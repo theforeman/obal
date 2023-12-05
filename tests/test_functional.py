@@ -612,6 +612,7 @@ def test_obal_repoclosure():
         "--config",
         "repoclosure/yum.conf",
         "--check el7-katello",
+        "--repo el7-katello",
         "--repo el7-base"
     ]
     assert_in_mockbin_log(expected_log)

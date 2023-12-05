@@ -36,6 +36,7 @@ def main():
 
     for name in check:
         command.extend(['--check', name])
+        command.extend(['--repo', name])
 
     for repo in additional_repos:
         command.extend(['--repofrompath', '{},{}'.format(repo['name'], repo['url'])])
