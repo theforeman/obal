@@ -7,6 +7,20 @@
   roles:
     - package_variables
   tasks:
+
+    - name: 'Scans for rpmlint file'
+      ansible.builtin.find:
+        path: "{{ inventory_dir }}/rpmlint"
+        file_type: file
+        recurse: true
+        hidden: true
+      register: lintfile
+
+    - name: 'Set rpmlint file when present'
+      set_fact:
+        rpmlint_rc_file: "{{ lintfile.files | map(attribute='path') | first }}"
+      when: lintfile.files | map(attribute='size') | length > 0
+
     - name: 'Set default rpmlint RC file'
       set_fact:
         rpmlint_rc_file: "{{ inventory_dir }}/{{ package_base_dir }}{{ inventory_hostname }}/.rpmlintrc"
