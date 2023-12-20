@@ -857,6 +857,9 @@ def test_copr_project_fork():
     assert_obal_success(['copr-project', 'client', '-e copr_project_fork_from=client-test'])
 
     expected_log = [
-        "copr-cli fork example/client-test example/foreman-client"
+        "copr-cli fork example/client-test example/foreman-client",
+        "copr-cli edit-chroot example/foreman-client/rhel-9-x86_64",
+        "copr-cli edit-chroot example/foreman-client/rhel-8-x86_64",
+        "copr-cli edit-chroot example/foreman-client/rhel-7-x86_64",
     ]
     assert_mockbin_log(expected_log)

@@ -4,3 +4,17 @@
 
 - when: not copr_project_fork_from
   include_tasks: create.yml
+
+- name: Configure chroots
+  copr_chroot:
+    user: "{{ copr_project_user }}"
+    project: "{{ copr_project_name }}"
+    chroot: "{{ chroot.name }}"
+    external_repos: "{{ chroot.external_repos | default(omit) }}"
+    buildroot_packages: "{{ chroot.buildroot_packages | default(omit) }}"
+    modules: "{{ chroot.modules | default(omit) }}"
+    config_file: "{{ copr_project_copr_config | default(omit) }}"
+    comps_file: "{{ chroot.comps_file | default(omit) }}"
+  loop: "{{ copr_project_chroots }}"
+  loop_control:
+    loop_var: chroot
