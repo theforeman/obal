@@ -3,26 +3,9 @@
 Create a Project in Copr
 """
 
-import re
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.copr import copr_cli, CoprCliCommandError, full_name # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.copr import copr_cli, CoprCliCommandError, full_name, project_exists # pylint:disable=import-error,no-name-in-module
 
-
-def project_exists(user, project, module, config_file=None):
-    """
-    Return true if a project already exists for a user
-    """
-    command = [
-        'list',
-        user
-    ]
-
-    try:
-        project_list = copr_cli(command, config_file=config_file)
-    except CoprCliCommandError as error:
-        module.fail_json(msg='Copr project listing failed', command=' '.join(error.command), output=error.message)
-
-    return re.search("Name: {}\n".format(project), project_list) is not None
 
 def main():
     """

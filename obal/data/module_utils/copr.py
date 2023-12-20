@@ -1,6 +1,7 @@
 """
 A copr-cli wrapper and support functions for Copr
 """
+import re
 from subprocess import check_output, CalledProcessError, STDOUT
 
 class CoprCliCommandError(Exception):
@@ -30,3 +31,19 @@ def full_name(user, project):
     Returns a full Copr name: user/project
     """
     return "{}/{}".format(user, project)
+
+def project_exists(user, project, module, config_file=None):
+    """
+    Return true if a project already exists for a user
+    """
+    command = [
+        'list',
+        user
+    ]
+
+    try:
+        project_list = copr_cli(command, config_file=config_file)
+    except CoprCliCommandError as error:
+        module.fail_json(msg='Copr project listing failed', command=' '.join(error.command), output=error.message)
+
+    return re.search("Name: {}\n".format(project), project_list) is not None
