@@ -857,9 +857,23 @@ def test_copr_project_fork():
     assert_obal_success(['copr-project', 'client', '-e copr_project_fork_from=client-test'])
 
     expected_log = [
+        "copr-cli list example",
         "copr-cli fork example/client-test example/foreman-client",
         "copr-cli edit-chroot example/foreman-client/rhel-9-x86_64",
         "copr-cli edit-chroot example/foreman-client/rhel-8-x86_64",
         "copr-cli edit-chroot example/foreman-client/rhel-7-x86_64",
+    ]
+    assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='copr')
+def test_copr_project_fork_already_exists():
+    assert_obal_success(['copr-project', 'client', '-e copr_project_fork_from=client-test', '-e copr_project_user=existing-fork'])
+
+    expected_log = [
+        "copr-cli list existing-fork",
+        "copr-cli edit-chroot existing-fork/foreman-client/rhel-9-x86_64",
+        "copr-cli edit-chroot existing-fork/foreman-client/rhel-8-x86_64",
+        "copr-cli edit-chroot existing-fork/foreman-client/rhel-7-x86_64",
     ]
     assert_mockbin_log(expected_log)
