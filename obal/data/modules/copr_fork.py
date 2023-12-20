@@ -4,7 +4,7 @@ Fork a Copr project
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.copr import copr_cli, CoprCliCommandError, full_name # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.copr import copr_cli, CoprCliCommandError, full_name, project_exists # pylint:disable=import-error,no-name-in-module
 
 
 def main():
@@ -28,6 +28,9 @@ def main():
     dest_project = module.params['dest_project']
     delete_after_days = module.params['delete_after_days']
     config_file = module.params['config_file']
+
+    if project_exists(dest_user, dest_project, module, config_file=config_file):
+        module.exit_json(changed=False)
 
     command = [
         'fork',

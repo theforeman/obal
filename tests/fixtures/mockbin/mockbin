@@ -208,5 +208,9 @@ elif prog in ['copr-cli']:
         print("Build was added to foreman-1234:")
         print("https://copr.fedorainfracloud.org/coprs/build/5678")
         print("Created builds: 5678")
+    elif args.subcommand == 'list':
+        if args.project == 'existing-fork':
+            print("Name: foreman-client")
+            print("  Description: foreman-client")
     else:
         print({})
