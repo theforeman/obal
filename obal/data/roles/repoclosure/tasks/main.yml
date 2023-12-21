@@ -26,7 +26,7 @@
     loop_var: repo_url
     index_var: index
   vars:
-    check_repos: "{{ 'repo' + index|string }}"
+    check_repos: "{{ ['repo' + index|string] + repoclosure_target_repos[repoclosure_target_dist]|default([]) }}"
     lookaside_repos: "{{ repoclosure_lookaside_repos[repoclosure_target_dist] }}"
     additional_repos: "{{ [{'name': 'repo' + index|string, 'url': repo_url}] }}"
   when:
