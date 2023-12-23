@@ -5,8 +5,3 @@
 
 - name: 'Setup sources from specfile'
   include_tasks: specfile.yml
-  when: setup_sources_git is not defined
-
-- name: 'Clone git repository'
-  include_tasks: git.yml
-  when: setup_sources_git is defined
