@@ -3,5 +3,10 @@
   set_fact:
     package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- name: 'Setup sources from specfile'
-  include_tasks: specfile.yml
+- name: 'Extract Sources from spec'
+  shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
+  register: setup_sources_sources
+  changed_when: false
+
+- include_tasks: annex.yml
+  with_items: "{{ setup_sources_sources.stdout_lines | list }}"
