@@ -5,7 +5,5 @@
   serial: 1
   gather_facts: false
   roles:
-    - role: diff_package
-      when: not build_package_use_koji_build
     - role: build_package
-      when: (build_package_use_koji_build or diff_package_changed is not defined or diff_package_changed|bool)
+      when: (diff_package_changed is not defined or diff_package_changed|bool)

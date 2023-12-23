@@ -11,9 +11,7 @@ packages:
       - name: obaltest-nightly-rhel7
         dist: '.el7'
   hosts:
-    hello:
-      nightly_package_tito_releaser_args:
-        - "jenkins_job=hello-master-release"
+    hello: {}
 
 repoclosures:
   hosts:

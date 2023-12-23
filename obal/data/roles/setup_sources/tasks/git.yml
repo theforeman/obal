@@ -10,8 +10,3 @@
     version: "{{ git_branch | default(omit) }}"
     force: true
     depth: 1
-
-- name: 'Register source dir tito argument'
-  set_fact:
-    build_package_tito_releaser_args:
-      - 'source_dir={{ setup_sources_git_checkout_dir }}'
