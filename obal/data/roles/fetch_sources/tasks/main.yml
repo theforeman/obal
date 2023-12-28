@@ -18,9 +18,11 @@
         depth: 1
 
     - name: 'Copy upstream files'
-      ansible.posix.synchronize:
+      ansible.builtin.copy:
         src: "{{ obal_tmp_dir }}/{{ upstream_directory }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+        mode: '0640'
+        directory_mode: '0750'
       with_items: "{{ upstream_files }}"
   rescue:
     - name: 'Remove package directory'
@@ -58,9 +60,11 @@
         chdir: "{{ obal_tmp_dir }}/{{ inventory_hostname }}"
 
     - name: 'Copy upstream files'
-      ansible.posix.synchronize:
+      ansible.builtin.copy:
         src: "{{ obal_tmp_dir }}/{{ inventory_hostname }}/{{ item }}"
         dest: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}/"
+        mode: '0640'
+        directory_mode: '0750'
       with_items: "{{ upstream_files }}"
   rescue:
     - name: 'Remove package directory'
