@@ -48,7 +48,7 @@ def build_exists(nevr, package_info, chroot=None):
         ]
         successful_builds = [
             build for build in chroots
-            if build['state'] == 'succeeded'
+            if build['state'] in ['succeeded', 'forked']
         ]
         successful_nevrs = [
             "{}-{}".format(build['source_package']['name'], build['source_package']['version'])
