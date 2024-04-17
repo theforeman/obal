@@ -6,6 +6,8 @@ env:
   COLORTERM: 'yes'
   TERM: 'xterm-256color'
   PYTEST_ADDOPTS: '--color=yes'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -42,9 +44,20 @@ jobs:
   container:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run container tests
-        run: docker build --build-arg REPO=${GITHUB_REPOSITORY} --build-arg VERSION=${GITHUB_REF} -t quay.io/foreman/obal:$(echo ${GITHUB_REF} | tr '/' '_') .
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build container
+        uses: docker/build-push-action@v5
+        with:
+          file: Containerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            REPO=${{ github.repository }}
+            VERSION=${{ github.ref }}
 
   lint:
     runs-on: ubuntu-latest

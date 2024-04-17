@@ -1,7 +1,7 @@
 FROM quay.io/centos/centos:stream8
 
 RUN echo "tsflags=nodocs" >> /etc/yum.conf && \
-    yum -y install git glibc-langpack-en epel-release python3-pip 'dnf-command(config-manager)' && \
+    yum -y install git glibc-langpack-en epel-release python3.12-pip 'dnf-command(config-manager)' && \
     yum clean all
 
 ENV LANG=en_US.UTF-8 \
@@ -13,9 +13,11 @@ ARG VERSION=master
 ARG REPO=theforeman/obal.git
 
 RUN dnf config-manager --add-repo https://downloads.kitenet.net/git-annex/linux/current/rpms/git-annex.repo && \
-    pip3 install --upgrade pip && \
-    pip3 install git+https://github.com/${REPO}@${VERSION} && \
-    obal setup
+    pip3.12 install --upgrade pip && \
+    pip3.12 install git+https://github.com/${REPO}@${VERSION} && \
+    obal setup && \
+    dnf clean all
+
 
 RUN mkdir -p /opt/packaging
 WORKDIR /opt/packaging
