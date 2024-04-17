@@ -17,6 +17,7 @@ def main():
             check=dict(type='list', required=True),
             additional_repos=dict(type='list', required=False, default=[]),
             lookaside=dict(type='list', required=False, default=[]),
+            arch=dict(type='list', required=False, default=['noarch', 'x86_64']),
         )
     )
 
@@ -33,6 +34,9 @@ def main():
         '--config',
         config
     ]
+
+    for arch in module.params['arch']:
+        command.extend(['--arch', arch])
 
     for name in check:
         command.extend(['--check', name])
