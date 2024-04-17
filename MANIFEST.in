@@ -4,4 +4,4 @@ include LICENSE
 include .coveragerc
 include .pylintrc
 recursive-include rules *.py
-exclude Dockerfile
+exclude Containerfile
