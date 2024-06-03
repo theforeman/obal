@@ -43,42 +43,7 @@ if mockbin_log:
     with open(mockbin_log, 'r') as logfile:
         mockbin_log_contents = [line.strip() for line in logfile.readlines()]
 
-if prog == 'tito':
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    # tito release arguments and options
-    parser_release = subparsers.add_parser('release')
-    parser_release.add_argument('dest')
-    parser_release.add_argument('--scratch', action='store_true')
-    parser_release.add_argument('--test', action='store_true')
-    parser_release.add_argument('-y', '--yes', dest='yes', action='store_true', default=False)
-    parser_release.add_argument('--arg')
-
-    # tito build arguments and options
-    parser_build = subparsers.add_parser('build')
-    parser_build.add_argument('--srpm', action='store_true', default=False)
-    parser_build.add_argument('--output', default=None)
-    parser_build.add_argument('--scl')
-    parser_build.add_argument('--offline', action='store_true')
-
-    args = parser.parse_args()
-
-    pkg = os.path.basename(os.getcwd())
-
-    if 'yes' in args and args.yes:
-        print('Created task: 1234')
-    if 'output' in args and args.output:
-        if not os.path.exists(args.output):
-            os.makedirs(args.output)
-        srpm_path = os.path.join(args.output, _FAKE_SRPMS[pkg])
-        open(srpm_path, 'w').close()
-    else:
-        srpm_path = _FAKE_SRPMS[pkg]
-    if 'srpm'in args and args.srpm:
-        print("Wrote: {}".format(srpm_path))
-
-elif prog in ['koji', 'brew']:
+if prog in ['koji', 'brew']:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='subcommand')
 

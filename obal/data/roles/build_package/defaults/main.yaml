@@ -1,17 +1,12 @@
 ---
 build_package_build_system: koji
 build_package_koji_command: koji
-build_package_tito_args: []
 build_package_scratch: false
-build_package_test: false
-build_package_tito_releaser_args: []
 build_package_wait: true
 build_package_download_logs: false
 build_package_download_rpms: false
 build_package_waitrepo: false
 build_package_koji_whitelist_check: false
-build_package_tito_builder:
-build_package_use_koji_build: false
 build_package_copr_rebuild: false
 build_package_skip_failed_build: false
 build_package_archive_build_info: false
