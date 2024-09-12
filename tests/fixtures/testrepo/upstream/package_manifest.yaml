@@ -16,9 +16,7 @@ packages:
       rhel7:
         - el7-base
   hosts:
-    hello:
-      nightly_package_tito_releaser_args:
-        - "jenkins_job=hello-master-release"
+    hello: {}
     foo: {}
     package-with-existing-build: {}
     package-with-two-targets:

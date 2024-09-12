@@ -1,11 +1,5 @@
 ---
-- name: 'Use tito to build package'
-  include_tasks: tito_release.yml
-  when: not build_package_use_koji_build
-
-- when: build_package_use_koji_build
-  block:
-    - include_tasks: koji_build.yml
-      loop: "{{ koji_tags }}"
-      loop_control:
-        loop_var: tag
+- include_tasks: koji_build.yml
+  loop: "{{ koji_tags }}"
+  loop_control:
+    loop_var: tag

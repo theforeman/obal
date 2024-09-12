@@ -3,10 +3,10 @@
   set_fact:
     package_dir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- name: 'Setup sources from specfile'
-  include_tasks: specfile.yml
-  when: setup_sources_git is not defined
+- name: 'Extract Sources from spec'
+  shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
+  register: setup_sources_sources
+  changed_when: false
 
-- name: 'Clone git repository'
-  include_tasks: git.yml
-  when: setup_sources_git is defined
+- include_tasks: annex.yml
+  with_items: "{{ setup_sources_sources.stdout_lines | list }}"
