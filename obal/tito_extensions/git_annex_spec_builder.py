@@ -22,6 +22,7 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
     A tito builder that uses git annex
     """
 
+    # pylint: disable=too-many-positional-arguments
     def __init__(self, name=None, tag=None, build_dir=None,
                  config=None, user_config=None,
                  args=None, **kwargs):
