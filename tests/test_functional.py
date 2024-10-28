@@ -168,10 +168,8 @@ def test_obal_scratch_with_koji_upstream_hello():
     expected_log = [
         "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234",
         "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234",
     ]
     assert_mockbin_log(expected_log)
     assert os.path.exists('/tmp/SRPMs/hello-2.10-2.src.rpm')
@@ -201,13 +199,11 @@ def test_obal_release_with_koji_upstream_hello():
         "koji latest-build --quiet obaltest-nightly-rhel7 hello",
         "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234",
         "koji buildinfo hello-2.10-2.el8",
         "koji latest-build --quiet obaltest-nightly-el8 hello",
         "koji latest-build --quiet obaltest-nightly-el8 hello",
         "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -225,7 +221,6 @@ def test_obal_release_with_koji_upstream_existing_build():
         "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
         "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-existing-build-1.0-1.src.rpm",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -240,7 +235,6 @@ def test_obal_release_with_koji_upstream_two_target_tags():
         "koji latest-build --quiet obaltest-nightly-el8 package-with-two-targets",
         "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-two-targets-1.0-1.src.rpm",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234",
         "koji buildinfo package-with-two-targets-1.0-1.el8",
         "koji latest-build --quiet obalclient-nightly-el8 package-with-two-targets",
         "koji tag-build obalclient-nightly-el8 package-with-two-targets-1.0-1.el8"
@@ -262,7 +256,6 @@ def test_obal_release_with_koji_upstream_whitelist_check():
         "koji latest-build --quiet obaltest-nightly-el8 package-with-existing-build",
         "koji build obaltest-nightly-el8 /tmp/SRPMs/package-with-existing-build-1.0-1.src.rpm",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234"
     ]
     assert_mockbin_log(expected_log)
 
