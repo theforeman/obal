@@ -32,10 +32,44 @@
     var: build_package_tito_release.task_urls
 
 - name: 'Wait for tasks to finish'
-  include_tasks: wait.yml
   when: build_package_wait|bool
-  vars:
-    koji_tasks: "{{ build_package_tito_release.tasks }}"
+  block:
+    - name: Define koji_tasks
+      set_fact:
+        koji_tasks: "{{ build_package_tito_release.tasks }}"
+
+    - name: "Watch {{ build_package_koji_command }} task(s)"
+      command: "{{ build_package_koji_command }} watch-task {{ koji_tasks | join(' ') }}"
+      ignore_errors: true
+      register: build_package_koji_status
+      changed_when: false
+
+    - name: 'Download task logs'
+      include_tasks: download_logs.yml
+      when: build_package_download_logs|bool
+
+    - name: 'Failed build'
+      fail:
+        msg: "The build in {{ build_package_koji_command }}  has failed"
+      when: (build_package_koji_status is failed) and ('Build already exists' not in build_package_koji_status.stdout)
+
+    - name: "Get {{ build_package_koji_command }} build detals"
+      command: "{{ build_package_koji_command }} taskinfo -v {{ item }}"
+      with_items: "{{ koji_tasks }}"
+      changed_when: false
+      register: build_package_koji_task_info
+
+    - name: "Filter {{ build_package_build_system }} output"
+      set_fact:
+        build_package_koji_task_data:
+          "{{ build_package_koji_task_info.results | map(attribute='stdout') | map('from_yaml') | list }}"
+
+    - name: 'Wait for builds to apear in the repo'
+      include_tasks: waitrepo.yml
+      when:
+        - build_package_waitrepo|bool
+        - not build_package_scratch
+        - build_package_koji_status is succeeded
 
 - name: 'Download task results'
   include_tasks: download_rpms.yml

@@ -65,12 +65,24 @@
         var: koji_build_tasks.task_urls
       when: koji_build_tasks.changed
 
-    - name: 'Wait for tasks to finish'
-      include_tasks: wait.yml
+    - name: Wait for task to finish
       when: build_package_wait|bool and koji_build_tasks.changed
-      vars:
-        koji_tasks: "{{ koji_build_tasks.tasks }}"
+      block:
+        - name: "Watch {{ build_package_koji_command }} task(s)"
+          command: "{{ build_package_koji_command }} watch-task {{ koji_build_tasks.tasks | join(' ') }}"
+          ignore_errors: true
+          register: build_package_koji_status
+          changed_when: false
+
+        - name: 'Download task logs'
+          include_tasks: download_logs.yml
+          when: build_package_download_logs|bool
+
+        - name: 'Failed build'
+          fail:
+            msg: "The build in {{ build_package_koji_command }}  has failed"
+          when: (build_package_koji_status is failed) and ('Build already exists' not in build_package_koji_status.stdout)
 
     - name: 'Download task results'
-      include_tasks: download_rpms.yml
-      when: build_package_download_rpms|bool
+      include_tasks: download_rpms_from_task.yml
+      with_items: "{{ koji_build_tasks.tasks }}"

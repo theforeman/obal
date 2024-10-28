@@ -56,9 +56,20 @@
   when:
     - build_package_wait|bool
     - copr_builds is changed
-  include_tasks: wait.yml
-  vars:
-    copr_build_ids: "{{ copr_builds['results'] | selectattr('builds', 'defined') | map(attribute='builds') | list | flatten }}"
+  block:
+    - name: "Watch copr build(s)"
+      command:
+        "copr-cli {{ '--config ' + build_package_copr_config if build_package_copr_config is defined else '' }} watch-build {{ copr_build_ids | join(' ') }}"
+      ignore_errors: true
+      register: build_package_copr_status
+      changed_when: false
+      vars:
+        copr_build_ids: "{{ copr_builds['results'] | selectattr('builds', 'defined') | map(attribute='builds') | list | flatten }}"
+
+    - name: 'Failed build'
+      fail:
+        msg: "The build in Copr has failed"
+      when: (build_package_copr_status is failed)
 
 - when:
     - build_package_archive_build_info
