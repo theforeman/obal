@@ -96,7 +96,7 @@ def build_srpm(module, package, base_dir, sources_dir, scl=None, macros=None):
     command += ['--define', '_builddir %s' % build_dir]
     command += ['--define', '_srcrpmdir %s' % base_dir]
     command += ['--define', '_rpmdir %s' % base_dir]
-    command += ['--undefine', 'dist']
+    command += ['--define', 'dist %{nil}']
 
     if scl:
         command += ['--define', 'scl %s' %  scl]
