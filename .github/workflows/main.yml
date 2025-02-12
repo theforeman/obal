@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -40,14 +40,14 @@ jobs:
         run: tox
 
   container:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run container tests
         run: docker build --build-arg REPO=${GITHUB_REPOSITORY} --build-arg VERSION=${GITHUB_REF} -t quay.io/foreman/obal:$(echo ${GITHUB_REF} | tr '/' '_') .
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
