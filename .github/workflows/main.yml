@@ -32,7 +32,7 @@ jobs:
           sudo curl --create-dirs -o /usr/local/bin/spectool https://pagure.io/rpmdevtools/raw/26a8abc746fba9c0b32eb899b96c92841a37855a/f/spectool.in
           sudo curl --create-dirs -o /usr/local/bin/rpmdev-bumpspec https://pagure.io/rpmdevtools/raw/6f387c1deaa5cbed770310e288abde04b17421dc/f/rpmdev-bumpspec
           sudo curl --create-dirs -o /usr/local/bin/rpmdev-packager https://pagure.io/rpmdevtools/raw/main/f/rpmdev-packager
-          sudo chmod +x /usr/local/bin/*
+          sudo chmod +x /usr/local/bin/spectool /usr/local/bin/rpmdev-bumpspec /usr/local/bin/rpmdev-packager
           sudo apt-get update && sudo apt-get install -y git-annex rpm
       - name: Run tests
         run: tox
