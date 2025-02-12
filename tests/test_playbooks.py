@@ -48,6 +48,8 @@ def test_help(playbook, capsys, help_dir):
         expected = help_file.read()
         if sys.version_info >= (3, 10, 0):
             expected = expected.replace('optional arguments:', 'options:')
+        if sys.version_info >= (3, 13, 0):
+            expected = expected.replace('-e EXTRA_VARS,', '-e,')
         assert expected == captured.out
     else:
         help_file.write(captured.out)
