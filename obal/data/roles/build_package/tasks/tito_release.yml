@@ -63,6 +63,8 @@
       set_fact:
         build_package_koji_task_data:
           "{{ build_package_koji_task_info.results | map(attribute='stdout') | map('from_yaml') | list }}"
+      when:
+        - build_package_waitrepo|bool or build_package_download_rpms|bool
 
     - name: 'Wait for builds to apear in the repo'
       include_tasks: waitrepo.yml
