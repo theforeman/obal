@@ -1,7 +1,19 @@
 ---
 - name: 'Use tito to build package'
-  include_tasks: tito_release.yml
   when: not build_package_use_koji_build
+  block:
+    - name: Scratch build with koji_build
+      when:
+        - build_package_scratch
+        - koji_tags
+      include_tasks: koji_build.yml
+      loop: "{{ koji_tags }}"
+      loop_control:
+        loop_var: tag
+
+    - name: Release with tito
+      when: (build_package_scratch and not koji_tags) or (not build_package_scratch)
+      include_tasks: tito_release.yml
 
 - when: build_package_use_koji_build
   block:
