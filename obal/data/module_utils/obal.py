@@ -2,6 +2,7 @@
 Ansible module helper functions for obal modules
 """
 import subprocess
+import os
 
 try:
     from ansible.module_utils.koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
@@ -144,8 +145,11 @@ def run_command(command):
     """
     Run a system command
     """
+    env = dict(os.environ, LANG="C.utf8")
+
     return subprocess.check_output(
         command,
         universal_newlines=True,
-        stderr=subprocess.STDOUT
+        stderr=subprocess.STDOUT,
+        env=env
     )
