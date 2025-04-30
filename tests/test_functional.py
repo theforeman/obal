@@ -140,9 +140,10 @@ def test_obal_scratch_with_tito_upstream_hello():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "tito release --yes --scratch dist-git",
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
         "koji watch-task 1234",
-        "koji taskinfo -v 1234",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
+        "koji watch-task 1234"
     ]
     assert_mockbin_log(expected_log)
 
@@ -154,7 +155,8 @@ def test_obal_scratch_with_tito_upstream_hello_nowait():
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
     expected_log = [
-        "tito release --yes --scratch dist-git"
+        "koji build obaltest-nightly-rhel7 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch",
+        "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch"
     ]
     assert_mockbin_log(expected_log)
 
