@@ -7,7 +7,7 @@ A tito plugin to build using git-annex
 import os
 import shutil
 from distutils.version import LooseVersion as loose_version  # pylint: disable=E0611,deprecated-module
-from pkg_resources import require
+from importlib import metadata
 
 from tito.compat import getstatusoutput
 from tito.config_object import ConfigObject
@@ -59,11 +59,11 @@ class GitAnnexSpecBuilder(GitAnnexBuilder):
 
         if self.config.has_option("requirements", "tito"):
             if loose_version(self.config.get("requirements", "tito")) > \
-                    loose_version(require('tito')[0].version):
+                    loose_version(metadata.version('tito')):
                 error_out([
                     "tito version %s or later is needed to build this project." %
                     self.config.get("requirements", "tito"),
-                    "Your version: %s" % require('tito')[0].version
+                    "Your version: %s" % metadata.version('tito')
                 ])
 
         self.display_version = self._get_display_version()

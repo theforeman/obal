@@ -24,10 +24,8 @@ copyright = '2018, The Foreman'
 author = 'The Foreman'
 
 try:
-    import pkg_resources
-    package = pkg_resources.require("obal")[0]
-    version = package.version
-    release = package.version
+    from importlib import metadata
+    version = release = metadata.version('obal')
 except:
     # The short X.Y version
     version = ''
