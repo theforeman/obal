@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 
 """
@@ -10,7 +10,7 @@ from __future__ import print_function
 import os
 import obsah
 
-import pkg_resources
+from importlib import resources
 
 
 class ApplicationConfig(obsah.ApplicationConfig):
@@ -46,12 +46,7 @@ class ApplicationConfig(obsah.ApplicationConfig):
         """
         path = os.environ.get('OBAL_DATA')
         if path is None:
-            path = pkg_resources.resource_filename(__name__, 'data')
-            if not os.path.isabs(path):
-                # this is essentially a workaround for
-                # https://github.com/pytest-dev/pytest-xdist/issues/414
-                distribution = pkg_resources.get_distribution('obal')
-                path = os.path.join(distribution.location, path)
+            path = str(resources.files(__name__) / 'data')
 
         return path
 
