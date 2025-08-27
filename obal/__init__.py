@@ -8,9 +8,9 @@ Obal is a wrapper around Ansible playbooks. They are exposed as a command line a
 from __future__ import print_function
 
 import os
-import obsah
-
 from importlib import resources
+
+import obsah
 
 
 class ApplicationConfig(obsah.ApplicationConfig):
