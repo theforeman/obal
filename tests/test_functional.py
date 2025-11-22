@@ -150,7 +150,7 @@ def test_obal_scratch_with_tito_upstream_hello():
 
 @obal_cli_test(repotype='upstream')
 def test_obal_scratch_with_tito_upstream_hello_nowait():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -179,7 +179,7 @@ def test_obal_scratch_with_koji_upstream_hello():
 
 @obal_cli_test(repotype='upstream')
 def test_obal_scratch_with_koji_upstream_hello_nowait():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False', '-e', 'build_package_use_koji_build=true'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=false', '-e', 'build_package_use_koji_build=true'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -298,7 +298,7 @@ def test_obal_release_upstream_hello_no_whitelist_check():
 
 @obal_cli_test(repotype='upstream')
 def test_obal_release_upstream_hello_nowait():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -314,7 +314,7 @@ def test_obal_release_upstream_hello_nowait():
 
 @obal_cli_test(repotype='upstream')
 def test_obal_release_upstream_hello_waitrepo():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=true'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -361,7 +361,7 @@ def test_obal_release_downstream_hello_no_whitelist_check():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_scratch_downstream_hello_nowait():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -373,7 +373,7 @@ def test_obal_scratch_downstream_hello_nowait():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_release_downstream_hello_nowait():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -400,7 +400,7 @@ def test_obal_scratch_downstream_hello():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_scratch_downstream_hello_wait_download_logs():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_logs=True'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_logs=true'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -415,7 +415,7 @@ def test_obal_scratch_downstream_hello_wait_download_logs():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_scratch_downstream_hello_wait_download_rpms():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_rpms=True'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_download_rpms=true'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -446,7 +446,7 @@ def test_obal_release_downstream_hello():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_release_downstream_hello_wait_download_logs():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_download_logs=True'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_download_logs=true'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -462,7 +462,7 @@ def test_obal_release_downstream_hello_wait_download_logs():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_release_downstream_hello_wait_download_rpms():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_download_rpms=True'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_download_rpms=true'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -478,7 +478,7 @@ def test_obal_release_downstream_hello_wait_download_rpms():
 
 @obal_cli_test(repotype='downstream')
 def test_obal_release_downstream_hello_waitrepo():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=True'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_waitrepo=true'])
 
     assert os.path.exists('packages/hello/hello-2.9.tar.gz')
 
@@ -672,7 +672,7 @@ def test_obal_repoclosure_with_check_repo():
 
 @obal_cli_test(repotype='copr')
 def test_obal_scratch_copr_hello_nowait():
-    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['scratch', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
@@ -705,7 +705,7 @@ def test_obal_scratch_copr_hello():
 
 @obal_cli_test(repotype='copr')
 def test_obal_release_copr_hello_nowait():
-    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=False'])
+    assert_obal_success(['release', 'hello', '-e', 'build_package_wait=false'])
 
     assert os.path.exists('packages/hello/hello-2.10.tar.gz')
 
