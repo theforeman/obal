@@ -8,7 +8,7 @@ All `obal` actions should also work with plain Ansible when called like `ansible
 
 ## necessary tools
 
-- `python` (2 or 3)
+- `python` 3.9+
 - `ansible`
 
 ## Using Obal via Container
