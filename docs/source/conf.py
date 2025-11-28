@@ -23,14 +23,12 @@ project = 'Obal'
 copyright = '2018, The Foreman'
 author = 'The Foreman'
 
+from importlib import metadata
+
 try:
-    from importlib import metadata
     version = release = metadata.version('obal')
-except:
-    # The short X.Y version
-    version = ''
-    # The full version, including alpha/beta/rc tags
-    release = ''
+except metadata.PackageNotFoundError:
+    version = release = ''
 
 
 # -- General configuration ---------------------------------------------------
