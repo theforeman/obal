@@ -1,4 +1,4 @@
-- when: build_package_build_system == 'koji' and build_package_download_rpms
+- when: build_package_build_system == 'koji' and build_package_download_rpms | bool
   block:
     - name: Define download directory
       set_fact:

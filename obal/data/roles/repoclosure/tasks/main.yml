@@ -3,7 +3,7 @@
   include_tasks: downloaded_rpms_repoclosure.yml
   when:
     - repoclosure_target_dist is not defined
-    - not repoclosure_check_repos
+    - repoclosure_check_repos is not truthy
 
 - name: Run repoclosure for main repo
   include_tasks: repoclosure.yml
@@ -17,7 +17,7 @@
     additional_repos: []
   when:
     - repoclosure_target_dist is defined
-    - not repoclosure_check_repos
+    - repoclosure_check_repos is not truthy
 
 - name: Run repoclosure for a target repo
   include_tasks: repoclosure.yml
@@ -30,4 +30,4 @@
     lookaside_repos: "{{ repoclosure_lookaside_repos[repoclosure_target_dist] }}"
     additional_repos: "{{ [{'name': 'repo' + index|string, 'url': repo_url}] }}"
   when:
-    - repoclosure_check_repos
+    - repoclosure_check_repos is truthy

@@ -1,8 +1,8 @@
 ---
-- when: copr_project_fork_from
+- when: copr_project_fork_from is truthy
   include_tasks: fork.yml
 
-- when: not copr_project_fork_from
+- when: copr_project_fork_from is not truthy
   include_tasks: create.yml
 
 - name: Configure chroots

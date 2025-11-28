@@ -2,4 +2,4 @@
   command: "{{ build_package_koji_command }}  download-logs -r {{ koji_tasks | join(' ') }}"
   args:
     chdir: "{{ inventory_dir }}"
-  when: build_package_build_system == 'koji' and build_package_download_logs
+  when: build_package_build_system == 'koji' and build_package_download_logs | bool
