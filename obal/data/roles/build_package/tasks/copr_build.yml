@@ -16,7 +16,7 @@
   set_fact:
     build_package_project_user: "{{ copr_scratch_user | default(copr_project_user) }}"
 
-- when: build_package_scratch
+- when: build_package_scratch | bool
   block:
     - name: Define Copr scratch project name
       set_fact:

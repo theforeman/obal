@@ -14,7 +14,7 @@
     package: "{{ package_nvr.name }}"
     koji_executable: "{{ build_package_koji_command }}"
   register: build_exists
-  when: not build_package_scratch
+  when: not build_package_scratch | bool
 
 - debug:
     msg: "{{ build_exists }}"
