@@ -19,6 +19,8 @@ def main():
             external_repos=dict(type='list', required=False),
             buildroot_packages=dict(type='list', required=False),
             modules=dict(type='list', required=False),
+            rpmbuild_with=dict(type='list', required=False),
+            rpmbuild_without=dict(type='list', required=False),
             config_file=dict(type='str', required=False),
             comps_file=dict(type='str', required=False),
         )
@@ -30,6 +32,8 @@ def main():
     external_repos = module.params['external_repos']
     buildroot_packages = module.params['buildroot_packages']
     modules = module.params['modules']
+    rpmbuild_with = module.params['rpmbuild_with']
+    rpmbuild_without = module.params['rpmbuild_without']
     config_file = module.params['config_file']
     comps_file = module.params['comps_file']
 
@@ -46,6 +50,16 @@ def main():
 
     if modules:
         command.extend(['--modules', ','.join(modules)])
+
+    if not rpmbuild_with:
+        rpmbuild_with = ['']
+    for value in rpmbuild_with:
+        command.extend(['--rpmbuild-with', value])
+
+    if not rpmbuild_without:
+        rpmbuild_without = ['']
+    for value in rpmbuild_without:
+        command.extend(['--rpmbuild-without', value])
 
     if comps_file:
         command.extend(['--upload-comps', comps_file])
