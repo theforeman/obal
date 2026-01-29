@@ -29,9 +29,9 @@ def main():
     user = module.params['user']
     project = module.params['project']
     chroot = module.params['chroot']
-    external_repos = module.params['external_repos']
-    buildroot_packages = module.params['buildroot_packages']
-    modules = module.params['modules']
+    external_repos = module.params['external_repos'] or []
+    buildroot_packages = module.params['buildroot_packages'] or []
+    modules = module.params['modules'] or []
     rpmbuild_with = module.params['rpmbuild_with']
     rpmbuild_without = module.params['rpmbuild_without']
     config_file = module.params['config_file']
@@ -39,17 +39,11 @@ def main():
 
     command = [
         'edit-chroot',
-        "{}/{}".format(full_name(user, project), chroot)
+        "{}/{}".format(full_name(user, project), chroot),
+        '--repos', ' '.join(external_repos),
+        '--packages', ' '.join(buildroot_packages),
+        '--modules', ','.join(modules),
     ]
-
-    if external_repos:
-        command.extend(['--repos', ' '.join(external_repos)])
-
-    if buildroot_packages:
-        command.extend(['--packages', ' '.join(buildroot_packages)])
-
-    if modules:
-        command.extend(['--modules', ','.join(modules)])
 
     if not rpmbuild_with:
         rpmbuild_with = ['']
