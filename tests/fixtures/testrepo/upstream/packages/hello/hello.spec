@@ -18,7 +18,7 @@ BuildRequires: gettext
 Requires(post): info
 Requires(preun): info
 
-Obsoletes: goodbye
+Obsoletes: goodbye < 2
 
 %description
 The "Hello World" program, done with all bells and whistles of a proper FOSS
