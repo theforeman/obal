@@ -10,12 +10,12 @@
 - name: 'Set tito_releasers for brew scratch'
   set_fact:
     build_package_tito_releasers: "{{ releasers | map('replace', 'dist-git', 'scratch') | list }}"
-  when: build_package_koji_command == 'brew' and build_package_scratch
+  when: build_package_koji_command == 'brew' and build_package_scratch is truthy
 
 - name: 'Set tito_releasers'
   set_fact:
     build_package_tito_releasers: "{{ releasers }}"
-  when: build_package_koji_command != 'brew' or not build_package_scratch
+  when: build_package_koji_command != 'brew' or build_package_scratch is not truthy
 
 - name: 'Release to {{ build_package_koji_command }}'
   tito_release:
