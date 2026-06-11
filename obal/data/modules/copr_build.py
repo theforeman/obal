@@ -112,7 +112,8 @@ def main():
         build_urls = re.findall(r'^Build was added to.+:\n^\s+(.+)\s*', output, re.MULTILINE)
         builds = re.findall(r'^Created builds:\s(\d+)', output, re.MULTILINE)
 
-        module.exit_json(changed=True, output=output, builds=builds, build_urls=build_urls)
+        module.exit_json(changed=True, output=output, builds=builds, build_urls=build_urls,
+                         user=user, project=project, chroot=chroot)
     else:
         module.exit_json(changed=False)
 
