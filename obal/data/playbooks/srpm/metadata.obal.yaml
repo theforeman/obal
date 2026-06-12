@@ -2,7 +2,19 @@
 help: |
   Build a SRPM for packages
 
-  Building source RPMs can be useful when locally building packages.
+  Building source RPMs can be useful when locally building packages. For
+  example, when you've made local changes.
+
+    --source-system local-bundle-rake --source-location $HOME/foreman-installer
+
+  Not all projects need bundler so it's possible to run without.
+
+    --source-system local-bundle-rake --source-location $HOME/smart-proxy
+
+  It is also possible to retrieve the source from a Jenkins job.
+
+    --source-system jenkins --source-location https://ci.theforeman.org/job/foreman-installer-develop-source-release
+
 variables:
   build_srpm_dist:
     parameter: --dist
@@ -13,3 +25,7 @@ variables:
   build_srpm_output_dir:
     parameter: --dir
     help: Absolute path to output dir for SRPM. Defaults to <inventory_dir>/SRPMs
+  source_system:
+    help: The system to be used when passing source_location. Either jenkins, local-bundle-rake or local-rake.
+  source_location:
+    help: Source location. Format is dependent on the source system

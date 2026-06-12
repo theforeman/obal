@@ -16,6 +16,11 @@ from ansible.module_utils.six.moves.urllib.error import HTTPError # pylint:disab
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.obal import run_command, get_specfile_sources # pylint:disable=import-error,no-name-in-module
 
+SOURCE_SYSTEM_URLS = {
+    'jenkins': '{}/lastSuccessfulBuild/artifact/*zip*/archive.zip',
+}
+VALID_SOURCE_SYSTEMS = list(SOURCE_SYSTEM_URLS.keys())
+
 
 @contextmanager
 def chdir(directory):
@@ -60,15 +65,28 @@ def copy_sources(spec_file, package_dir, sources_dir):
             run_command(["git-annex", "lock", "--force"])
 
 
+def fetch_local_sources(source_location, source_system, sources_dir):
+    if source_system == 'local-bundle-rake':
+        command = ['bundle', 'exec', 'rake', 'pkg:generate_source']
+    elif source_system == 'local-rake':
+        command = ['rake', 'pkg:generate_source']
+    else:
+        raise ValueError("Unknown source system %s" % source_system)
+
+    with chdir(source_location):
+        output = run_command(command)
+
+        for line in output.splitlines():
+            if os.path.isfile(line):
+                shutil.copy(line, sources_dir)
+
+
 def fetch_remote_sources(source_location, source_system, sources_dir):
     """
     Copy RPM sources from a remote source like Jenkins to rpmbuild environment
     """
-    source_system_urls = {
-        'jenkins': '{}/lastSuccessfulBuild/artifact/*zip*/archive.zip',
-    }
 
-    url = source_system_urls[source_system].format(source_location)
+    url = SOURCE_SYSTEM_URLS[source_system].format(source_location)
     request = urlopen(url)
 
     with TemporaryFile() as archive:
@@ -154,14 +172,28 @@ def main():
         os.mkdir(sources_dir)
 
         if source_location:
+            if source_system.startswith('local-'):
+                try:
+                    fetch_local_sources(source_location, source_system, sources_dir)
+                except ValueError:
+                    module.fail_json(msg="Unknown source_system specified.",
+                        source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
+                except subprocess.CalledProcessError as error:
+                    module.fail_json(msg='Failed fetch local sources', output=error.output)
+            else:
+                try:
+                    fetch_remote_sources(source_location, source_system, sources_dir)
+                except HTTPError as error:
+                    module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
+                except KeyError as error:
+                    module.fail_json(msg="Unknown source_system specified.",
+                        source_system=source_system, valid_choices=VALID_SOURCE_SYSTEMS)
+        else:
             try:
-                fetch_remote_sources(source_location, source_system, sources_dir)
-            except HTTPError as error:
-                module.fail_json(msg="HTTP %s: %s. Check %s exists." % (error.code, error.reason, source_location))
-            except KeyError as error:
-                module.fail_json(msg="Unknown source_system specified.", output=error)
+                copy_sources(spec_file, package, sources_dir)
+            except subprocess.CalledProcessError as error:
+                module.fail_json(msg='Failed to build srpm', output=error.output)
 
-        copy_sources(spec_file, package, sources_dir)
         shutil.copy(spec_file, base_dir)
 
         result = build_srpm(module, package, base_dir, sources_dir, scl, macros)
@@ -173,8 +205,6 @@ def main():
         path = os.path.join(output, os.path.basename(result))
 
         module.exit_json(changed=True, path=path)
-    except subprocess.CalledProcessError as error:
-        module.fail_json(msg='Failed to build srpm', output=error.output)
     finally:
         shutil.rmtree(base_dir)
 
