@@ -7,6 +7,11 @@ packages:
     build_package_koji_command: 'brew'
     build_package_build_system: 'koji'
     koji_executable: 'brew'
+    koji_tags:
+      - name: obaltest-nightly-rhel7
+        dist: '.el7'
+      - name: obaltest-nightly-el8
+        dist: '.el8'
     scl: 'tfm'
     diff_package_tags:
       - obaltest-6.3.0-rhel-7-candidate
