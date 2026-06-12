@@ -22,7 +22,7 @@
           - dnf-plugins-core
 
     - name: Install required Fedora packages
-      when: ansible_os_family == 'Fedora'
+      when: ansible_distribution == 'Fedora'
       become: true
       package:
         state: present
