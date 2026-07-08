@@ -604,6 +604,7 @@ def test_obal_repoclosure():
         "dnf repoclosure",
         "--refresh",
         "--newest",
+        "--best",
         "--config",
         "repoclosure/yum.conf",
         "--check el7-katello",
@@ -623,6 +624,7 @@ def test_obal_repoclosure_with_downloaded_rpms():
     expected_log = [
         "dnf repoclosure",
         "--newest",
+        "--best",
         "--refresh",
         "--config",
         "repoclosure/yum.conf",
@@ -643,6 +645,7 @@ def test_obal_repoclosure_katello_with_downloaded_rpms():
     expected_log = [
         "dnf repoclosure",
         "--newest",
+        "--best",
         "--refresh",
         "--config",
         "repoclosure/yum.conf",
@@ -660,6 +663,7 @@ def test_obal_repoclosure_with_check_repo():
     expected_log = [
         "dnf repoclosure",
         "--newest",
+        "--best",
         "--refresh",
         "--config",
         "repoclosure/yum.conf",

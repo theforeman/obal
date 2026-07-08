@@ -31,6 +31,7 @@ def main():
         'repoclosure',
         '--refresh',
         '--newest',
+        '--best',
         '--config',
         config
     ]
