@@ -24,3 +24,8 @@ packages:
       branch: "develop"
       upstream_files:
         - "packages/hello/"
+    bar:
+      upstream: "file://{{ inventory_dir }}/../upstream/.git"
+      branch: "develop"
+      upstream_files:
+        - "packages/bar/"

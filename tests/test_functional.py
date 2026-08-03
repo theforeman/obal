@@ -587,6 +587,27 @@ def test_obal_update_downstream_with_version_hello():
     assert '- Release hello' in specfilecontent
 
 
+@obal_cli_test(repotype='downstream')
+def test_obal_update_downstream_removes_renamed_local_source():
+    # Reproduces the foreman-packaging -> satellite-packaging (brook) scenario:
+    # a local (non-URL) Source that gets renamed upstream, e.g. nodejs bundle
+    # tarballs switching from a "-registry.npmjs.org.tgz" cache dump to a
+    # "-package-lock.json" file, with Version unchanged and only Release bumped.
+    setup_upstream('../upstream/')
+
+    assert_obal_success(['update', 'bar'])
+
+    assert os.path.exists('packages/bar/bar-new-source')
+    assert not os.path.exists('packages/bar/bar-old-source')
+
+    with open('packages/bar/bar.spec') as specfile:
+        specfilecontent = specfile.read()
+
+    assert 'Release:        2' in specfilecontent
+    assert 'Source0:        bar-new-source' in specfilecontent
+    assert 'bar-old-source' not in specfilecontent
+
+
 @obal_cli_test(repotype='empty')
 def test_obal_add_downstream_hello():
     setup_upstream('../upstream/')
