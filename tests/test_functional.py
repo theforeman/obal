@@ -587,6 +587,24 @@ def test_obal_update_downstream_with_version_hello():
     assert '- Release hello' in specfilecontent
 
 
+@obal_cli_test(repotype='upstream')
+def test_obal_update_upstream_keeps_unrenamed_local_source():
+    # A plain version-only bump (no upstream sync) has no way to recreate a
+    # local (non-URL) source, so it must be left alone even though it's
+    # unconditionally removed by 'Remove old sources' for the downstream-sync
+    # case. Regression test for a case broken by the fix for
+    # test_obal_update_downstream_removes_renamed_local_source below.
+    assert_obal_success(['update', 'foo', '-e', 'version=2.0'])
+
+    assert os.path.exists('packages/foo/foo-source')
+
+    with open('packages/foo/foo.spec') as specfile:
+        specfilecontent = specfile.read()
+
+    assert 'Version:        2.0' in specfilecontent
+    assert 'Source0:        foo-source' in specfilecontent
+
+
 @obal_cli_test(repotype='downstream')
 def test_obal_update_downstream_removes_renamed_local_source():
     # Reproduces the foreman-packaging -> satellite-packaging (brook) scenario:

@@ -21,6 +21,12 @@
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
       with_items: "{{ old_source_urls.stdout_lines | list }}"
+      when:
+        # Local sources are only safe to remove when 'Fetch sources' is about
+        # to repopulate them from upstream (same condition fetch_sources uses
+        # for its 'Copy upstream files' block). A plain version bump has
+        # nothing to recreate a local source with, so leave it alone there.
+        - "'://' in item or (upstream is defined and version is not defined)"
 
     - name: 'Fetch sources'
       include_role:
