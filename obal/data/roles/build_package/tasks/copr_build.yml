@@ -77,7 +77,7 @@
 
 - name: Archive Copr build information
   when:
-    - build_package_archive_build_info
+    - build_package_copr_archive_build_info | bool
     - copr_builds is changed
   block:
     - name: Create build info directory
@@ -88,7 +88,7 @@
 
     - name: 'Write out build info'
       when:
-        - build_package_archive_build_info
+        - build_package_copr_archive_build_info | bool
       copy:
         dest: "{{ inventory_dir }}/copr_build_info/{{ inventory_hostname }}"
         content: "{{ copr_builds | to_yaml }}"

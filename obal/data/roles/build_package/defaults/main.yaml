@@ -15,3 +15,4 @@ build_package_use_koji_build: false
 build_package_copr_rebuild: false
 build_package_skip_failed_build: false
 build_package_archive_build_info: false
+build_package_copr_archive_build_info: "{{ build_package_archive_build_info }}"

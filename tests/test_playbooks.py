@@ -4,6 +4,7 @@ import sys
 import pytest
 
 import obal
+import obsah
 
 
 @pytest.fixture
@@ -54,3 +55,11 @@ def test_help(playbook, capsys, help_dir):
     else:
         help_file.write(captured.out)
         raise pytest.skip('Written help text')
+
+
+def test_scratch_copr_archive_build_info_argument():
+    parser = obsah.obsah_argument_parser(obal.ApplicationConfig, targets=['hello'])
+
+    args = parser.parse_args(['scratch', 'hello', '--copr-archive-build-info'])
+
+    assert args.build_package_copr_archive_build_info is True
