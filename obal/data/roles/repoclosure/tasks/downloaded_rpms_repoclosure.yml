@@ -20,7 +20,7 @@
     lookaside_repos: "{{ repoclosure_lookaside_repos[dist] }}"
     # downloaded_rpms is the freshly-built repo for this package - exclude its
     # stale sibling from the persistent staging repos only.
-    exclude_repos: "{{ repoclosure_target_repos[dist]|default([]) }}"
+    exclude_repos: "{{ repoclosure_target_repos[dist] | default([]) }}"
     exclude_packages: "{{ resolved_exclude_packages }}"
   loop: "{{ downloaded_rpms_dists }}"
   loop_control:

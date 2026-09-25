@@ -29,13 +29,13 @@
     loop_var: repo_url
     index_var: index
   vars:
-    check_repos: "{{ ['repo' + index|string] + repoclosure_target_repos[repoclosure_target_dist]|default([]) }}"
+    check_repos: "{{ ['repo' + index | string] + repoclosure_target_repos[repoclosure_target_dist] | default([]) }}"
     lookaside_repos: "{{ repoclosure_lookaside_repos[repoclosure_target_dist] }}"
-    additional_repos: "{{ [{'name': 'repo' + index|string, 'url': repo_url}] }}"
+    additional_repos: "{{ [{'name': 'repo' + index | string, 'url': repo_url}] }}"
     # repo0 (repo_url, the freshly-built PR/scratch repo) is authoritative for
     # this package - exclude its stale sibling from the persistent staging
     # repos only, not from repo0 itself.
-    exclude_repos: "{{ repoclosure_target_repos[repoclosure_target_dist]|default([]) }}"
+    exclude_repos: "{{ repoclosure_target_repos[repoclosure_target_dist] | default([]) }}"
     exclude_packages: "{{ resolved_exclude_packages }}"
   when:
     - repoclosure_check_repos is truthy
