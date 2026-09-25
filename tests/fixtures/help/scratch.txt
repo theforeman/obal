@@ -1,4 +1,4 @@
-usage: obal scratch [-h] [-v] [-e EXTRA_VARS]
+usage: obal scratch [-h] [-v] [-e EXTRA_VARS] [--copr-archive-build-info]
                     [--copr-config BUILD_PACKAGE_COPR_CONFIG]
                     [--skip-koji-whitelist-check]
                     target [target ...]
@@ -13,6 +13,10 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --copr-archive-build-info
+                        Archive Copr build information in the copr_build_info
+                        directory. Copr only, has no effect on Koji/Brew
+                        builds.
   --copr-config BUILD_PACKAGE_COPR_CONFIG
                         Path to a Copr config file
   --skip-koji-whitelist-check
