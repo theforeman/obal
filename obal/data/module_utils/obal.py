@@ -12,7 +12,7 @@ except ImportError:
 
 
 def macro_lookup(command, scl=None, dist=None, macros=None):
-    """run a macro lookup command"""
+    """run a macro lookup command, returning stdout and stderr separately"""
     if dist:
         command += ['--define', 'dist %s' % dist]
     else:
@@ -25,11 +25,17 @@ def macro_lookup(command, scl=None, dist=None, macros=None):
         for (macro, value) in macros.items():
             command += ['--define', '%s %s' % (macro, value)]
 
-    return subprocess.check_output(command, universal_newlines=True)
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        universal_newlines=True,
+        check=True,
+    )
+    return result.stdout, result.stderr
 
 
 def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None):
-    """expand a given macro from a specfile"""
+    """expand a given macro from a specfile, returning value and stderr"""
     command = [
         'rpmspec',
         '--query',
@@ -43,7 +49,7 @@ def specfile_macro_lookup(specfile, macro_str, scl=None, dist=None, macros=None)
 
 
 def srpm_macro_lookup(srpm, macro_str, scl=None, dist=None, macros=None):
-    """expand a given macro from an srpm"""
+    """expand a given macro from an srpm, returning value and stderr"""
     command = [
         'rpmquery',
         '--queryformat',
@@ -70,42 +76,50 @@ def get_changelog_evr(specfile):
 
 def get_specfile_evr(specfile):
     """get the EVR from the source header of the specfile"""
-    return specfile_macro_lookup(specfile, '%{evr}')
+    value, _stderr = specfile_macro_lookup(specfile, '%{evr}')
+    return value
 
 
 def get_srpm_evr(srpm):
     """get the EVR from the source header of the srpm"""
-    return srpm_macro_lookup(srpm, '%{evr}')
+    value, _stderr = srpm_macro_lookup(srpm, '%{evr}')
+    return value
 
 
 def get_specfile_name(specfile, scl=None):
     """get the name from the specfile"""
-    return specfile_macro_lookup(specfile, '%{name}', scl=scl)
+    value, _stderr = specfile_macro_lookup(specfile, '%{name}', scl=scl)
+    return value
 
 
 def get_srpm_name(srpm, scl=None):
     """get the name from the srpm"""
-    return srpm_macro_lookup(srpm, '%{name}', scl=scl)
+    value, _stderr = srpm_macro_lookup(srpm, '%{name}', scl=scl)
+    return value
 
 
 def get_specfile_nevr(specfile, scl=None, dist=None, macros=None):
     """get the name, epoch, version and release from the specfile"""
-    return specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
+    value, _stderr = specfile_macro_lookup(specfile, '%{nevr}', scl=scl, dist=dist, macros=macros)
+    return value
 
 
 def get_srpm_nevr(srpm, scl=None, dist=None, macros=None):
     """get the name, epoch, version and release from the srpm"""
-    return srpm_macro_lookup(srpm, '%{nevr}', scl=scl, dist=dist, macros=macros)
+    value, _stderr = srpm_macro_lookup(srpm, '%{nevr}', scl=scl, dist=dist, macros=macros)
+    return value
 
 
 def get_specfile_nvr(specfile, scl=None, dist=None, macros=None):
     """get the name, version and release from the specfile"""
-    return specfile_macro_lookup(specfile, '%{nvr}', scl=scl, dist=dist, macros=macros)
+    value, _stderr = specfile_macro_lookup(specfile, '%{nvr}', scl=scl, dist=dist, macros=macros)
+    return value
 
 
 def get_srpm_nvr(srpm, scl=None, dist=None, macros=None):
     """get the name, version and release from the srpm"""
-    return srpm_macro_lookup(srpm, '%{nvr}', scl=scl, dist=dist, macros=macros)
+    value, _stderr = srpm_macro_lookup(srpm, '%{nvr}', scl=scl, dist=dist, macros=macros)
+    return value
 
 
 def get_whitelist_status(build_command, tag, package):
