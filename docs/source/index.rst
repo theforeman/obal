@@ -8,4 +8,5 @@ Obal is named after the Czech word for wrapper or packaging. It is a command lin
    :caption: Contents:
 
    actions
+   configuration
    development
