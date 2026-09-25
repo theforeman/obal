@@ -8,9 +8,13 @@ Obal is a wrapper around Ansible playbooks. They are exposed as a command line a
 from __future__ import print_function
 
 import os
+import sys
 from importlib import resources
 
 import obsah
+
+
+INVENTORY_LIST_ACTIONS = ('list-groups', 'list-packages')
 
 
 class ApplicationConfig(obsah.ApplicationConfig):
@@ -58,11 +62,46 @@ class ApplicationConfig(obsah.ApplicationConfig):
         return os.environ.get('OBAL_INVENTORY', os.path.join(os.getcwd(), 'package_manifest.yaml'))
 
 
+def inventory_items(inventory_path, action):
+    """
+    Return user-defined package or group names from an Ansible inventory
+    """
+    from ansible.inventory.manager import InventoryManager  # pylint: disable=all
+    from ansible.parsing.dataloader import DataLoader  # pylint: disable=all
+
+    ansible_inventory = InventoryManager(
+        loader=DataLoader(),
+        sources=inventory_path,
+    )
+
+    if action == 'list-packages':
+        packages = ansible_inventory.groups.get('packages')
+        return sorted(host.name for host in packages.get_hosts()) if packages else []
+
+    implicit_groups = {'all', 'ungrouped'}
+    return sorted(set(ansible_inventory.groups) - implicit_groups)
+
+
 def main(cliargs=None, application_config=ApplicationConfig):  # pylint: disable=R0914
     """
     Main command
     """
-    obsah.main(cliargs=cliargs, application_config=application_config)
+    arguments = cliargs if cliargs is not None else sys.argv[1:]
+
+    if arguments and arguments[0] in INVENTORY_LIST_ACTIONS:
+        inventory_path = application_config.inventory_path()
+        targets = obsah.find_targets(inventory_path)
+        parser = obsah.obsah_argument_parser(application_config, targets=targets)
+        args = parser.parse_args(arguments)
+
+        if not os.path.exists(inventory_path):
+            parser.exit(1, "Could not find your inventory at {}".format(inventory_path))
+
+        for item in inventory_items(inventory_path, args.action):
+            print(item)
+        return
+
+    obsah.main(cliargs=arguments, application_config=application_config)
 
 
 if __name__ == '__main__':

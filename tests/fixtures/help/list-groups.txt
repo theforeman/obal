@@ -1,0 +1,12 @@
+usage: obal list-groups [-h] [-v] [-e EXTRA_VARS]
+
+List groups defined in package_manifest.yaml
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         verbose output
+
+advanced arguments:
+  -e, --extra-vars EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @

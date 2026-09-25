@@ -1,0 +1,4 @@
+---
+- name: List available inventory groups
+  hosts: []
+  gather_facts: false
