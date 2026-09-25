@@ -1,4 +1,7 @@
-from obal.data.module_utils import obal
+import os
+
+import obal
+from obal.data.module_utils import obal as obal_utils
 from obal.data.module_utils.obal import get_specfile_sources, get_changelog_evr
 from obal.data.modules.repoclosure import build_command
 
@@ -13,7 +16,7 @@ def test_get_specfile_sources_includes_patches(monkeypatch):
         assert command == ['spectool', '--list-files', '--all', 'package.spec']
         return 'Source0: https://example.com/source.tar.gz\nPatch0: fix.patch\n'
 
-    monkeypatch.setattr(obal, 'run_command', mock_run_command)
+    monkeypatch.setattr(obal_utils, 'run_command', mock_run_command)
 
     assert get_specfile_sources('package.spec') == [
         'https://example.com/source.tar.gz',
@@ -24,6 +27,54 @@ def test_get_specfile_sources_includes_patches(monkeypatch):
 def test_get_changelog_evr():
     evr = get_changelog_evr('tests/fixtures/testrepo/upstream/packages/hello/hello.spec')
     assert evr == '2.10-2'
+
+
+def test_inventory_packages():
+    inventory = os.path.join(
+        os.path.dirname(__file__),
+        'fixtures/testrepo/upstream/package_manifest.yaml',
+    )
+
+    assert obal.inventory_items(inventory, 'list-packages') == [
+        'bar',
+        'broken-spec-package',
+        'foo',
+        'hello',
+        'package-with-existing-build',
+        'package-with-two-targets',
+    ]
+
+
+def test_inventory_groups():
+    inventory = os.path.join(
+        os.path.dirname(__file__),
+        'fixtures/testrepo/copr/package_manifest.yaml',
+    )
+
+    assert obal.inventory_items(inventory, 'list-groups') == [
+        'copr_projects',
+        'packages',
+        'repoclosures',
+    ]
+
+
+def test_list_packages_command(monkeypatch, capsys):
+    inventory_dir = os.path.join(
+        os.path.dirname(__file__),
+        'fixtures/testrepo/upstream',
+    )
+    monkeypatch.chdir(inventory_dir)
+
+    obal.main(['list-packages'])
+
+    assert capsys.readouterr().out.splitlines() == [
+        'bar',
+        'broken-spec-package',
+        'foo',
+        'hello',
+        'package-with-existing-build',
+        'package-with-two-targets',
+    ]
 
 
 def test_repoclosure_build_command_no_excludes():

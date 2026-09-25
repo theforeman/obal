@@ -1,0 +1,4 @@
+---
+- name: List available packages
+  hosts: []
+  gather_facts: false

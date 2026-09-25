@@ -21,7 +21,13 @@ def playbook(request):
 
 
 def test_takes_target_argument(playbook):
-    expected = playbook.name not in ('setup', 'cleanup-copr', 'verify-koji-tag')
+    expected = playbook.name not in (
+        'setup',
+        'cleanup-copr',
+        'list-groups',
+        'list-packages',
+        'verify-koji-tag',
+    )
     assert playbook.takes_target_parameter == expected
 
 
