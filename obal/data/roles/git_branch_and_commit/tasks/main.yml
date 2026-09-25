@@ -14,12 +14,35 @@
   register: git_branch
   run_once: true
 
+- name: 'Set target branch name'
+  set_fact:
+    target_branch: "{{ branch | default(git_branch.stdout + '-update-' + inventory_hostname + '-' + updated_version.stdout) }}"
+  run_once: true
+
+- name: 'Check if branch exists'
+  command: "git rev-parse --verify {{ target_branch }}"
+  args:
+    chdir: "{{ inventory_dir }}"
+  register: branch_exists
+  failed_when: false
+  changed_when: false
+  run_once: true
+
 - name: 'Create git branch'
-  command: "git checkout -b {{ git_branch.stdout }}-update-{{ inventory_hostname }}-{{ updated_version.stdout }}"
+  command: "git checkout -b {{ target_branch }}"
   args:
     chdir: "{{ inventory_dir }}"
   run_once: true
   changed_when: true
+  when: branch_exists.rc != 0
+
+- name: 'Checkout existing git branch'
+  command: "git checkout {{ target_branch }}"
+  args:
+    chdir: "{{ inventory_dir }}"
+  run_once: true
+  changed_when: true
+  when: branch_exists.rc == 0
 
 - name: 'Create git commit'
   command: "git commit -a -m 'Update {{ inventory_hostname }} to {{ updated_version.stdout }}'"
