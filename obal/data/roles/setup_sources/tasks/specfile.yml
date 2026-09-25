@@ -4,5 +4,6 @@
     spec_file: "{{ spec_file_path }}"
   register: setup_sources_sources
 
-- include_tasks: annex.yml
+- name: Configure source in Git Annex
+  include_tasks: annex.yml
   with_items: "{{ setup_sources_sources.sources | list }}"

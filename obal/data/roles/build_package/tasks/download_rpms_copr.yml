@@ -1,4 +1,5 @@
-- when: build_package_build_system == 'copr' and build_package_download_rpms | bool
+- name: Download RPMs from Copr
+  when: build_package_build_system == 'copr' and build_package_download_rpms | bool
   block:
     - name: Define download directory
       set_fact:

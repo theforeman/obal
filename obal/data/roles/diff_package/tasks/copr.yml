@@ -1,5 +1,6 @@
 ---
-- include_tasks: git_package_info.yml
+- name: Gather local package version
+  include_tasks: git_package_info.yml
 
 - name: 'Get latest package info from copr'
   command: >
@@ -31,7 +32,8 @@
   set_fact:
     diff_package_changed: "{{ not copr_package_version.startswith(git_package_version) }}"
 
-- debug:
+- name: Show Copr package comparison
+  debug:
     msg:
       - "Git version: {{ git_package_version }}"
       - "Copr version: {{ copr_package_version }}"

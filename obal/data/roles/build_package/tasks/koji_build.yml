@@ -16,7 +16,8 @@
   register: build_exists
   when: not build_package_scratch | bool
 
-- debug:
+- name: Show Koji build status
+  debug:
     msg: "{{ build_exists }}"
 
 - name: Tag package build into Koji tag
@@ -30,7 +31,8 @@
     - build_exists.exists
     - not build_package_scratch
 
-- when: build_exists is skipped or not build_exists.exists
+- name: Build missing package
+  when: build_exists is skipped or not build_exists.exists
   block:
     - name: Create temporary build directory
       tempfile:
@@ -60,7 +62,7 @@
         tag_check: "{{ build_package_koji_whitelist_check }}"
       register: koji_build_tasks
 
-    - name: 'Created tasks'
+    - name: Report created Koji tasks  # noqa no-handler
       debug:
         var: koji_build_tasks.task_urls
       when: koji_build_tasks.changed

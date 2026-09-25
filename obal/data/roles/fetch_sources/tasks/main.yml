@@ -1,5 +1,6 @@
 ---
-- when:
+- name: Fetch files from upstream Git repository
+  when:
     - upstream is defined
     - upstream.endswith('.git')
     - upstream_files is defined
@@ -30,7 +31,8 @@
         state: 'absent'
         path: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- when:
+- name: Fetch files from upstream source RPM
+  when:
     - upstream is defined
     - upstream.endswith('src.rpm')
     - upstream_files is defined
@@ -72,8 +74,10 @@
         state: 'absent'
         path: "./{{ package_base_dir }}/{{ inventory_hostname }}"
 
-- block:
-    - include_role:
+- name: Update package sources
+  block:
+    - name: Load spec file
+      include_role:
         name: spec_file
 
     - name: 'Set setup flag'

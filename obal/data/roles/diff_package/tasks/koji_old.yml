@@ -4,7 +4,8 @@
     koji_tags: "{{ diff_package_tags }}"
   when: diff_package_tags is defined
 
-- include_tasks: git_package_info.yml
+- name: Gather local package version
+  include_tasks: git_package_info.yml
 
 - name: Initialize diff_package_changed
   set_fact:
@@ -28,7 +29,8 @@
   with_items: "{{ koji_package_versions }}"
   no_log: true
 
-- debug:
+- name: Show legacy Koji package comparison
+  debug:
     msg:
       - "Git version: {{ git_package_version }}"
       - "Tagged version: {{ item }}"

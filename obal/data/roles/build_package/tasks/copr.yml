@@ -1,5 +1,6 @@
 ---
-- include_tasks: copr_build.yml
+- name: Build package in Copr project
+  include_tasks: copr_build.yml
   loop: "{{ copr_projects }}"
   loop_control:
     loop_var: copr_project

@@ -4,7 +4,8 @@
     packages: "{{ hostvars }}"
   register: all_tags
 
-- include_tasks: "verify.yaml"
+- name: Verify Koji tag
+  include_tasks: "verify.yaml"
   loop: "{{ all_tags.tags }}"
   loop_control:
     loop_var: tag_name

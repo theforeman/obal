@@ -1,5 +1,6 @@
 ---
-- block:
+- name: Prepare source RPM
+  block:
     - name: Create temporary build directory
       tempfile:
         state: directory
@@ -7,7 +8,8 @@
       register: srpm_directory
       when: build_package_srpm_directory is not defined
 
-    - include_role:
+    - name: Build source RPM
+      include_role:
         name: build_srpm
       vars:
         build_srpm_output_dir: "{{ build_package_srpm_directory | default(srpm_directory.path) }}"
@@ -16,13 +18,15 @@
   set_fact:
     build_package_project_user: "{{ copr_scratch_user | default(copr_project_user) }}"
 
-- when: build_package_scratch | bool
+- name: Create scratch Copr project
+  when: build_package_scratch | bool
   block:
     - name: Define Copr scratch project name
       set_fact:
         build_package_project_name: "{{ copr_scratch_project | default(copr_project['copr_project_name'] + '-scratch-' + (999999999 | random | to_uuid)) }}"
 
-    - include_role:
+    - name: Configure scratch Copr project
+      include_role:
         name: copr_project
       vars:
         copr_project_user: "{{ build_package_project_user }}"
@@ -47,7 +51,7 @@
   loop_control:
     loop_var: chroot
 
-- name: 'Created tasks'
+- name: Report created Copr tasks  # noqa no-handler
   when: copr_builds is changed
   debug:
     msg: "{{ copr_builds['results'] | selectattr('build_urls', 'defined') | map(attribute='build_urls') | list | flatten }}"
@@ -71,7 +75,8 @@
         msg: "The build in Copr has failed"
       when: (build_package_copr_status is failed)
 
-- when:
+- name: Archive Copr build information
+  when:
     - build_package_archive_build_info
     - copr_builds is changed
   block:

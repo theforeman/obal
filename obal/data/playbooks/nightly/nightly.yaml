@@ -17,7 +17,8 @@
             releasers:
               - "{{ nightly_releaser }}"
 
-        - import_role:
+        - name: Build legacy nightly package
+          import_role:
             name: build_package
 
     - name: 'Nightly building'
@@ -57,7 +58,8 @@
             backup: true
           register: original_specfile
 
-        - import_role:
+        - name: Build nightly package
+          import_role:
             name: build_package
       always:
         - name: 'Restore spec file'

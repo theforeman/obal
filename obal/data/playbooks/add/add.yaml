@@ -20,7 +20,8 @@
         mode: '0755'
       register: package_directory_result
 
-    - when: package_directory_result is changed
+    - name: Add newly created package files  # noqa no-handler
+      when: package_directory_result is changed
       block:
         - name: 'Fetch sources'
           include_role:
