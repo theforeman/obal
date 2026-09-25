@@ -9,18 +9,16 @@
     - spec_file
   tasks:
     - name: Determine source file from spec
-      shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
-      args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      specfile_sources:
+        spec_file: "{{ spec_file_path }}"
       register: old_source_urls
       when: old_source_urls is not defined
-      changed_when: false
 
     - name: "Remove old sources"
       command: "git rm --ignore-unmatch {{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
-      with_items: "{{ old_source_urls.stdout_lines | list }}"
+      with_items: "{{ old_source_urls.sources | list }}"
       when:
         # Local sources are only safe to remove when 'Fetch sources' is about
         # to repopulate them from upstream (same condition fetch_sources uses
@@ -33,18 +31,16 @@
         name: fetch_sources
 
     - name: Determine new source file from spec
-      shell: "spectool --list-files --all {{ spec_file_path }} | awk '{print $2}'"
-      args:
-        chdir: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+      specfile_sources:
+        spec_file: "{{ spec_file_path }}"
       register: new_source_urls
       when: new_source_urls is not defined
-      changed_when: false
 
     - name: 'Git annex add new sources'
       command: "git annex add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}"
-      with_items: "{{ new_source_urls.stdout_lines | list }}"
+      with_items: "{{ new_source_urls.sources | list }}"
       when:
         - "'://' in item"
 
@@ -52,7 +48,7 @@
       command: "git -c annex.largefiles=nothing add ./{{ package_base_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
       args:
         chdir: "{{ inventory_dir }}"
-      with_items: "{{ new_source_urls.stdout_lines | list }}"
+      with_items: "{{ new_source_urls.sources | list }}"
       when:
         - "'://' not in item"
 
