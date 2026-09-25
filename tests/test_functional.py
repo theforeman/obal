@@ -15,6 +15,7 @@ FIXTURE_DIR = os.path.join(
 TESTREPO_DIR = os.path.join(FIXTURE_DIR, 'testrepo')
 MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin')
 MOCK_SOURCES_DIR = os.path.join(FIXTURE_DIR, 'mock_sources')
+ANNEX_LOOKUP_FAILURE_MOCKBIN_DIR = os.path.join(FIXTURE_DIR, 'mockbin_git_annex_lookup_failure')
 
 DEFAULT_ARGS = ['-e', 'build_package_srpm_directory="/tmp/SRPMs"']
 
@@ -159,6 +160,34 @@ def test_obal_scratch_with_tito_upstream_hello_nowait():
         "koji build obaltest-nightly-el8 /tmp/SRPMs/hello-2.10-2.src.rpm --scratch"
     ]
     assert_mockbin_log(expected_log)
+
+
+@obal_cli_test(repotype='upstream')
+def test_obal_scratch_upstream_hello_annex_lookup_error_fails_play(capsys):
+    # Regression test for #165: setup_sources/tasks/annex.yml's "Search annex
+    # for web link" task must not swallow a *real* git-annex error the way it
+    # used to under 'ignore_errors: true' - a real error has to fail the play
+    # and its message has to be visible, unlike "no web source found yet"
+    # (see test_obal_add_downstream_hello below, which is empty stdout/exit 0
+    # and must keep succeeding).
+    #
+    # This makes only 'git annex find'/'git annex whereis' fail, via a 'git'
+    # shim placed ahead of MOCKBIN_DIR on PATH for this test only (see
+    # tests/fixtures/mockbin_git_annex_lookup_failure/git for why a corrupted
+    # git-annex repo, e.g. 'git config --unset annex.uuid', is not used here:
+    # it breaks every git-annex command in the play, not just the lookup, so
+    # a later, unrelated, pre-existing 'failed_when: false'/best-effort
+    # git-annex call ends up surfacing the same error text on unpatched code
+    # too and the test can't tell the two apart).
+    oldpath = os.environ['PATH']
+    os.environ['PATH'] = "{}:{}".format(ANNEX_LOOKUP_FAILURE_MOCKBIN_DIR, oldpath)
+    try:
+        assert_obal_failure(['scratch', 'hello'])
+    finally:
+        os.environ['PATH'] = oldpath
+
+    captured = capsys.readouterr()
+    assert 'annex.uuid is not set' in captured.out + captured.err
 
 
 @obal_cli_test(repotype='upstream')
