@@ -6,10 +6,17 @@
 
 All `obal` actions should also work with plain Ansible when called like `ansible-playbook <action_playbook>.yml -l <package>` instead of `obal <action> <package>`.
 
-## necessary tools
+## Installation
 
-- `python` 3.9+
-- `ansible`
+Obal requires Python 3.9 or later and Ansible. Install both from PyPI with:
+
+    python3 -m pip install ansible obal
+
+If your configured RPM repositories provide Obal, install the RPM package with:
+
+    sudo dnf install obal
+
+Verify the installation by running `obal --help`.
 
 ## Using Obal via Container
 
