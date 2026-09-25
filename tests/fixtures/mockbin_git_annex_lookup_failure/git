@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+"""
+A thin wrapper around the real 'git' binary used by exactly one test:
+test_obal_update_upstream_hello_annex_lookup_error_fails_play in
+tests/test_functional.py.
+
+It makes 'git annex find'/'git annex whereis' fail deterministically with a
+real git-annex error message, while transparently passing every other git
+(and git-annex) invocation straight through to the real binary.
+
+Why this exists instead of corrupting the test repo's git-annex state
+(e.g. 'git config --unset annex.uuid'): that corruption breaks *every*
+git-annex command in the repository, not just the lookup. In this codebase
+'git annex addurl' (setup_sources/tasks/annex.yml) and the srpm-building
+custom module both also shell out to git-annex later in the same play, and
+both happen to surface the exact same "annex.uuid is not set" text when they
+fail - which makes a corrupted-repo test pass on unpatched code too, for the
+wrong reason, defeating the point of a regression test. Failing only the
+lookup call in isolation is the only way to prove specifically that
+setup_sources/tasks/annex.yml no longer swallows a real lookup error (#165),
+without also tripping over unrelated, pre-existing error handling
+elsewhere in the same play.
+
+This file is only ever put on PATH (ahead of tests/fixtures/mockbin/) by the
+one test above, for the duration of that test's single obal.main() call. No
+other test adds this directory to PATH, so this file has zero effect on the
+rest of the suite.
+"""
+
+from __future__ import print_function
+
+import os
+import sys
+
+# The exact message a real git-annex (10.20250929) prints for 'git annex
+# find'/'git annex whereis' when its own annex.uuid config has been lost -
+# reproduced once against a real git-annex repository and hard-coded here so
+# the test is deterministic and independent of the git-annex version
+# installed on the machine running it.
+_FAKE_ANNEX_ERROR = (
+    "git-annex: This repository has annex.version set, but annex.uuid is "
+    "not set. Perhaps that git config was lost. Cannot use the repository "
+    "in this state; set back annex.uuid to fix this."
+)
+
+
+def _real_git():
+    self_dir = os.path.dirname(os.path.realpath(__file__))
+    for entry in os.environ.get('PATH', '').split(os.pathsep):
+        if not entry or os.path.realpath(entry) == self_dir:
+            continue
+        candidate = os.path.join(entry, 'git')
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    sys.stderr.write("mockbin_git_annex_lookup_failure/git: real 'git' not found on PATH\n")
+    sys.exit(127)
+
+
+if len(sys.argv) >= 3 and sys.argv[1] == 'annex' and sys.argv[2] in ('find', 'whereis'):
+    print(_FAKE_ANNEX_ERROR, file=sys.stderr)
+    sys.exit(1)
+
+os.execv(_real_git(), ['git'] + sys.argv[1:])
