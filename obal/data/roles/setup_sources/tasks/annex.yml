@@ -7,6 +7,8 @@
 - name: 'Set source path'
   set_fact:
     setup_sources_sourcepath: "{{ package_dir }}/{{ setup_sources_sourcebase }}"
+    setup_sources_source_relative_path: >-
+      {{ (package_dir + '/' + setup_sources_sourcebase) | relpath(inventory_dir) }}
 
 - name: 'Source exists'
   stat:
@@ -14,12 +16,18 @@
   register: setup_sources_source_exists
 
 - name: 'Search annex for web link'
-  shell: 'git annex whereis {{ setup_sources_sourcepath }} 2>/dev/null | grep -q "web:"'
+  command:
+    argv:
+      - git
+      - annex
+      - find
+      - --branch=HEAD
+      - "--include={{ setup_sources_source_relative_path }}"
+      - --in=web
   args:
-    chdir: "{{ package_dir }}"
+    chdir: "{{ inventory_dir }}"
   changed_when: false
   register: setup_sources_search_annex
-  ignore_errors: true
   when: "( not setup_sources_source_exists.stat.exists ) or
     ( setup_sources_source_exists.stat.exists and setup_sources_source_exists.stat.islnk is defined
     and setup_sources_source_exists.stat.islnk )"
@@ -29,7 +37,9 @@
     name: "{{ setup_sources_sourcepath }}"
     state: absent
   register: setup_sources_remove_source
-  when: setup_sources_search_annex is failed
+  when:
+    - setup_sources_search_annex is not skipped
+    - (setup_sources_search_annex.stdout | default('') | length) == 0
 
 - name: 'Add url to annex for source'
   command: >-
@@ -41,7 +51,9 @@
   args:
     chdir: "{{ package_dir }}"
   failed_when: false
-  when: setup_sources_search_annex is failed
+  when:
+    - setup_sources_search_annex is not skipped
+    - (setup_sources_search_annex.stdout | default('') | length) == 0
 
 - name: 'Ensure no actual change happened'
   command: "git diff --exit-code -- {{ setup_sources_sourcebase }}"
