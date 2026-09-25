@@ -1,3 +1,4 @@
+from obal.data.module_utils import obal
 from obal.data.module_utils.obal import get_specfile_sources, get_changelog_evr
 from obal.data.modules.repoclosure import build_command
 
@@ -5,6 +6,20 @@ from obal.data.modules.repoclosure import build_command
 def test_get_specfile_sources():
     sources = get_specfile_sources('tests/fixtures/testrepo/upstream/packages/hello/hello.spec')
     assert sources == ['http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz']
+
+
+def test_get_specfile_sources_includes_patches(monkeypatch):
+    def mock_run_command(command):
+        assert command == ['spectool', '--list-files', '--all', 'package.spec']
+        return 'Source0: https://example.com/source.tar.gz\nPatch0: fix.patch\n'
+
+    monkeypatch.setattr(obal, 'run_command', mock_run_command)
+
+    assert get_specfile_sources('package.spec') == [
+        'https://example.com/source.tar.gz',
+        'fix.patch',
+    ]
+
 
 def test_get_changelog_evr():
     evr = get_changelog_evr('tests/fixtures/testrepo/upstream/packages/hello/hello.spec')

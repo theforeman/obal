@@ -136,7 +136,7 @@ def get_specfile_sources(specfile):
 
     Returns the filenames or URLs as an array
     """
-    sources = run_command(["spectool", "--list-files", specfile])
+    sources = run_command(["spectool", "--list-files", "--all", specfile])
     return [source.split(' ')[1] for source in sources.split("\n")
             if source and (source.startswith('Source') or source.startswith('Patch'))]
 
