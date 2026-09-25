@@ -1,8 +1,10 @@
 ---
-- when: tag != 'all'
+- name: Verify selected Koji tag
+  when: tag != 'all'
   include_tasks: "verify.yaml"
   vars:
     tag_name: "{{ tag }}"
 
-- when: tag == 'all'
+- name: Verify all Koji tags
+  when: tag == 'all'
   include_tasks: "all.yaml"

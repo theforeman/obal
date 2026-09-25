@@ -15,9 +15,11 @@
       when: (build_package_scratch and koji_tags is not truthy) or (not build_package_scratch)
       include_tasks: tito_release.yml
 
-- when: build_package_use_koji_build | bool
+- name: Build package with Koji
+  when: build_package_use_koji_build | bool
   block:
-    - include_tasks: koji_build.yml
+    - name: Build package for Koji tag
+      include_tasks: koji_build.yml
       loop: "{{ koji_tags }}"
       loop_control:
         loop_var: tag

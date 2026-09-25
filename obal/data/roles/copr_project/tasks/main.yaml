@@ -1,8 +1,10 @@
 ---
-- when: copr_project_fork_from is truthy
+- name: Fork Copr project
+  when: copr_project_fork_from is truthy
   include_tasks: fork.yml
 
-- when: copr_project_fork_from is not truthy
+- name: Create Copr project
+  when: copr_project_fork_from is not truthy
   include_tasks: create.yml
 
 - name: Configure chroots

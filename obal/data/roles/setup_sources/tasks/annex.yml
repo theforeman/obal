@@ -55,7 +55,7 @@
     - setup_sources_search_annex is not skipped
     - (setup_sources_search_annex.stdout | default('') | length) == 0
 
-- name: 'Ensure no actual change happened'
+- name: Ensure no actual change happened  # noqa no-handler
   command: "git diff --exit-code -- {{ setup_sources_sourcebase }}"
   changed_when: false
   args:

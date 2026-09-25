@@ -1,4 +1,5 @@
-- block:
+- name: Check package repository closure
+  block:
     - name: Set config filename for repoclosure
       set_fact:
         config_filename: "{{ repoclosure_config | basename }}"
@@ -32,7 +33,8 @@
         exclude_packages: "{{ exclude_packages | default([]) }}"
       register: output
 
-    - debug:
+    - name: Show repoclosure output
+      debug:
         msg: "{{ output.output }}"
   always:
     - name: Clean up temporary directory
