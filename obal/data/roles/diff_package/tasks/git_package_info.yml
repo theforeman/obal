@@ -1,15 +1,11 @@
 ---
 - name: 'Get latest package info from git'
-  command: >
-    rpmspec --query
-      --undefine=dist
-      --queryformat=%{name}-%{version}-%{release}
-      {{ '--define "scl_prefix ' + scl + '-"' if scl else '' }}
-      --srpm
-      {{ spec_file_path }}
+  rpmspec_query:
+    spec_file: "{{ spec_file_path }}"
+    query_format: "%{name}-%{version}-%{release}"
+    macros: "{{ {'scl_prefix': scl + '-'} if scl else {} }}"
   register: git_package_info
-  changed_when: false
 
 - name: Set git package version
   set_fact:
-    git_package_version: "{{ git_package_info.stdout }}"
+    git_package_version: "{{ git_package_info.value }}"
