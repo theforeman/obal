@@ -1,9 +1,11 @@
 ---
-- include_tasks: koji_tag.yml
+- name: Compare Koji tags
+  include_tasks: koji_tag.yml
   loop: "{{ koji_tags }}"
   loop_control:
     loop_var: tag
   when: diff_package_tags is undefined
 
-- include_tasks: koji_old.yml
+- name: Compare legacy Koji tags
+  include_tasks: koji_old.yml
   when: diff_package_tags is defined
