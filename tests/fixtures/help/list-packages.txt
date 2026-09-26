@@ -1,0 +1,6 @@
+usage: obal list-packages [-h]
+
+List packages available in package_manifest.yaml
+
+optional arguments:
+  -h, --help  show this help message and exit

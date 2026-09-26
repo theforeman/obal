@@ -1,0 +1,5 @@
+---
+- name: List packages available in the package manifest
+  hosts: localhost
+  gather_facts: false
+  tasks: []
