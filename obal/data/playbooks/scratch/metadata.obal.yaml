@@ -4,6 +4,10 @@ help: |
 
   A scratch build produces the same result as a normal release would, but it's not tagged in any repository. This allows verification of a change without actually committing it.
 variables:
+  build_package_copr_archive_build_info:
+    action: store_true
+    parameter: --copr-archive-build-info
+    help: Archive Copr build information in the copr_build_info directory. Copr only, has no effect on Koji/Brew builds.
   build_package_koji_whitelist_check:
     action: store_false
     parameter: --skip-koji-whitelist-check
