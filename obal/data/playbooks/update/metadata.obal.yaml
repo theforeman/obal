@@ -12,6 +12,10 @@ help: |
 
     obal update mypackage --version 3.4.5 --commit
 
+  To update a package and commit the changes to a specific branch (creating it if necessary):
+
+    obal update mypackage --version 3.4.5 --commit --branch my-update-branch
+
   Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
 
     obal update mypackage
@@ -27,3 +31,5 @@ variables:
   commit:
     help: When true, creates a git branch and commits the update changes to it.
     action: store_true
+  branch:
+    help: Branch name to use when committing. If the branch already exists, it will be checked out and the commit added to it. When unspecified, a branch name is generated from the current branch, package name, and new version.

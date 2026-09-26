@@ -1,5 +1,6 @@
-usage: obal update [-h] [-v] [-e EXTRA_VARS] [--changelog CHANGELOG]
-                   [--commit] [--prerelease PRERELEASE] [--release RELEASE]
+usage: obal update [-h] [-v] [-e EXTRA_VARS] [--branch BRANCH]
+                   [--changelog CHANGELOG] [--commit]
+                   [--prerelease PRERELEASE] [--release RELEASE]
                    [--version VERSION]
                    target [target ...]
 
@@ -15,6 +16,10 @@ To update a package to a new version and create a git branch for the change from
 
   obal update mypackage --version 3.4.5 --commit
 
+To update a package and commit the changes to a specific branch (creating it if necessary):
+
+  obal update mypackage --version 3.4.5 --commit --branch my-update-branch
+
 Updating a package that is taken from an upstream repository assumes that the package_manifest already defines the upstream location. Thus, the command line to update to a newer version that is available upstream automatically is:
 
   obal update mypackage
@@ -25,6 +30,11 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         verbose output
+  --branch BRANCH       Branch name to use when committing. If the branch
+                        already exists, it will be checked out and the commit
+                        added to it. When unspecified, a branch name is
+                        generated from the current branch, package name, and
+                        new version.
   --changelog CHANGELOG
                         Optionally set the changelog. When unspecified, an
                         entry will be generated
