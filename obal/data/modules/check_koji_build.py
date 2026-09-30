@@ -5,6 +5,7 @@ Check if build exists in Koji
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.rhpkg import build_info, ReleaseError # pylint:disable=import-error,no-name-in-module
 
 def main():
     """
@@ -24,22 +25,15 @@ def main():
     package = module.params['package']
     koji_executable = module.params['koji_executable']
 
-    command = ['buildinfo', nvr]
     try:
-        output = koji(command, koji_executable)
-        exists = "BUILD: %s" % (nvr) in output and "State: COMPLETE" in output
-    except KojiCommandError:
-        output = None
-        exists = False
+        info = build_info(koji_executable or 'koji', nvr)
+    except ReleaseError as error:
+        module.fail_json(msg=str(error), changed=False)
+    exists = info['state'] == 'COMPLETE'
+    result = dict(changed=False, exists=exists, state=info['state'], task=info['task'])
 
     if tag:
-        exists_for_tag = False
-
-        if output is not None:
-            for line in output.split("\n"):
-                if line.startswith("Tags:"):
-                    tags = line.split()[1:]
-                    exists_for_tag = tag in tags
+        exists_for_tag = exists and tag in info['tags']
 
         if not exists_for_tag:
             command = ['latest-build', '--quiet', tag, package]
@@ -50,11 +44,11 @@ def main():
                 module.fail_json(changed=False, msg=error.message, command=error.command)
 
             build = build.split(' ')[0]
-            module.exit_json(changed=False, exists=exists, tagged_version=build, exists_for_tag=False)
+            module.exit_json(tagged_version=build, exists_for_tag=False, **result)
         else:
-            module.exit_json(changed=False, exists=exists, tagged_version=nvr, exists_for_tag=True)
+            module.exit_json(tagged_version=nvr, exists_for_tag=True, **result)
     else:
-        module.exit_json(changed=False, exists=exists)
+        module.exit_json(**result)
 
 if __name__ == '__main__':
     main()

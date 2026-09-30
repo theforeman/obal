@@ -1,16 +1,17 @@
 ---
 build_package_build_system: koji
-build_package_koji_command: koji
-build_package_tito_args: []
+build_package_koji_command: >-
+  {{ 'brew' if build_package_build_system == 'koji' and build_package_releaser == 'rhpkg' else 'koji' }}
+build_package_releaser: "{{ 'koji' if build_package_use_koji_build | bool else 'rhpkg' }}"
+build_package_rhpkg_command: rhpkg
+rhpkg_targets: []
 build_package_scratch: false
 build_package_test: false
-build_package_tito_releaser_args: []
 build_package_wait: true
 build_package_download_logs: false
 build_package_download_rpms: false
 build_package_waitrepo: false
-build_package_koji_whitelist_check: false
-build_package_tito_builder:
+build_package_koji_whitelist_check: "{{ build_package_releaser == 'rhpkg' and not build_package_scratch | bool }}"
 build_package_use_koji_build: false
 build_package_copr_rebuild: false
 build_package_skip_failed_build: false

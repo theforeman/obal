@@ -7,8 +7,9 @@ import os
 import subprocess
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.obal import get_specfile_name # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.obal import specfile_macro_lookup # pylint:disable=import-error,no-name-in-module
 from ansible.module_utils.koji_wrapper import koji # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.rhpkg import inventory_tags, uses_rhpkg, ReleaseError  # pylint:disable=import-error,no-name-in-module
 
 def main():
     """
@@ -19,31 +20,48 @@ def main():
             packages=dict(type='dict', required=True),
             tag=dict(type='str', required=True),
             directory=dict(type='str', required=True),
-            koji_executable=dict(type='str', require=False, default='koji')
+            koji_executable=dict(type='str', required=False)
         )
     )
 
     packages_for_tag = set()
+    executables = set()
 
     for (package, attributes) in module.params['packages'].items():
         tag = None
 
-        if 'koji_tags' in attributes:
-            for koji_tag in attributes['koji_tags']:
+        try:
+            tags = inventory_tags(attributes, package)
+        except ReleaseError as error:
+            module.fail_json(msg=str(error))
+
+        if tags:
+            for koji_tag in tags:
                 if module.params['tag'] == koji_tag['name']:
                     tag = koji_tag
 
-            if tag and 'package_base_dir' in attributes:
-                specfile = os.path.join(attributes['package_base_dir'], package, "{}.spec".format(package))
-                scl = tag.get('scl')
-                name = get_specfile_name(os.path.join(module.params['directory'], specfile), scl)
+            if tag and ('package_base_dir' in attributes or uses_rhpkg(attributes)):
+                specfile = os.path.join(attributes.get('package_base_dir', 'packages'), package,
+                                        "{}.spec".format(package))
+                directory = attributes.get('inventory_dir', module.params['directory'])
+                name, _ = specfile_macro_lookup(os.path.join(directory, specfile), '%{name}',
+                                                scl=tag.get('scl'), dist=tag.get('dist'), macros=tag.get('macros'))
                 packages_for_tag.add(name)
+                default_command = 'brew' if uses_rhpkg(attributes) else 'koji'
+                executables.add(attributes.get('build_package_koji_command',
+                                                attributes.get('koji_executable', default_command)))
+
+    executable = module.params['koji_executable']
+    if not executable:
+        if len(executables) > 1:
+            module.fail_json(msg='Packages for this tag select different Koji executables')
+        executable = next(iter(executables), 'koji')
 
     try:
         command = ['list-pkgs', '--quiet', '--tag', module.params['tag']]
         koji_output = koji(
             command,
-            executable=module.params['koji_executable']
+            executable=executable
         )
 
         packages_in_koji = {item.split(' ', 1)[0] for item in koji_output.split("\n") if item}

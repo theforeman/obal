@@ -1,7 +1,4 @@
 ---
 build_srpm_dist:
 build_srpm_scl:
-build_srpm_tito_build_args: "{{ build_package_tito_releaser_args | default([]) }}"
 build_srpm_output_dir: "{{ inventory_dir }}/SRPMs"
-build_srpm_tito_args: "{{ build_package_tito_args | default([]) }}"
-build_srpm_tito_builder: "{{ build_package_tito_builder | default() }}"

@@ -9,6 +9,7 @@ import subprocess
 from zipfile import ZipFile
 from contextlib import contextmanager
 from tempfile import mkdtemp, TemporaryFile
+from urllib.parse import urlsplit
 
 from ansible.module_utils.six.moves.urllib.request import urlopen # pylint:disable=import-error,no-name-in-module
 from ansible.module_utils.six.moves.urllib.error import HTTPError # pylint:disable=import-error,no-name-in-module
@@ -38,7 +39,14 @@ def copy_sources(spec_file, package_dir, sources_dir):
     sources = get_specfile_sources(spec_file)
 
     for source in sources:
-        if not source.startswith('http'):
+        if source.startswith('http'):
+            # Nightly builds can supply URL-named sources locally without annexing them.
+            local_source = os.path.join(package_dir, os.path.basename(urlsplit(source).path))
+            if os.path.isfile(local_source):
+                # Keep staging writable if this is a locked annex source: it will
+                # be copied again below after unlocking.
+                shutil.copyfile(local_source, os.path.join(sources_dir, os.path.basename(local_source)))
+        else:
             shutil.copy(os.path.join(package_dir, source), sources_dir)
 
     with chdir(package_dir):

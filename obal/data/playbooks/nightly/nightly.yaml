@@ -4,19 +4,12 @@
     - packages
   serial: 1
   gather_facts: false
-  vars:
-    build_package_tito_releaser_args: "{{ nightly_package_tito_releaser_args | default([]) }}"
   roles:
     - package_variables
   tasks:
     - name: 'Legacy nightly building'
       when: nightly_sourcefiles is not defined and nightly_githash is not defined
       block:
-        - name: 'Set nightly_releaser'
-          set_fact:
-            releasers:
-              - "{{ nightly_releaser }}"
-
         - name: Build legacy nightly package
           import_role:
             name: build_package

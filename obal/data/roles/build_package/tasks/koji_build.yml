@@ -20,11 +20,30 @@
   debug:
     msg: "{{ build_exists }}"
 
+- name: Check that a Koji build can be reused or submitted
+  assert:
+    that:
+      - build_exists.state in ['MISSING', 'COMPLETE']
+    fail_msg: "Build {{ package_nvr.nvr }} is {{ build_exists.state }}; refusing another submission"
+  when: not build_package_scratch | bool
+
+- name: Check registration before tagging an existing build
+  package_whitelist_check:
+    package: "{{ package_nvr.name }}"
+    tags: ["{{ tag.name }}"]
+    build_command: "{{ build_package_koji_command }}"
+  when:
+    - build_package_koji_whitelist_check | bool
+    - build_exists is not skipped
+    - build_exists.exists
+    - not build_exists.exists_for_tag
+    - not build_package_scratch | bool
+
 - name: Tag package build into Koji tag
   koji_tag_package:
     tag: "{{ tag.name }}"
     nvr: "{{ package_nvr.nvr }}"
-    koji_executable: "{{ koji_executable | default('koji') }}"
+    koji_executable: "{{ build_package_koji_command }}"
   when:
     - build_exists is not skipped
     - not build_exists.exists_for_tag
