@@ -5,10 +5,10 @@ import subprocess
 import os
 
 try:
-    from ansible.module_utils.koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
+    from ansible.module_utils.koji_wrapper import package_whitelisted, KojiCommandError # pylint:disable=import-error,no-name-in-module
 except ImportError:
     # when trying to import this file outside the ansible context, we cannot rely on the magic ansible import path
-    from .koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
+    from .koji_wrapper import package_whitelisted, KojiCommandError # pylint:disable=import-error,no-name-in-module
 
 
 def macro_lookup(command, scl=None, dist=None, macros=None):
@@ -128,18 +128,8 @@ def get_whitelist_status(build_command, tag, package):
 
     Return `True` if the package is whitelisted, `False` otherwise.
     """
-    cmd = [
-        'list-pkgs',
-        '--tag',
-        tag,
-        '--package',
-        package,
-        '--quiet'
-    ]
-
     try:
-        koji(cmd, build_command)
-        return True
+        return package_whitelisted(build_command, tag, package)
     except KojiCommandError:
         return False
 

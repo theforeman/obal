@@ -1,22 +1,18 @@
 ---
-- name: 'Use tito to build package'
-  when: not build_package_use_koji_build | bool
-  block:
-    - name: Scratch build with koji_build
-      when:
-        - build_package_scratch
-        - koji_tags is truthy
-      include_tasks: koji_build.yml
-      loop: "{{ koji_tags }}"
-      loop_control:
-        loop_var: tag
+- name: Validate Koji releaser selection
+  assert:
+    that:
+      - build_package_releaser in ['koji', 'rhpkg']
+      - not (build_package_releaser == 'rhpkg' and build_package_use_koji_build | bool)
+      - build_package_releaser != 'koji' or koji_tags | length > 0
+    fail_msg: Tito releases are no longer supported. Configure rhpkg_targets for dist-git releases or select koji for direct SRPM builds
 
-    - name: Release with tito
-      when: (build_package_scratch and koji_tags is not truthy) or (not build_package_scratch)
-      include_tasks: tito_release.yml
+- name: Release with rhpkg
+  include_tasks: rhpkg_release.yml
+  when: build_package_releaser == 'rhpkg'
 
 - name: Build package with Koji
-  when: build_package_use_koji_build | bool
+  when: build_package_releaser == 'koji'
   block:
     - name: Build package for Koji tag
       include_tasks: koji_build.yml

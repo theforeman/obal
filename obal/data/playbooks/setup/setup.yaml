@@ -11,8 +11,8 @@
         name:
           - rpm-build
           - koji
+          - git
           - "{{ 'git-annex' if ansible_distribution == 'Fedora' or ansible_distribution_major_version == '7' else 'git-annex-standalone' }}"
-          - tito
           - scl-utils
           - scl-utils-build
           - rpmlint
@@ -20,3 +20,22 @@
           - which
           - dnf
           - dnf-plugins-core
+
+    - name: Identify configured dist-git releases
+      set_fact:
+        setup_rhpkg_required: true
+      loop: "{{ groups['packages'] | default([]) }}"
+      vars:
+        setup_package: "{{ hostvars[item] }}"
+      when:
+        - setup_package.build_package_build_system | default('koji') == 'koji'
+        - >-
+          setup_package.build_package_releaser |
+          default('koji' if setup_package.build_package_use_koji_build | default(false) | bool else 'rhpkg') == 'rhpkg'
+
+    - name: Install rhpkg for dist-git releases
+      become: true
+      package:
+        state: present
+        name: rhpkg
+      when: setup_rhpkg_required | default(false) | bool

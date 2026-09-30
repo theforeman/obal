@@ -1,5 +1,8 @@
 ---
 diff_package_type: koji
-diff_package_koji_command: koji
+diff_package_koji_command: >-
+  {{ 'brew' if build_package_build_system | default('koji') == 'koji'
+     and build_package_releaser == 'rhpkg' else 'koji' }}
 diff_package_skip: false
+build_package_releaser: "{{ 'koji' if build_package_use_koji_build | default(false) | bool else 'rhpkg' }}"
 scl: false

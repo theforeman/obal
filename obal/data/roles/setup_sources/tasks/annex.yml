@@ -15,7 +15,7 @@
     path: "{{ setup_sources_sourcepath }}"
   register: setup_sources_source_exists
 
-- name: 'Search annex for web link'
+- name: 'Search annex for source'
   command:
     argv:
       - git
@@ -23,7 +23,7 @@
       - find
       - --branch=HEAD
       - "--include={{ setup_sources_source_relative_path }}"
-      - --in=web
+      - --anything
   args:
     chdir: "{{ inventory_dir }}"
   changed_when: false
