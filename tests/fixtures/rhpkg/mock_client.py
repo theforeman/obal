@@ -21,9 +21,9 @@ def execute(command, cwd=None):
     return subprocess.check_output(command, cwd=cwd, text=True, stderr=subprocess.STDOUT).strip()
 
 
-def fail(message):
+def fail(message, code=1):
     print(message, file=sys.stderr)
-    sys.exit(1)
+    sys.exit(code)
 
 
 def build_info(nvr):
@@ -45,8 +45,12 @@ def brew():
         build_info(arguments[1])
     elif command == 'list-targets':
         target = arguments[-1]
+        if state.get('target_query_error'):
+            fail('Authentication failed while querying build targets')
         if target in state['targets']:
             print('{} {}-build {}'.format(target, target, target))
+        else:
+            fail('Usage: brew list-targets [options]\nbrew: error: No such build target: ' + target, code=2)
     elif command == 'list-pkgs':
         if state.get('registration_error'):
             fail('Authentication failed while querying package registration')
@@ -67,15 +71,23 @@ def brew():
         nvr = execute(['rpmquery', '--queryformat', '%{nvr}', '--package', srpm])
         assert nvr.endswith(state['targets'][target]['dist'])
         archive = subprocess.check_output(['rpm2cpio', srpm])
-        payload = subprocess.check_output(['cpio', '-i', '--to-stdout', 'payload.txt'],
+        payload = subprocess.check_output(['cpio', '-i', '--to-stdout', 'payload.txt', './payload.txt'],
                                           input=archive, stderr=subprocess.PIPE)
+        assert payload, 'SRPM payload.txt was not extracted'
         task_id = str(1000 + len(state['tasks']))
         state['tasks'][task_id] = dict(nvr=nvr, source=srpm, target=target, scratch=True, state='open',
                                        source_sha256=hashlib.sha256(payload).hexdigest())
         print('Created task: ' + task_id)
         print('Task info: https://brew.example.test/taskinfo?taskID=' + task_id)
+    elif command == 'taskinfo':
+        if state.get('task_query_error'):
+            fail('Authentication failed while querying task')
+        print('Task: ' + arguments[1])
+        print('State: ' + state['tasks'][arguments[1]]['state'])
     elif command == 'watch-task':
         task = state['tasks'][arguments[1]]
+        if task['state'] in ('canceled', 'failed'):
+            fail('Task ' + task['state'])
         if task['target'] in state.get('failed_targets', []):
             fail('Build failed')
         task['state'] = 'closed'
@@ -120,6 +132,7 @@ def rhpkg():
     elif command == 'build':
         assert '--scratch' not in args
         assert '--srpm' not in args
+        assert '--skip-nvr-check' in args
         target = args[args.index('--target') + 1]
         if target in state.get('submission_errors', []):
             fail('Submission rejected')
@@ -129,6 +142,15 @@ def rhpkg():
         for name, value in context.items():
             query += ['--define', '{} {}'.format(name, value)]
         nvr = execute(query)
+        if state.get('concurrent_build'):
+            concurrent_state = state['concurrent_build']
+            state['builds'][nvr] = dict(state=concurrent_state, tags=[])
+            if concurrent_state == 'BUILDING':
+                state['tasks']['1000'] = dict(nvr=nvr, source='git://example.test/rpms/package#concurrent',
+                                               target=target, scratch=False, state='open')
+                state['builds'][nvr]['task'] = '1000'
+            state_path.write_text(json.dumps(state))
+            fail('Build submission rejected by hub')
         assert execute(['git', 'rev-parse', 'HEAD']) == execute(['git', 'rev-parse', '@{upstream}'])
         task_id = str(1000 + len(state['tasks']))
         source = 'git://example.test/rpms/package#' + execute(['git', 'rev-parse', 'HEAD'])

@@ -8,8 +8,8 @@
     - role: diff_package
       when:
         - not build_package_use_koji_build | bool
-        - build_package_build_system != 'koji'
+        - build_package_releaser | default('tito') != 'rhpkg'
     - role: build_package
       when: >-
-        build_package_build_system == 'koji' or
+        build_package_releaser | default('tito') == 'rhpkg' or
         build_package_use_koji_build | bool or diff_package_changed is not defined or diff_package_changed | bool

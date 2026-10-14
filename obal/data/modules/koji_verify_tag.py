@@ -4,11 +4,10 @@ Verify packages against a tag in Koji
 """
 
 import os
-import subprocess
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.obal import specfile_macro_lookup # pylint:disable=import-error,no-name-in-module
-from ansible.module_utils.koji_wrapper import koji # pylint:disable=import-error,no-name-in-module
+from ansible.module_utils.koji_wrapper import koji, KojiCommandError # pylint:disable=import-error,no-name-in-module
 from ansible.module_utils.rhpkg import inventory_tags, uses_rhpkg, ReleaseError  # pylint:disable=import-error,no-name-in-module
 
 def main():
@@ -66,8 +65,8 @@ def main():
 
         packages_in_koji = {item.split(' ', 1)[0] for item in koji_output.split("\n") if item}
 
-    except subprocess.CalledProcessError as error:
-        module.fail_json(changed=False, msg=error.output)
+    except KojiCommandError as error:
+        module.fail_json(changed=False, msg=error.message, command=error.command)
 
     missing_in_koji = packages_for_tag - packages_in_koji
     missing_in_git = packages_in_koji - packages_for_tag

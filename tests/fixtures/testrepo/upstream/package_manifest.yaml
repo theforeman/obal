@@ -1,7 +1,9 @@
 ---
 packages:
   vars:
-    build_package_use_koji_build: true
+    releasers:
+      - dist-git
+    nightly_releaser: dist-git-jenkins
     diff_package_skip: false
     diff_package_type: 'koji'
     diff_package_koji_command: 'koji'
@@ -15,6 +17,8 @@ packages:
         - el7-base
   hosts:
     hello:
+      nightly_package_tito_releaser_args:
+        - "jenkins_job=hello-master-release"
       repoclosure_target_repos:
         rhel7:
           - el7-katello

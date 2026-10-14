@@ -17,7 +17,7 @@ import sys
 import pytest
 import yaml
 
-from obal.data.module_utils.rhpkg import build_info, inventory_tags, normalize_targets, ReleaseError
+from obal.data.module_utils.rhpkg import build_info, inventory_tags, normalize_targets, ReleaseError, RhpkgRelease
 
 
 DEVELOP = 'foreman-develop-rhel-9-candidate'
@@ -101,6 +101,7 @@ class BrewFixture:
 
     def manifest(self, packages, targets=None, koji_executable=None):
         variables = dict(build_package_build_system='koji',
+                         build_package_releaser='rhpkg',
                          rhpkg_targets=targets or [self.target],
                          diff_package_tags=[DEVELOP], diff_package_skip=False,
                          ansible_python_interpreter=sys.executable)
@@ -501,13 +502,14 @@ def test_tag_registration_checked_before_submission(brew, registered):
 
 
 @pytest.mark.parametrize('action', ['release', 'scratch'])
-def test_tito_selector_is_rejected(brew, action):
+def test_unknown_releaser_is_rejected(brew, action):
     package = 'nodejs-graphql'
     brew.add(package)
     brew.manifest([package])
-    output = brew.release(package, '-e', 'build_package_releaser=tito', action=action, success=False)
-    assert 'Tito releases are no longer supported' in output
-    assert not brew.read()['commands']
+    output = brew.release(package, '-e', 'build_package_releaser=unknown', action=action, success=False)
+    assert 'Select tito for legacy releases' in output
+    assert not brew.read()['tasks']
+    assert not any(command[0] == 'rhpkg' for command in brew.read()['commands'])
 
 
 def test_legacy_brew_inventory_requires_explicit_distgit_targets(brew):
@@ -542,21 +544,17 @@ def test_existing_build_is_not_tagged_without_destination_registration(brew, fai
     assert not any(command[0] == 'rhpkg' or command[1] == 'tag-build' for command in state['commands'])
 
 
-@pytest.mark.parametrize('legacy', [True, False])
 @pytest.mark.parametrize('registered', [True, False])
-def test_whitelist_module_supports_explicit_tags_and_legacy_config(brew, legacy, registered):
+def test_legacy_whitelist_module_reads_releaser_config(brew, registered):
     package = 'nodejs-graphql'
     directory = brew.add(package)
     state = brew.read()
     state['unregistered_tags'] = [] if registered else [SECONDARY]
     brew.write(state)
-    if legacy:
-        config = brew.root / 'releasers.conf'
-        config.write_text('[release]\nbranches={}\n[client]\nautobuild_tags={}\n'.format(DESTINATION, SECONDARY))
-        parameters = dict(releasers_conf=str(config), releasers=['release', 'client'],
-                          spec_file_path=str(directory / (package + '.spec')))
-    else:
-        parameters = dict(package=package, tags=[DESTINATION, SECONDARY])
+    config = brew.root / 'releasers.conf'
+    config.write_text('[release]\nbranches={}\n[client]\nautobuild_tags={}\n'.format(DESTINATION, SECONDARY))
+    parameters = dict(releasers_conf=str(config), releasers=['release', 'client'],
+                      spec_file_path=str(directory / (package + '.spec')))
     brew.whitelist(parameters, success=registered)
     commands = brew.read()['commands']
     assert ['brew', 'list-pkgs', '--tag', DESTINATION, '--package', package, '--quiet'] in commands
@@ -582,10 +580,115 @@ def test_koji_scratch_fetches_annex_bytes_without_registration_or_rhpkg(brew):
     state = brew.read()
     state['unregistered'] = True
     brew.write(state)
-    brew.release(package, '-e', 'build_package_koji_whitelist_check=true', action='scratch')
+    # Source preparation's broader non-web annex lookup belongs in a separate
+    # change. Exercise the rhpkg module's source retrieval directly here.
+    options = dict(directory=str(directory), spec_file=str(directory / (package + '.spec')),
+                   targets=[brew.target], koji_executable='brew', rhpkg_executable='rhpkg',
+                   receipt=str(brew.root / 'scratch.json'), scratch=True, tag_check=True,
+                   wait=True, download_logs=False, download_rpms=False, waitrepo=False,
+                   output_directory=str(brew.root))
+    result = RhpkgRelease(options).execute()
+    assert not result['errors']
     state = brew.read()
     task = next(iter(state['tasks'].values()))
     assert task['source_sha256'] == hashlib.sha256(payload).hexdigest()
     assert source.is_symlink() and source.read_bytes() == payload
     assert any(command[:4] == ['brew', 'build', '--scratch', '--nowait'] for command in state['commands'])
     assert not any(command[0] == 'rhpkg' or command[1] in ('list-pkgs', 'tag-build') for command in state['commands'])
+
+
+def test_rhpkg_targets_require_explicit_opt_in():
+    attributes = dict(rhpkg_targets=[{'invalid': 'unused until opted in'}],
+                      koji_tags=[dict(name=DEVELOP, dist='.el9')])
+    assert inventory_tags(attributes, 'package') == attributes['koji_tags']
+    with pytest.raises(ReleaseError, match='requires a nonempty'):
+        inventory_tags(dict(attributes, build_package_releaser='rhpkg'), 'package')
+
+
+def test_verify_tag_query_failure_returns_module_diagnostic(brew):
+    package = 'nodejs-graphql'
+    brew.add(package)
+    brew.manifest([package])
+    state = brew.read()
+    state['registration_error'] = True
+    brew.write(state)
+    output = brew.release('all', action='verify-koji-tag', success=False)
+    assert 'Authentication failed while querying package registration' in output
+    assert 'Traceback' not in output
+    assert not brew.read()['tasks']
+
+
+@pytest.mark.parametrize('action', ['release', 'scratch'])
+@pytest.mark.parametrize('query_error', [False, True])
+def test_target_query_failure_prevents_submission(brew, action, query_error):
+    package = 'nodejs-graphql'
+    brew.add(package)
+    brew.manifest([package])
+    state = brew.read()
+    if query_error:
+        state['target_query_error'] = True
+    else:
+        state['targets'] = {}
+    brew.write(state)
+    output = brew.release(package, action=action, success=False)
+    expected = 'Authentication failed while querying build targets' if query_error else 'Unknown build target'
+    assert expected in output
+    state = brew.read()
+    assert not state['tasks']
+    assert not any(command[0] == 'rhpkg' for command in state['commands'])
+
+
+@pytest.mark.parametrize('build_state', ['COMPLETE', 'BUILDING'])
+def test_concurrent_build_is_reused_after_hub_rejects_submission(brew, build_state):
+    package = 'nodejs-graphql'
+    brew.add(package)
+    brew.target['tags'].append(SECONDARY)
+    brew.manifest([package])
+    state = brew.read()
+    state['concurrent_build'] = build_state
+    brew.write(state)
+    brew.release(package)
+    state = brew.read()
+    assert len(state['tasks']) == int(build_state == 'BUILDING')
+    assert set(state['builds'][package + '-15.10.3-1.el9']['tags']) == {DESTINATION, SECONDARY}
+    assert sum(command[0] == 'rhpkg' and 'build' in command for command in state['commands']) == 1
+
+
+@pytest.mark.parametrize('task_state', ['canceled', 'failed'])
+@pytest.mark.parametrize('change_source', [False, True])
+def test_terminal_scratch_task_allows_new_submission(brew, task_state, change_source):
+    package = 'nodejs-graphql'
+    directory = brew.add(package)
+    brew.manifest([package])
+    brew.release(package, '-e', 'build_package_wait=false', action='scratch')
+    state = brew.read()
+    old_task = next(iter(state['tasks']))
+    state['tasks'][old_task]['state'] = task_state
+    brew.write(state)
+    if change_source:
+        (directory / 'payload.txt').write_text('new input after terminal task\n')
+    brew.release(package, action='scratch')
+    state = brew.read()
+    assert len(state['tasks']) == 2
+    assert ['brew', 'watch-task', old_task] not in state['commands']
+    new_task = next(task for task in state['tasks'] if task != old_task)
+    assert state['tasks'][new_task]['state'] == 'closed'
+    receipt = json.loads((brew.repository / '.tmp/rhpkg/nodejs-graphql-scratch.json').read_text())
+    assert receipt['targets']['rhel9']['tasks'] == [new_task]
+    assert receipt['targets']['rhel9']['state'] == 'COMPLETE'
+
+
+def test_scratch_task_query_failure_preserves_receipt(brew):
+    package = 'nodejs-graphql'
+    brew.add(package)
+    brew.manifest([package])
+    brew.release(package, '-e', 'build_package_wait=false', action='scratch')
+    receipt = brew.repository / '.tmp/rhpkg/nodejs-graphql-scratch.json'
+    original = receipt.read_bytes()
+    state = brew.read()
+    state['task_query_error'] = True
+    brew.write(state)
+    output = brew.release(package, action='scratch', success=False)
+    assert 'Authentication failed while querying task' in output
+    assert receipt.read_bytes() == original
+    assert len(brew.read()['tasks']) == 1

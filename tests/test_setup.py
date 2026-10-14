@@ -1,4 +1,4 @@
-"""Verify setup follows package inventory rather than localhost defaults."""
+"""Verify setup preserves legacy dependencies during the rhpkg opt-in rollout."""
 
 import json
 import os
@@ -10,14 +10,15 @@ import pytest
 import yaml
 
 
-@pytest.mark.parametrize('variables,rhpkg_required', [
-    (None, False),
-    ({'build_package_build_system': 'copr'}, False),
-    ({'build_package_build_system': 'koji', 'build_package_use_koji_build': True}, False),
-    ({'build_package_build_system': 'koji', 'build_package_releaser': 'koji'}, False),
-    ({'build_package_build_system': 'koji', 'build_package_koji_command': 'brew'}, True),
+@pytest.mark.parametrize('variables', [
+    None,
+    {'build_package_build_system': 'copr'},
+    {'build_package_build_system': 'koji', 'build_package_use_koji_build': True},
+    {'build_package_build_system': 'koji', 'build_package_releaser': 'koji'},
+    {'build_package_build_system': 'koji', 'build_package_koji_command': 'brew'},
+    {'build_package_build_system': 'koji', 'build_package_releaser': 'rhpkg'},
 ])
-def test_setup_installs_only_the_required_releaser(tmp_path, variables, rhpkg_required):
+def test_setup_preserves_legacy_dependencies_without_installing_rhpkg(tmp_path, variables):
     root = Path(__file__).resolve().parent.parent
     if variables is not None:
         manifest = {'packages': {'vars': variables, 'hosts': {'package': {}}}}
@@ -32,5 +33,5 @@ def test_setup_installs_only_the_required_releaser(tmp_path, variables, rhpkg_re
     packages = {name for line in log.read_text().splitlines() for name in json.loads(line)}
     assert 'git' in packages
     assert packages & {'git-annex', 'git-annex-standalone'}
-    assert 'tito' not in packages
-    assert ('rhpkg' in packages) == rhpkg_required
+    assert 'tito' in packages
+    assert 'rhpkg' not in packages

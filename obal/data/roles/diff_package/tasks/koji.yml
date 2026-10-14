@@ -11,11 +11,11 @@
   loop_control:
     loop_var: tag
   when:
-    - build_package_build_system | default('koji') != 'koji' or build_package_releaser == 'koji'
+    - build_package_build_system | default('koji') != 'koji' or build_package_releaser != 'rhpkg'
     - diff_package_tags is undefined
 
 - name: Compare legacy Koji tags
   include_tasks: koji_old.yml
   when:
-    - build_package_build_system | default('koji') != 'koji' or build_package_releaser == 'koji'
+    - build_package_build_system | default('koji') != 'koji' or build_package_releaser != 'rhpkg'
     - diff_package_tags is defined

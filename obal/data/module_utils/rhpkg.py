@@ -10,8 +10,6 @@ import subprocess
 import tempfile
 from urllib.parse import urlsplit
 
-from ansible.module_utils.parsing.convert_bool import boolean
-
 try:
     from ansible.module_utils.obal import specfile_macro_lookup
     from ansible.module_utils.koji_wrapper import package_whitelisted, KojiCommandError
@@ -66,9 +64,7 @@ def normalize_targets(targets, package):
 
 def uses_rhpkg(attributes):
     """Recognize configured dist-git targets outside build role defaults."""
-    direct = boolean(attributes.get('build_package_use_koji_build', False))
-    default = 'rhpkg' if attributes.get('rhpkg_targets') and not direct else 'koji'
-    return attributes.get('build_package_releaser', default) == 'rhpkg'
+    return attributes.get('build_package_releaser') == 'rhpkg'
 
 
 def inventory_tags(attributes, package):
@@ -224,7 +220,13 @@ class RhpkgRelease:  # pylint: disable=too-many-instance-attributes
         if self.options.get('check_mode'):
             item['changed'] = self.changed = True
             return
-        output = run([self.brew, 'list-targets', '--quiet', '--name', target['build_target']]).stdout
+        result = run([self.brew, 'list-targets', '--quiet', '--name', target['build_target']], check=False)
+        if result.returncode:
+            missing_target = 'error: No such build target: {}'.format(target['build_target'])
+            if result.returncode == 2 and missing_target in result.stdout:
+                raise ReleaseError('Unknown build target {}'.format(target['build_target']))
+            raise ReleaseError('Unable to query build target {}: {}'.format(target['build_target'], result.stdout))
+        output = result.stdout
         if not any(line.split() and line.split()[0] == target['build_target'] for line in output.splitlines()):
             raise ReleaseError('Unknown build target {}'.format(target['build_target']))
         self.check_registration(item, target['tags'])
@@ -251,6 +253,17 @@ class RhpkgRelease:  # pylint: disable=too-many-instance-attributes
         previous = self.previous.get(item['target']['name'], {})
         if not previous.get('tasks') or previous.get('state') == 'COMPLETE':
             return False
+        if self.options['scratch']:
+            states = []
+            for task in previous['tasks']:
+                output = run([self.brew, 'taskinfo', task]).stdout
+                state = re.search(r'^State:\s*(free|open|assigned|closed|canceled|failed)\s*$', output, re.MULTILINE)
+                if not state:
+                    raise ReleaseError('Unrecognized taskinfo response for {}: {}'.format(task, output))
+                states.append(state.group(1))
+            if all(state in ('closed', 'canceled', 'failed') for state in states) and any(
+                    state in ('canceled', 'failed') for state in states):
+                return False
         if previous['nvr'] != item['nvr'] or previous['target'] != item['target']:
             # Scratch tasks do not reserve NVRs, so buildinfo cannot establish
             # whether an earlier scratch task has finished.
@@ -320,16 +333,21 @@ class RhpkgRelease:  # pylint: disable=too-many-instance-attributes
                        '--target', target['build_target']]
             self.commit(checkout, files, item)
             item['source_sha'] = run(['git', 'rev-parse', 'HEAD'], checkout).stdout.strip()
+            # Obal queries the NVR with the target's dist and custom macros.
+            # rhpkg's local macro context can differ from that build context.
             command.append('--skip-nvr-check')
             result = run(command, checkout, check=False)
             if result.returncode:
                 # A concurrent release can win the NVR race after our initial query.
-                if 'already been built' in result.stdout:
-                    info = build_info(self.brew, item['nvr'])
-                    if info['state'] == 'COMPLETE':
-                        item['source_sha'] = None
-                        item['state'] = 'COMPLETE'
-                        return
+                info = build_info(self.brew, item['nvr'])
+                if info['state'] == 'COMPLETE':
+                    item['source_sha'] = None
+                    item['state'] = 'COMPLETE'
+                    return
+                if info['state'] == 'BUILDING' and info['task']:
+                    item['source_sha'] = None
+                    item['tasks'] = [info['task']]
+                    return
                 raise ReleaseError('rhpkg build failed: {}'.format(result.stdout))
             self.record_submission(item, result.stdout)
 
