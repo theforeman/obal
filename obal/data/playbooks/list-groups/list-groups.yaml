@@ -1,0 +1,5 @@
+---
+- name: List available inventory groups
+  hosts: localhost
+  gather_facts: false
+  tasks: []
