@@ -34,7 +34,7 @@ jobs:
           sudo curl --create-dirs -o /usr/local/bin/rpmdev-bumpspec https://codeberg.org/rpm-community/rpmdevtools/raw/commit/30eca1b7a06a2df5bbfa3bfd6a4c89c19c6ebd60/rpmdev-bumpspec
           sudo curl --create-dirs -o /usr/local/bin/rpmdev-packager https://codeberg.org/rpm-community/rpmdevtools/raw/branch/main/rpmdev-packager
           sudo chmod +x /usr/local/bin/spectool /usr/local/bin/rpmdev-bumpspec /usr/local/bin/rpmdev-packager
-          sudo apt-get update && sudo apt-get install -y git-annex rpm
+          sudo apt-get update && sudo apt-get install -y git-annex rpm cpio
       - name: Run tests
         run: tox
 

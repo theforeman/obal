@@ -1,7 +1,7 @@
 """
 A koji wrapper
 """
-from subprocess import check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError, STDOUT
 
 class KojiCommandError(Exception):
     """Raised when Koji command fails"""
@@ -18,6 +18,18 @@ def koji(command, executable=None):
         executable = 'koji'
 
     try:
-        return check_output([executable] + command, universal_newlines=True)
+        return check_output([executable] + command, universal_newlines=True, stderr=STDOUT)
     except CalledProcessError as error:
         raise KojiCommandError(error.output, error.cmd)
+
+
+def package_whitelisted(executable, tag, package):
+    """Check effective tag registration, excluding blocked packages."""
+    try:
+        output = koji(['list-pkgs', '--tag', tag, '--package', package, '--quiet'], executable)
+    except KojiCommandError as error:
+        if error.message.strip() == '(no matching packages)':
+            return False
+        raise
+    return any(line.split() and line.split()[0] == package and '[BLOCKED]' not in line
+               for line in output.splitlines())

@@ -4,6 +4,7 @@ Find all defined Koji tags in inventory
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.rhpkg import inventory_tags, ReleaseError  # pylint:disable=import-error,no-name-in-module
 
 def main():
     """
@@ -19,9 +20,11 @@ def main():
 
     tags = set()
 
-    for attributes in packages.values():
-        if 'koji_tags' in attributes:
-            tags.update(tag['name'] for tag in attributes['koji_tags'])
+    try:
+        for package, attributes in packages.items():
+            tags.update(tag['name'] for tag in inventory_tags(attributes, package))
+    except ReleaseError as error:
+        module.fail_json(msg=str(error))
 
     module.exit_json(changed=False, tags=sorted(tags))
 
