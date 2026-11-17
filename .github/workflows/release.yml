@@ -8,8 +8,11 @@ on:
 jobs:
   release:
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'theforeman' }}
+
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/checkout@v7
@@ -23,6 +26,3 @@ jobs:
         run: python setup.py sdist bdist_wheel
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.3
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
