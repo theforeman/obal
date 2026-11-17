@@ -1,0 +1,20 @@
+---
+- name: Inspect rhpkg release destinations
+  rhpkg_release:
+    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    spec_file: "{{ spec_file_path }}"
+    targets: "{{ rhpkg_targets }}"
+    koji_tags: "{{ koji_tags }}"
+    koji_executable: "{{ build_package_koji_command | default(diff_package_koji_command) }}"
+    receipt: "{{ inventory_dir }}/.tmp/rhpkg/{{ inventory_hostname }}.json"
+    output_directory: "{{ inventory_dir }}"
+  check_mode: true
+  register: diff_package_rhpkg
+
+- name: Record missing rhpkg builds or tags
+  set_fact:
+    diff_package_changed: "{{ diff_package_rhpkg.changed }}"
+
+- name: Report rhpkg release differences
+  debug:
+    var: diff_package_rhpkg

@@ -1,6 +1,18 @@
 ---
+- name: Validate Koji releaser selection
+  assert:
+    that:
+      - build_package_releaser in ['tito', 'koji', 'rhpkg']
+      - not (build_package_releaser != 'koji' and build_package_use_koji_build | bool)
+      - build_package_releaser != 'koji' or koji_tags | length > 0
+    fail_msg: Select tito for legacy releases, rhpkg with explicit rhpkg_targets, or koji for direct SRPM builds
+
+- name: Release with rhpkg
+  include_tasks: rhpkg_release.yml
+  when: build_package_releaser == 'rhpkg'
+
 - name: 'Use tito to build package'
-  when: not build_package_use_koji_build | bool
+  when: build_package_releaser == 'tito'
   block:
     - name: Scratch build with koji_build
       when:
@@ -16,7 +28,7 @@
       include_tasks: tito_release.yml
 
 - name: Build package with Koji
-  when: build_package_use_koji_build | bool
+  when: build_package_releaser == 'koji'
   block:
     - name: Build package for Koji tag
       include_tasks: koji_build.yml

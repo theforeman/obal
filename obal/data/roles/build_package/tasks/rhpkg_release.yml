@@ -1,0 +1,30 @@
+---
+- name: Validate rhpkg source configuration
+  assert:
+    that:
+      - not build_package_test | bool
+      - setup_sources_git is not defined
+      - source_location is not defined
+    fail_msg: The rhpkg releaser requires package spec sources; Tito test and custom source builders are unsupported
+
+- name: Release and tag packages through rhpkg
+  rhpkg_release:
+    directory: "{{ inventory_dir }}/{{ package_base_dir }}/{{ inventory_hostname }}"
+    spec_file: "{{ spec_file_path }}"
+    targets: "{{ rhpkg_targets }}"
+    koji_tags: "{{ koji_tags }}"
+    koji_executable: "{{ build_package_koji_command }}"
+    rhpkg_executable: "{{ build_package_rhpkg_command }}"
+    receipt: "{{ obal_tmp_dir }}/rhpkg/{{ inventory_hostname }}{{ '-scratch' if build_package_scratch else '' }}.json"
+    output_directory: "{{ inventory_dir }}"
+    scratch: "{{ build_package_scratch }}"
+    wait: "{{ build_package_wait }}"
+    waitrepo: "{{ build_package_waitrepo }}"
+    tag_check: "{{ build_package_koji_whitelist_check }}"
+    download_logs: "{{ build_package_download_logs }}"
+    download_rpms: "{{ build_package_download_rpms }}"
+  register: build_package_rhpkg_release
+
+- name: Report rhpkg release results
+  debug:
+    var: build_package_rhpkg_release
